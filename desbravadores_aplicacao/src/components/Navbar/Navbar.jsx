@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./Navbar.module.css";
 
 function Navbar() {
@@ -17,9 +18,9 @@ function Navbar() {
 
       <div className={styles.menu}>
 
-        <a href="/unidades">
+        <Link to="/unidades">
           ▦ Unidades
-        </a>
+        </Link>
 
         <a href="/tarefas">
           ☑ Tarefas
@@ -29,9 +30,9 @@ function Navbar() {
           ▤ Evidências
         </a>
 
-        <a href="/cadernos">
+        <Link to="/cadernos">
           ♧ Cadernos
-        </a>
+        </Link>
 
         <a href="/convites">
           ✉ Convites

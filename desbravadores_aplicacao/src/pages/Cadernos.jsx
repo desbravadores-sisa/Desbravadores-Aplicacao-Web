@@ -1,4 +1,4 @@
-import NotebookCard from "../../components/NotebookCard/NotebookCard";
+import NotebookCard from "../components/NotebookCard/NotebookCard";
 
 function Cadernos() {
 

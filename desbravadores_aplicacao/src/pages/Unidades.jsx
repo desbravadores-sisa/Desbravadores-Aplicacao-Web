@@ -1,4 +1,4 @@
-import UnitCard from "../../components/UnitCard/UnitCard";
+import UnitCard from "../components/UnitCard/UnitCard";
 
 function Unidades() {
 
