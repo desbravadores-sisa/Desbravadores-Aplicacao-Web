@@ -109,8 +109,17 @@
   border-radius: 20px;
 
   background: #eff6ff;
-
   color: #155eef;
+}
+
+.statusCompleted {
+  background: #e7fbf2;
+  color: #07875f;
+}
+
+.statusClosed {
+  background: #eef2f6;
+  color: #64748b;
 }
 
 

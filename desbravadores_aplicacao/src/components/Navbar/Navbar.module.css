@@ -1,14 +1,15 @@
 .navbar {
-  height: 44px;
-  background: white;
+  height: 52px;
+  background: #fff;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 22px;
+  padding: 0 28px;
 
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #dfe4ea;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
 
   box-sizing: border-box;
 }
@@ -19,24 +20,29 @@
 .logoArea {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
+  flex-shrink: 0;
 }
 
 .logo {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   border-radius: 50%;
-  background: #f3f4f6;
+  background: #f8fafc;
+  border: 1px solid #d9e0e8;
+  font-size: 18px;
 }
 
 .title {
-  font-size: 13px;
+  color: #1f2937;
+  font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 
@@ -45,18 +51,25 @@
 .menu {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .menu a {
+  box-sizing: border-box;
   text-decoration: none;
-  color: #374151;
+  color: #475569;
 
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
 
-  padding: 7px 11px;
+  padding: 8px 12px;
 
-  border-radius: 10px;
+  border: 2px solid transparent;
+  border-radius: 11px;
+  white-space: nowrap;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .menu a:hover {
@@ -64,9 +77,10 @@
 }
 
 .menu a.active {
-  background: #ff6508;
-  color: white;
-  box-shadow: 0 4px 10px rgba(255, 101, 8, 0.2);
+  background: #f45b05;
+  border-color: #111827;
+  color: #fff;
+  box-shadow: 0 3px 7px rgba(15, 23, 42, 0.14);
 }
 
 
@@ -75,20 +89,23 @@
 .profile {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
+  flex-shrink: 0;
 }
 
 .notification {
-  margin-right: 12px;
+  margin-right: 10px;
+  color: #475569;
+  font-size: 17px;
 }
 
 .avatar {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
 
   border-radius: 50%;
 
-  background: #ec5800;
+  background: #e95b0c;
   color: white;
 
   display: flex;
@@ -100,11 +117,43 @@
 
 .profile strong {
   display: block;
+  color: #1f2937;
   font-size: 12px;
 }
 
 .profile small {
   display: block;
-  font-size: 11px;
+  font-size: 10px;
   color: #6b7280;
+}
+
+@media (max-width: 900px) {
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .menu {
+    padding: 0 8px;
+  }
+
+  .menu a {
+    padding-inline: 8px;
+  }
+
+  .profile > div:not(.avatar),
+  .profile > span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .title,
+  .menu a:not(.active) {
+    display: none;
+  }
+
+  .menu {
+    margin-left: auto;
+    padding: 0;
+  }
 }

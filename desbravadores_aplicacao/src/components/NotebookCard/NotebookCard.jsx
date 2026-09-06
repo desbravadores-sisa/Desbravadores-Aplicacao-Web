@@ -66,7 +66,13 @@ function NotebookCard({
           <p>Término: {endDate}</p>
         </div>
 
-        <span className={styles.status}>
+        <span className={`${styles.status} ${
+          status === "Ativo"
+            ? styles.statusActive
+            : status === "Concluído antecipadamente"
+              ? styles.statusCompleted
+              : styles.statusClosed
+        }`}>
           ● {status}
         </span>
 
