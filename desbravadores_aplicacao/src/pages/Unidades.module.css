@@ -7,45 +7,6 @@
   text-align: left;
 }
 
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 25px;
-}
-
-.heading h1 {
-  margin: 0 0 3px;
-  color: #111827;
-  font-size: 26px;
-  line-height: 1.25;
-  letter-spacing: 0;
-  font-weight: 700;
-}
-
-.heading p {
-  color: #64748b;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.addButton {
-  border: 0;
-  border-radius: 12px;
-  padding: 11px 18px;
-  background: #ff6508;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  box-shadow: 0 5px 12px rgba(255, 101, 8, 0.2);
-  cursor: pointer;
-}
-
-.addButton:hover {
-  background: #e95700;
-}
 
 .grid {
   display: grid;

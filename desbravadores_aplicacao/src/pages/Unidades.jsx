@@ -1,21 +1,18 @@
 import UnitCard from "../components/UnitCard/UnitCard";
+import SectionHeader from "../components/SectionHeader/SectionHeader";
 import styles from "./Unidades.module.css";
 
 function Unidades() {
   return (
-    <main className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.heading}>
-          <h1>Unidades</h1>
-          <p>Gerencie as unidades do clube e acompanhe o desempenho</p>
-        </div>
-        <button type="button" className={styles.addButton}>
-          +&nbsp; Adicionar Unidade
-        </button>
-      </header>
+<main className={styles.page}>
+      <SectionHeader
+        title="Unidades"
+        subtitle="Gerencie as unidades do clube e acompanhe o desempenho"
+        buttonText="+ Adicionar Unidade"
+        onButtonClick={() => console.log("Adicionar Unidade clicado")}
+      />
 
       <div className={styles.grid}>
-
         <UnitCard
           name="Tigresas"
           leader="Carlos Silva"
@@ -25,7 +22,6 @@ function Unidades() {
           totalTasks={15}
           completionRate={80}
         />
-
 
         <UnitCard
           name="Leões"
@@ -37,7 +33,6 @@ function Unidades() {
           completionRate={67}
         />
 
-
         <UnitCard
           name="Onças"
           leader="Maria Oliveira"
@@ -48,7 +43,6 @@ function Unidades() {
           completionRate={60}
         />
 
-
         <UnitCard
           name="Panteras"
           leader="João Almeida"
@@ -58,7 +52,6 @@ function Unidades() {
           totalTasks={15}
           completionRate={53}
         />
-
       </div>
     </main>
   );

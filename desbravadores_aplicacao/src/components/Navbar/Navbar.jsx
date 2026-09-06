@@ -7,57 +7,44 @@ function Navbar() {
 
       <div className={styles.logoArea}>
         <div className={styles.logo}>
-          🏕️
+          <i className='bx bx-landscape'></i>
         </div>
-
-        <span className={styles.title}>
-          Tigre da Montanha
-        </span>
+        <span className={styles.title}>Tigre da Montanha</span>
       </div>
 
-
       <div className={styles.menu}>
-
         <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades">
-          ▦ Unidades
+          <i className='bx bx-group'></i> Unidades
         </NavLink>
 
         <a href="/tarefas">
-          ☑ Tarefas
+          <i className='bx bx-check-square'></i> Tarefas
         </a>
 
         <a href="/evidencias">
-          ▤ Evidências
+          <i className='bx bx-list-check'></i> Evidências
         </a>
 
         <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos">
-          ♧ Cadernos
+          <i className='bx bx-book'></i> Cadernos
         </NavLink>
 
         <a href="/convites">
-          ✉ Convites
+          <i className='bx bx-envelope'></i> Convites
         </a>
-
       </div>
 
-
       <div className={styles.profile}>
+        <i className='bx bx-bell'></i>
 
-        <span className={styles.notification}>
-          ♧
-        </span>
-
-        <div className={styles.avatar}>
-          A
-        </div>
+        <div className={styles.avatar}>A</div>
 
         <div>
           <strong>Ana Santos</strong>
           <small>Diretoria</small>
         </div>
 
-        <span>⌄</span>
-
+        <i className='bx bx-chevron-down'></i>
       </div>
 
     </nav>

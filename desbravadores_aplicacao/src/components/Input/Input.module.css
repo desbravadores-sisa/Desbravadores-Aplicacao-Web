@@ -1,47 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-:root {
-  --font-display: 'Rajdhani', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-}
-
 .formGroup {
-  margin-bottom: 15px;
+  margin-bottom: var(--spacing-md);
   font-family: var(--font-body);
 }
 
 .label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: var(--spacing-xs);
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
   font-family: var(--font-display);
   letter-spacing: 0.02em;
+  font-size: var(--font-size-sm);
 }
 
 .input {
-  width: 100%;             
-  box-sizing: border-box;  
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   transition: border 0.2s;
   font-family: var(--font-body);
+  font-size: var(--font-size-sm);
 }
 
 .input:focus {
-  border-color: #E58329;
+  border-color: var(--color-primary);
   outline: none;
 }
 
 .inputError {
-  border: 1px solid red;
+  border: 1px solid var(--color-destructive, red);
 }
 
 .errorMessage {
-  color: red;
-  font-size: 12px;
-  margin-top: 4px;
+  color: var(--color-destructive, red);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
   font-weight: 400;
   font-family: var(--font-body);
 }

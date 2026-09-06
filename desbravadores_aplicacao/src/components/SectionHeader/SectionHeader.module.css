@@ -1,0 +1,39 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.heading h1 {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--color-text);
+}
+
+.heading p {
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+  margin: var(--spacing-xs) 0 0;
+  font-family: var(--font-body);
+}
+
+.addButton {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-md);
+  padding:   var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  font-family: var(--font-body);
+}
+
+.addButton:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+}

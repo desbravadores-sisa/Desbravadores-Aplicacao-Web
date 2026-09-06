@@ -1,14 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-:root {
-  --font-display: 'Rajdhani', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-}
 
 .container {
-  max-width: 420px;       
-  margin: 60px auto;      
-  padding: 0 20px;       
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 0 20px;
   text-align: center;
   font-family: var(--font-body);
 }
@@ -17,49 +11,111 @@
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #E58329;
+  color: var(--color-primary);
+  font-size: var(--font-size-xl);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 400;
+}
+
+.form {
+  background: var(--color-bg);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-family: var(--font-body);
+}
+
+.formTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text);
+}
+
+.formSubtitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+  margin-bottom: var(--spacing-md);
+}
+
+.button {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  margin-top: var(--spacing-sm);
+  font-weight: 700;
+  font-family: var(--font-display);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.button:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+}
+
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-primary);
   font-size: 28px;
   margin: 0;
 }
 
 .subtitle {
   font-family: var(--font-body);
-  color: gray;
+  color: var(--color-muted);
   font-size: 14px;
   margin-bottom: 25px;
   font-weight: 400;
 }
 
 .form {
-  background: #fff;
+  background: var(--color-bg);
   padding: 25px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   text-align: left;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   font-family: var(--font-body);
 }
 
-
 .formTitle {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 20px;
   margin-bottom: 5px;
-  color: #333;
+  color: var(--color-text);
 }
 
 .formSubtitle {
   font-family: var(--font-body);
   font-size: 13px;
-  color: #666;
+  color: var(--color-muted);
   margin-bottom: 20px;
 }
 
 .button {
   width: 100%;
   padding: 12px;
-  background-color: #E58329;
+  background-color: var(--color-primary);
   color: white;
   border: none;
   border-radius: 4px;
