@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./AuthForm.module.css";
-import Input from "./Input";
+import Input from "../Input/Input";
 
 function AuthForm({ type }) {
   const [email, setEmail] = useState("");

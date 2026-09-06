@@ -1,0 +1,104 @@
+.navbar {
+  height: 64px;
+  background: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 24px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  box-sizing: border-box;
+}
+
+
+/* LOGO */
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: #f3f4f6;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+
+/* MENU */
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #374151;
+
+  font-size: 14px;
+
+  padding: 10px 12px;
+
+  border-radius: 10px;
+}
+
+.menu a:hover {
+  background: #f5f5f5;
+}
+
+
+/* PERFIL */
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification {
+  margin-right: 12px;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: #ec5800;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+}
+
+.profile strong {
+  display: block;
+  font-size: 13px;
+}
+
+.profile small {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+}
