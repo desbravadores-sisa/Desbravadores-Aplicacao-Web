@@ -1,13 +1,20 @@
 import UnitCard from "../components/UnitCard/UnitCard";
+import styles from "./Unidades.module.css";
 
 function Unidades() {
-
   return (
-    <div>
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <div className={styles.heading}>
+          <h1>Unidades</h1>
+          <p>Gerencie as unidades do clube e acompanhe o desempenho</p>
+        </div>
+        <button type="button" className={styles.addButton}>
+          +&nbsp; Adicionar Unidade
+        </button>
+      </header>
 
-      <h1>Unidades</h1>
-
-      <div>
+      <div className={styles.grid}>
 
         <UnitCard
           name="Tigresas"
@@ -53,8 +60,7 @@ function Unidades() {
         />
 
       </div>
-
-    </div>
+    </main>
   );
 }
 

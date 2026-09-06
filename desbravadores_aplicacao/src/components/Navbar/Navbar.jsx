@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import styles from "./Navbar.module.css";
 
 function Navbar() {
@@ -18,9 +18,9 @@ function Navbar() {
 
       <div className={styles.menu}>
 
-        <Link to="/unidades">
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades">
           ▦ Unidades
-        </Link>
+        </NavLink>
 
         <a href="/tarefas">
           ☑ Tarefas
@@ -30,9 +30,9 @@ function Navbar() {
           ▤ Evidências
         </a>
 
-        <Link to="/cadernos">
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos">
           ♧ Cadernos
-        </Link>
+        </NavLink>
 
         <a href="/convites">
           ✉ Convites

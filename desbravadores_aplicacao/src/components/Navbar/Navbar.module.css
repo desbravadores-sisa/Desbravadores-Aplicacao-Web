@@ -1,12 +1,12 @@
 .navbar {
-  height: 64px;
+  height: 44px;
   background: white;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 24px;
+  padding: 0 22px;
 
   border-bottom: 1px solid #e5e7eb;
 
@@ -23,8 +23,8 @@
 }
 
 .logo {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
 
   display: flex;
   align-items: center;
@@ -35,7 +35,7 @@
 }
 
 .title {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -45,22 +45,28 @@
 .menu {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 5px;
 }
 
 .menu a {
   text-decoration: none;
   color: #374151;
 
-  font-size: 14px;
+  font-size: 12px;
 
-  padding: 10px 12px;
+  padding: 7px 11px;
 
   border-radius: 10px;
 }
 
 .menu a:hover {
   background: #f5f5f5;
+}
+
+.menu a.active {
+  background: #ff6508;
+  color: white;
+  box-shadow: 0 4px 10px rgba(255, 101, 8, 0.2);
 }
 
 
@@ -77,8 +83,8 @@
 }
 
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
 
   border-radius: 50%;
 
@@ -94,7 +100,7 @@
 
 .profile strong {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .profile small {
