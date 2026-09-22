@@ -1,4 +1,6 @@
 import { useState } from "react";
+import EvidenceNotebookCard from "../components/EvidenceNotebookCard/EvidenceNotebookCard";
+import EvidenceNotebookModal from "../components/EvidenceNotebookModal/EvidenceNotebookModal";
 import styles from "./Evidencias.module.css";
 
 const initialEvidences = [
@@ -28,12 +30,45 @@ const initialEvidences = [
   }
 ];
 
+const initialNotebooks = [
+  {
+    id: 1,
+    title: "Caderno Pioneiro - Bloco de Sobrevivência",
+    unit: "Onças",
+    leader: "Maria Oliveira",
+    points: 60,
+    description: '"Carlos Eduardo e Fernanda concluíram todos os requisitos do bloco. Destaque para o acampamento liderado."',
+    completedAt: "18/07/2026, 06:30"
+  },
+  {
+    id: 2,
+    title: "Caderno Companheiro - Ciclo Completo",
+    unit: "Leões",
+    leader: "Pedro Costa",
+    points: 45,
+    description: '"Lucas Almeida concluiu todos os 7 requisitos do caderno Companheiro. Destaque para o projeto ambiental de plantio de mudas."',
+    completedAt: "01/07/2026, 11:00"
+  },
+  {
+    id: 3,
+    title: "Caderno Pesquisador - Concluído antecipadamente",
+    unit: "Tigresas",
+    leader: "Carlos Silva",
+    points: 60,
+    description: '"Helena Lima e Beatriz Santos concluíram o Caderno Pesquisador antes do prazo. Helena com destaque na caminhada de orientação por bússola."',
+    completedAt: "20/07/2026, 08:00"
+  }
+];
+
 function Evidencias() {
   const [evidences, setEvidences] = useState(initialEvidences);
+  const [notebooks, setNotebooks] = useState(initialNotebooks);
   const [activeTab, setActiveTab] = useState("activities");
   const [modal, setModal] = useState(null);
   const [points, setPoints] = useState(300);
   const [comment, setComment] = useState("");
+  const [recognition, setRecognition] = useState(null);
+  const [recognitionPoints, setRecognitionPoints] = useState(0);
 
   function openModal(type, evidence) {
     setModal({ type, evidence });
@@ -56,6 +91,21 @@ function Evidencias() {
   function requestCorrection(event) {
     event.preventDefault();
     closeModal();
+  }
+
+  function openRecognition(notebook) {
+    setRecognition(notebook);
+    setRecognitionPoints(notebook.points);
+  }
+
+  function recognizeNotebook(event) {
+    event.preventDefault();
+    setNotebooks((current) => current.filter((notebook) => notebook.id !== recognition.id));
+    setRecognition(null);
+  }
+
+  function dismissNotebook(id) {
+    setNotebooks((current) => current.filter((notebook) => notebook.id !== id));
   }
 
   return (
@@ -106,6 +156,14 @@ function Evidencias() {
             ))}
           </div>
         </article>
+      )) : notebooks.length > 0 ? notebooks.map((notebook) => (
+        <EvidenceNotebookCard
+          key={notebook.id}
+          notebook={notebook}
+          styles={styles}
+          onRecognize={openRecognition}
+          onDismiss={dismissNotebook}
+        />
       )) : (
         <div className={styles.emptyTab}>Nenhum reconhecimento de caderno pendente.</div>
       )}
@@ -140,6 +198,17 @@ function Evidencias() {
             <div className={styles.modalFooter}><button type="button" onClick={closeModal}>Cancelar</button><button className={styles.correctionButton} type="submit" disabled={!comment.trim()}><i className="bx bx-chevron-right" /> Enviar para correção</button></div>
           </form>
         </div>
+      )}
+
+      {recognition && (
+        <EvidenceNotebookModal
+          notebook={recognition}
+          points={recognitionPoints}
+          styles={styles}
+          onPointsChange={setRecognitionPoints}
+          onSubmit={recognizeNotebook}
+          onClose={() => setRecognition(null)}
+        />
       )}
     </main>
   );

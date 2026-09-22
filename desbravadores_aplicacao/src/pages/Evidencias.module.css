@@ -405,6 +405,119 @@
   cursor: not-allowed;
 }
 
+.notebookCard {
+  border-color: #eee0ff;
+}
+
+.notebookLabel,
+.notebookPoints {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.notebookLabel {
+  background: #f1e4ff;
+  color: #9638df;
+}
+
+.notebookPoints {
+  background: #f7edff;
+  color: #a447e7;
+}
+
+.notebookLabel i {
+  margin-right: 3px;
+}
+
+.recognizeButton {
+  background: #ae3ff0;
+}
+
+.dismissButton {
+  border: 1px solid #e3e8ee !important;
+  background: #fff !important;
+  color: #64748b !important;
+}
+
+.completedAt {
+  display: block;
+  margin-top: 10px;
+  color: #8290a0;
+  font-size: 10px;
+}
+
+.notebookModal {
+  width: min(408px, 100%);
+}
+
+.notebookModalEyebrow {
+  color: #9c2de6 !important;
+}
+
+.modalSubtitle {
+  display: block;
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.notebookInfoBox {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 13px;
+  border: 1px solid #ead8ff;
+  border-radius: 12px;
+  background: #faf2ff;
+  color: #8a36b5;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.notebookInfoBox i {
+  color: #8f32da;
+  font-size: 18px;
+}
+
+.notebookPointsInput {
+  display: flex;
+  align-items: center;
+  margin: 2px 0 2px;
+  padding: 0 12px;
+  border: 1px solid #dcb5ff;
+  border-radius: 13px;
+  background: #fcf8ff;
+}
+
+.notebookPointsInput:focus-within {
+  border-color: #ae3ff0;
+  box-shadow: 0 0 0 2px rgba(174, 63, 240, 0.12);
+}
+
+.notebookPointsInput input {
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #172033;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.notebookPointsInput span {
+  color: #9638df;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.modalFooter .recognizeButton {
+  background: #ae3ff0;
+  color: #fff;
+}
+
 @media (max-width: 700px) {
   .evidenceTop {
     flex-direction: column;
