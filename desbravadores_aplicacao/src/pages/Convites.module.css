@@ -1,0 +1,486 @@
+.page { min-height: calc(100vh - 52px); padding: 26px 24px 50px; background: #f8fafc; box-sizing: border-box; }
+.pageHeader, .columns, .invitesHeader, .userCard, .modalFooter, .linkRow { display: flex; }
+.pageHeader { justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+.page {
+	min-height: calc(100vh - 52px);
+	padding: 26px 24px 50px;
+	background: #f8fafc;
+	box-sizing: border-box;
+}
+
+.pageHeader,
+.columns,
+.invitesHeader,
+.userCard,
+.modalFooter,
+.linkRow {
+	display: flex;
+}
+
+.pageHeader {
+	align-items: flex-start;
+	justify-content: space-between;
+	margin-bottom: 28px;
+}
+
+.pageHeader h1 {
+	margin: 0 0 5px;
+	color: #111827;
+	font-size: 27px;
+	font-weight: 800;
+}
+
+.pageHeader p {
+	color: #64748b;
+	font-size: 13px;
+}
+
+.newButton,
+.generateButton {
+	border: 0;
+	border-radius: 12px;
+	background: #ff6508;
+	color: #fff;
+	font-weight: 700;
+	box-shadow: 0 6px 13px rgba(255, 101, 8, 0.22);
+}
+
+.newButton {
+	padding: 11px 17px;
+	font-size: 13px;
+}
+
+.columns {
+	align-items: flex-start;
+	gap: 25px;
+}
+
+.usersSection,
+.invitesSection {
+	flex: 1;
+	min-width: 0;
+}
+
+.sectionTitle,
+.invitesHeader {
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 14px;
+}
+
+.sectionTitle h2,
+.invitesHeader h2 {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	color: #111827;
+	font-size: 15px;
+}
+
+.sectionTitle h2 i,
+.invitesHeader h2 i {
+	color: #526070;
+	font-size: 17px;
+}
+
+.count {
+	padding: 4px 9px;
+	border-radius: 14px;
+	background: #d9fae9;
+	color: #15803d;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.userList {
+	display: grid;
+	gap: 11px;
+}
+
+.userCard {
+	align-items: center;
+	min-height: 64px;
+	padding: 10px 12px;
+	border: 1px solid #edf0f3;
+	border-radius: 12px;
+	background: #fff;
+	box-sizing: border-box;
+}
+
+.userCard:first-child {
+	border-color: #ffd6b8;
+	box-shadow: 0 2px 7px rgba(255, 101, 8, 0.08);
+}
+
+.avatar {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	flex: 0 0 auto;
+	margin-right: 10px;
+	border-radius: 50%;
+	background: #ff7b0b;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.userInfo {
+	min-width: 0;
+	flex: 1;
+}
+
+.userInfo strong,
+.userInfo span,
+.userRole small {
+	display: block;
+}
+
+.userInfo strong {
+	color: #111827;
+	font-size: 13px;
+}
+
+.userInfo span {
+	margin-top: 3px;
+	color: #8290a0;
+	font-size: 11px;
+}
+
+.userRole {
+	width: 118px;
+	text-align: right;
+}
+
+.userRole small {
+	margin-top: 4px;
+	color: #8290a0;
+	font-size: 10px;
+}
+
+.badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	padding: 4px 8px;
+	border-radius: 8px;
+	background: #dce9ff;
+	color: #2563eb;
+	font-size: 10px;
+	font-weight: 700;
+}
+
+.badge.director {
+	background: #f1ddff;
+	color: #8b21d1;
+}
+
+.deleteButton,
+.closeInvite,
+.modalHeader button {
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+
+.deleteButton {
+	margin-left: 9px;
+	color: #ff8b87;
+	font-size: 16px;
+}
+
+.tabs {
+	display: flex;
+	padding: 3px;
+	border: 1px solid #e4e8ed;
+	border-radius: 16px;
+	background: #fff;
+}
+
+.tabs button {
+	padding: 6px 10px;
+	border: 0;
+	border-radius: 13px;
+	background: transparent;
+	color: #64748b;
+	font-size: 10px;
+	cursor: pointer;
+}
+
+.tabs .tabActive {
+	background: #f1f4f7;
+	color: #1f2937;
+	font-weight: 700;
+}
+
+.inviteCard {
+	position: relative;
+	min-height: 92px;
+	padding: 15px 14px;
+	border: 1px solid #edf0f3;
+	border-radius: 12px;
+	background: #fff;
+	box-sizing: border-box;
+}
+
+.inviteCard > strong {
+	display: block;
+	color: #273449;
+	font-size: 12px;
+}
+
+.inviteCard > strong i {
+	color: #7d8a9a;
+}
+
+.inviteMeta {
+	display: inline-flex;
+	gap: 8px;
+	margin: 4px 0 10px 8px;
+	color: #64748b;
+	font-size: 10px;
+}
+
+.inviteMeta b {
+	padding: 3px 7px;
+	border-radius: 8px;
+	background: #dce9ff;
+	color: #2563eb;
+}
+
+.closeInvite {
+	position: absolute;
+	top: 10px;
+	right: 12px;
+	color: #ff7676;
+	font-size: 18px;
+}
+
+.linkRow {
+	align-items: center;
+	gap: 6px;
+	padding: 7px 9px;
+	border-radius: 9px;
+	background: #f8fafc;
+	color: #8290a0;
+	font-size: 10px;
+}
+
+.linkRow span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.linkRow button {
+	margin-left: auto;
+	padding: 5px 8px;
+	border: 0;
+	border-radius: 8px;
+	background: #fff0df;
+	color: #d56a17;
+	font-size: 10px;
+	font-weight: 700;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.emptyState {
+	color: #94a3b8;
+	font-size: 12px;
+}
+
+.modalBackdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 10;
+	display: grid;
+	place-items: center;
+	padding: 20px;
+	background: rgba(15, 23, 42, 0.52);
+}
+
+.modal {
+	width: min(380px, 100%);
+	overflow: hidden;
+	border-radius: 13px;
+	background: #fff;
+	box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+}
+
+.modalHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 18px;
+	border-bottom: 1px solid #e8edf2;
+}
+
+.modalHeader h2 {
+	color: #273449;
+	font-size: 17px;
+}
+
+.modalHeader button {
+	color: #334155;
+	font-size: 24px;
+	line-height: 1;
+}
+
+.modalBody {
+	display: grid;
+	gap: 8px;
+	padding: 19px 18px 14px;
+}
+
+.modalBody label {
+	margin-top: 1px;
+	color: #526070;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.modalBody input,
+.modalBody select {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #e1e7ed;
+	border-radius: 13px;
+	background: #f8fafc;
+	color: #334155;
+	font: inherit;
+	font-size: 12px;
+	outline: none;
+	box-sizing: border-box;
+}
+
+.modalBody input:focus,
+.modalBody select:focus {
+	border-color: #ff761e;
+	box-shadow: 0 0 0 2px rgba(255, 118, 30, 0.12);
+}
+
+.roleOptions {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 9px;
+}
+
+.roleOptions button {
+	min-height: 52px;
+	padding: 9px 10px;
+	border: 1px solid #e1e7ed;
+	border-radius: 12px;
+	background: #fff;
+	text-align: left;
+	cursor: pointer;
+}
+
+.roleOptions button.roleSelected {
+	border-color: #ff761e;
+	background: #fff8f2;
+}
+
+.roleOptions strong,
+.roleOptions small {
+	display: block;
+}
+
+.roleOptions strong {
+	color: #334155;
+	font-size: 11px;
+}
+
+.roleOptions small {
+	margin-top: 4px;
+	color: #7b8794;
+	font-size: 9px;
+}
+
+.howItWorks {
+	display: flex;
+	gap: 9px;
+	margin-top: 5px;
+	padding: 12px;
+	border: 1px solid #cfe2ff;
+	border-radius: 12px;
+	background: #eef6ff;
+	color: #2563eb;
+	font-size: 10px;
+}
+
+.howItWorks > i {
+	font-size: 18px;
+}
+
+.howItWorks strong,
+.howItWorks span {
+	display: block;
+}
+
+.howItWorks span {
+	margin-top: 3px;
+	line-height: 1.4;
+}
+
+.modalFooter {
+	gap: 9px;
+	padding: 0 18px 18px;
+}
+
+.modalFooter button {
+	flex: 1;
+	padding: 10px;
+	border: 0;
+	border-radius: 11px;
+	background: #f1f3f5;
+	color: #526070;
+	font-weight: 700;
+}
+
+.modalFooter .generateButton {
+	background: #ff6508;
+	color: #fff;
+}
+
+@media (max-width: 760px) {
+	.columns {
+		flex-direction: column;
+	}
+
+	.usersSection,
+	.invitesSection {
+		width: 100%;
+	}
+
+	.pageHeader {
+		gap: 16px;
+	}
+
+	.newButton {
+		white-space: nowrap;
+	}
+}
+
+@media (max-width: 500px) {
+	.page {
+		padding: 20px 16px 36px;
+	}
+
+	.pageHeader {
+		flex-direction: column;
+	}
+
+	.userRole {
+		width: auto;
+	}
+
+	.userInfo span {
+		max-width: 135px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}

@@ -4,6 +4,7 @@ import Cadernos from "./pages/Cadernos";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Unidades from "./pages/Unidades";
+import Convites from "./pages/Convites";
 
 function App() {
   return (
@@ -26,6 +27,15 @@ function App() {
             <>
               <Navbar />
               <Cadernos />
+            </>
+          }
+        />
+        <Route
+          path="/convites"
+          element={
+            <>
+              <Navbar />
+              <Convites />
             </>
           }
         />

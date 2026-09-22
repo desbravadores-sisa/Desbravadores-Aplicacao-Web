@@ -29,9 +29,9 @@ function Navbar() {
           <i className='bx bx-book'></i> Cadernos
         </NavLink>
 
-        <a href="/convites">
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites">
           <i className='bx bx-envelope'></i> Convites
-        </a>
+        </NavLink>
       </div>
 
       <div className={styles.profile}>
