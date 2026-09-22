@@ -21,9 +21,9 @@ function Navbar() {
           <i className='bx bx-check-square'></i> Tarefas
         </a>
 
-        <a href="/evidencias">
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias">
           <i className='bx bx-list-check'></i> Evidências
-        </a>
+        </NavLink>
 
         <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos">
           <i className='bx bx-book'></i> Cadernos
