@@ -5,7 +5,6 @@ function NotebookCard({
   name,
   age,
   linkedMembers,
-  requirements,
   startDate,
   endDate,
   status
@@ -43,13 +42,6 @@ function NotebookCard({
           <span>Vinculados</span>
           <strong>
             {linkedMembers} desbravadores
-          </strong>
-        </div>
-
-        <div>
-          <span>Requisitos</span>
-          <strong>
-            {requirements} por desbravador
           </strong>
         </div>
 

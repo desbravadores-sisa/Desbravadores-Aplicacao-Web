@@ -14,18 +14,10 @@
 
 .header {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   align-items: end;
   gap: 22px;
   margin-bottom: 20px;
-}
-
-.eyebrow {
-  margin: 0 0 2px;
-  color: #f15b18;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1.3px;
 }
 
 .heading h1 {
@@ -43,27 +35,17 @@
   line-height: 1.5;
 }
 
-.primaryButton,
-.secondaryButton {
+.primaryButton {
+  border: 0;
   border-radius: 12px;
   padding: 9px 15px;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
-}
-
-.primaryButton {
-  border: 0;
   background: #ff6508;
   color: #fff;
   box-shadow: 0 5px 12px rgba(255, 101, 8, 0.2);
-}
-
-.secondaryButton {
-  border: 1px solid #dfe7ef;
-  background: #fff;
-  color: #334155;
 }
 
 .tabs {
@@ -139,11 +121,6 @@
     grid-template-columns: 1fr auto;
   }
 
-  .secondaryButton {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
   .primaryButton {
     grid-column: 2;
     grid-row: 2;
@@ -166,8 +143,7 @@
     gap: 10px;
   }
 
-  .primaryButton,
-  .secondaryButton {
+  .primaryButton {
     align-self: flex-start;
   }
 

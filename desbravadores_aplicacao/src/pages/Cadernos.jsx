@@ -8,7 +8,8 @@ function Cadernos() {
       name: "Amigo",
       age: 10,
       linkedMembers: 2,
-      requirements: 6,
+      // Em outras palavras: o dado não precisa aparecer na tela inicial, mas ele deve permanecer no model para o futuro da página interna do caderno.
+      // requirements: 6,
       startDate: "10/02/2026",
       endDate: "10/02/2027",
       status: "Ativo"
@@ -19,7 +20,7 @@ function Cadernos() {
       name: "Companheiro",
       age: 11,
       linkedMembers: 4,
-      requirements: 7,
+      // requirements: 7,
       startDate: "10/02/2026",
       endDate: "10/02/2027",
       status: "Ativo"
@@ -30,7 +31,7 @@ function Cadernos() {
       name: "Pesquisador",
       age: 12,
       linkedMembers: 3,
-      requirements: 6,
+      // requirements: 6,
       startDate: "10/02/2026",
       endDate: "10/02/2027",
       status: "Concluído antecipadamente"
@@ -40,7 +41,7 @@ function Cadernos() {
       name: "Pioneiro",
       age: 13,
       linkedMembers: 3,
-      requirements: 6,
+      // requirements: 6,
       startDate: "15/02/2026",
       endDate: "15/02/2027",
       status: "Ativo"
@@ -50,7 +51,7 @@ function Cadernos() {
       name: "Excursionista",
       age: 14,
       linkedMembers: 2,
-      requirements: 5,
+      // requirements: 5,
       startDate: "18/02/2026",
       endDate: "18/02/2027",
       status: "Ativo"
@@ -60,7 +61,7 @@ function Cadernos() {
       name: "Guia",
       age: 15,
       linkedMembers: 3,
-      requirements: 6,
+      // requirements: 6,
       startDate: "10/02/2025",
       endDate: "10/02/2026",
       status: "Encerrado"
@@ -87,12 +88,10 @@ function Cadernos() {
       <div className={styles.content}>
         <header className={styles.header}>
           <div className={styles.heading}>
-            <p className={styles.eyebrow}>DESENVOLVIMENTO ANUAL</p>
             <h1>Cadernos</h1>
             <p>Gerencie ciclos, membros e requisitos de cada caderno.</p>
           </div>
           <button type="button" className={styles.primaryButton}>+&nbsp; Novo ciclo</button>
-          <button type="button" className={styles.secondaryButton}>▣&nbsp; Requisitos</button>
         </header>
 
         <div className={styles.tabs} role="tablist" aria-label="Visualização dos cadernos">
