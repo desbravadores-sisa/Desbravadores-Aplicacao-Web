@@ -17,9 +17,9 @@ function Navbar() {
           <i className='bx bx-group'></i> Unidades
         </NavLink>
 
-        <a href="/tarefas">
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/tarefas">
           <i className='bx bx-check-square'></i> Tarefas
-        </a>
+        </NavLink>
 
         <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias">
           <i className='bx bx-list-check'></i> Evidências

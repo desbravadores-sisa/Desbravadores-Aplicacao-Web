@@ -6,6 +6,7 @@ import RegisterPage from "./pages/RegisterPage";
 import Unidades from "./pages/Unidades";
 import Convites from "./pages/Convites";
 import Evidencias from "./pages/Evidencias";
+import Tarefas from "./pages/Tarefas";
 
 function App() {
   return (
@@ -46,6 +47,15 @@ function App() {
             <>
               <Navbar />
               <Evidencias />
+            </>
+          }
+        />
+        <Route
+          path="/tarefas"
+          element={
+            <>
+              <Navbar />
+              <Tarefas />
             </>
           }
         />
