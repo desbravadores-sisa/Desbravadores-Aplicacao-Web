@@ -1,0 +1,154 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.52);
+}
+
+.modal {
+  width: min(420px, 100%);
+  overflow: hidden;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 17px 22px;
+  border-bottom: 1px solid #e8edf2;
+}
+
+.header small {
+  color: #9c2de6;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.header h2 {
+  margin-top: 3px;
+  color: #172033;
+  font-size: 17px;
+}
+
+.header button {
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.body {
+  display: grid;
+  gap: 7px;
+  padding: 20px 22px 18px;
+}
+
+.subtitle {
+  display: block;
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.infoBox {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 13px;
+  border: 1px solid #ead8ff;
+  border-radius: 12px;
+  background: #faf2ff;
+  color: #8a36b5;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.infoBox i {
+  color: #8f32da;
+  font-size: 18px;
+}
+
+.label {
+  margin-top: 1px;
+  color: #172033;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.label b {
+  color: #f15b18;
+}
+
+.pointsInput {
+  display: flex;
+  align-items: center;
+  margin: 2px 0 2px;
+  padding: 0 12px;
+  border: 1px solid #dcb5ff;
+  border-radius: 13px;
+  background: #fcf8ff;
+}
+
+.pointsInput:focus-within {
+  border-color: #ae3ff0;
+  box-shadow: 0 0 0 2px rgba(174, 63, 240, 0.12);
+}
+
+.pointsInput input {
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #172033;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.pointsInput span {
+  color: #9638df;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 0 22px 18px;
+}
+
+.footer button {
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.footer .primaryAction {
+  background: #ae3ff0;
+  color: #fff;
+}
+
+.footer .secondaryAction {
+  border: 1px solid #e3e8ee;
+  background: #fff;
+  color: #64748b;
+}
+
+.footer button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

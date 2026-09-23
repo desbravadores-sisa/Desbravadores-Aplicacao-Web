@@ -58,7 +58,7 @@ function Convites() {
           </div>
           <div className={styles.userList}>
             {visibleUsers.map((user) => (
-              <UserCard key={user.name} user={user} styles={styles} onRemove={removeUser} />
+              <UserCard key={user.name} user={user} onRemove={removeUser} />
             ))}
             {visibleUsers.length === 0 && <p className={styles.emptyState}>Nenhum usuário encontrado.</p>}
           </div>
@@ -73,7 +73,7 @@ function Convites() {
             </div>
           </div>
           {activeTab === "active" && (
-            <InviteCard invitation={invitation} styles={styles} onRemove={() => setInvitation(null)} />
+            <InviteCard invitation={invitation} onRemove={() => setInvitation(null)} />
           )}
         </section>
       </div>
@@ -81,7 +81,6 @@ function Convites() {
       {isModalOpen && (
         <CreateInviteModal
           form={form}
-          styles={styles}
           onChange={handleChange}
           onRoleChange={(role) => setForm({ ...form, role })}
           onSubmit={handleSubmit}

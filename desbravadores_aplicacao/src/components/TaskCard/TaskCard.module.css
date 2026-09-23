@@ -1,0 +1,106 @@
+.taskCard {
+  padding: 15px 14px 12px;
+  border: 1px solid #e2e8ef;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.notebookTask {
+  border-color: #eadbfa;
+}
+
+.taskHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.taskTitleLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taskTitleLine h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 12px;
+}
+
+.deliveryCount {
+  padding: 3px 7px;
+  border-radius: 8px;
+  background: #edf3f8;
+  color: #64748b;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.taskDescription {
+  margin: 9px 0 10px;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.cardActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardActions button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #3478f6;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cardActions button:last-child {
+  color: #ff4a5c;
+}
+
+.evidenceHint {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #fff6e9;
+  color: #d66b20;
+  font-size: 10px;
+}
+
+.evidenceHint strong {
+  font-size: 10px;
+}
+
+.evidenceHint i {
+  margin-right: 4px;
+}
+
+.evidenceHint span {
+  color: #a67852;
+}
+
+.taskFooter {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  color: #8290a0;
+  font-size: 10px;
+}
+
+.taskFooter i {
+  margin-right: 3px;
+}
+
+.taskPoints {
+  color: #ed5d17;
+  font-weight: 700;
+}
+
+.notebookTask .taskPoints {
+  color: #9f35e2;
+}

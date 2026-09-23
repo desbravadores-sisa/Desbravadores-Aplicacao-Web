@@ -1,4 +1,6 @@
-function UserCard({ user, styles, onRemove }) {
+import styles from "./UserCard.module.css";
+
+function UserCard({ user, onRemove }) {
   const badgeClass = user.role === "Diretoria" ? `${styles.badge} ${styles.director}` : styles.badge;
 
   return (

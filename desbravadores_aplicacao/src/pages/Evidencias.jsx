@@ -157,10 +157,11 @@ function Evidencias() {
           </div>
         </article>
       )) : notebooks.length > 0 ? notebooks.map((notebook) => (
+        // <EvidenceNotebookCard notebook={notebook} styles={styles} onRecognize={openRecognition} onDismiss={dismissNotebook} />
+        // Removemos esse prop porque a página não deve injetar sua folha de estilos em um filho; o componente deve importar e controlar seu próprio módulo para manter o CSS isolado, reutilizável e previsível.
         <EvidenceNotebookCard
           key={notebook.id}
           notebook={notebook}
-          styles={styles}
           onRecognize={openRecognition}
           onDismiss={dismissNotebook}
         />
@@ -173,7 +174,7 @@ function Evidencias() {
           <form className={styles.modal} onSubmit={approveEvidence}>
             <div className={styles.modalHeader}><div><small>DECISÃO DA DIRETORIA</small><h2>Aprovar evidência</h2></div><button type="button" aria-label="Fechar" onClick={closeModal}>×</button></div>
             <div className={styles.modalBody}>
-              <EvidenceSummary evidence={modal.evidence} styles={styles} />
+              <EvidenceSummary evidence={modal.evidence} />
               <label htmlFor="points">Pontos a conceder</label>
               <p className={styles.helper}>A Diretoria pode manter ou ajustar a pontuação conforme a qualidade da entrega.</p>
               <div className={styles.pointsInput}><input id="points" type="number" min="0" value={points} onChange={(event) => setPoints(event.target.value)} /><span>pts</span></div>
@@ -189,7 +190,7 @@ function Evidencias() {
           <form className={styles.modal} onSubmit={requestCorrection}>
             <div className={styles.modalHeader}><div><small>DECISÃO DA DIRETORIA</small><h2>Solicitar correção</h2></div><button type="button" aria-label="Fechar" onClick={closeModal}>×</button></div>
             <div className={styles.modalBody}>
-              <EvidenceSummary evidence={modal.evidence} styles={styles} />
+              <EvidenceSummary evidence={modal.evidence} />
               <label htmlFor="comment">Motivo da solicitação de correção <b>*</b></label>
               <p className={styles.helper}>Explique com clareza o que o conselheiro precisa complementar.</p>
               <textarea id="comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Ex.: incluir lista de presença e foto de todos os participantes." required />
@@ -204,7 +205,6 @@ function Evidencias() {
         <EvidenceNotebookModal
           notebook={recognition}
           points={recognitionPoints}
-          styles={styles}
           onPointsChange={setRecognitionPoints}
           onSubmit={recognizeNotebook}
           onClose={() => setRecognition(null)}
@@ -214,7 +214,7 @@ function Evidencias() {
   );
 }
 
-function EvidenceSummary({ evidence, styles }) {
+function EvidenceSummary({ evidence }) {
   return <div className={styles.summary}><strong>{evidence.title}</strong><span>Unidade {evidence.unit} · {evidence.points} pontos previstos</span></div>;
 }
 

@@ -1,4 +1,6 @@
-function TaskFormModal({ task, isNew, styles, onChange, onTypeChange, onSubmit, onClose }) {
+import styles from "./TaskFormModal.module.css";
+
+function TaskFormModal({ task, isNew, onChange, onTypeChange, onSubmit, onClose }) {
   return (
     <div className={styles.modalBackdrop} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <form className={styles.taskModal} onSubmit={onSubmit}>

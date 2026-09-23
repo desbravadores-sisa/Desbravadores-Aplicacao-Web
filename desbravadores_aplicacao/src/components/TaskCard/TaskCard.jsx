@@ -1,4 +1,6 @@
-function TaskCard({ task, styles, onEdit, onDelete }) {
+import styles from "./TaskCard.module.css";
+
+function TaskCard({ task, onEdit, onDelete }) {
   return (
     <article className={`${styles.taskCard} ${task.type === "notebook" ? styles.notebookTask : ""}`}>
       <div className={styles.taskHeading}>

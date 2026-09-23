@@ -1,4 +1,6 @@
-function DeleteTaskModal({ task, styles, onConfirm, onClose }) {
+import styles from "./DeleteTaskModal.module.css";
+
+function DeleteTaskModal({ task, onConfirm, onClose }) {
   return (
     <div className={styles.modalBackdrop} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <div className={styles.deleteModal} role="dialog" aria-modal="true" aria-labelledby="delete-task-title">

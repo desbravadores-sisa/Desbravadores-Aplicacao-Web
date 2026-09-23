@@ -1,0 +1,207 @@
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.52);
+}
+
+.taskModal {
+  width: min(535px, 100%);
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e9ee;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 18px;
+}
+
+.modalHeader button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #172033;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modalBody {
+  display: grid;
+  gap: 8px;
+  padding: 19px 20px 16px;
+}
+
+.modalBody label {
+  color: #172033;
+  font-size: 13px;
+}
+
+.modalBody label b {
+  color: #f15b18;
+}
+
+.modalBody input,
+.modalBody select,
+.modalBody textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #dfe5ec;
+  border-radius: 12px;
+  outline: none;
+  background: #f8fafc;
+  color: #273449;
+  font: inherit;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.modalBody textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.modalBody input:focus,
+.modalBody select:focus,
+.modalBody textarea:focus {
+  border-color: #3478f6;
+  box-shadow: 0 0 0 2px rgba(52, 120, 246, 0.1);
+}
+
+.activityTypes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.activityTypes button {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 62px;
+  padding: 12px;
+  border: 1px solid #dfe5ec;
+  border-radius: 13px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.activityTypes button > i {
+  color: #3478f6;
+  font-size: 16px;
+}
+
+.activityTypes button:nth-child(2) > i {
+  color: #a33ce9;
+}
+
+.activityTypes .typeSelected {
+  border-color: #3478f6;
+  background: #eef5ff;
+}
+
+.activityTypes .typeNotebookSelected {
+  border-color: #a33ce9;
+  background: #fbf3ff;
+}
+
+.activityTypes strong,
+.activityTypes small {
+  display: block;
+}
+
+.activityTypes strong {
+  color: #172033;
+  font-size: 12px;
+}
+
+.activityTypes small {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 9px;
+}
+
+.formHint {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 5px;
+  padding: 10px;
+  border: 1px solid #eadbfa;
+  border-radius: 10px;
+  background: #fbf3ff;
+  color: #9130bd;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.formHint i {
+  font-size: 15px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 7px;
+}
+
+.formRow div {
+  display: grid;
+  gap: 8px;
+}
+
+.modalFooter {
+  display: flex;
+  gap: 10px;
+  padding: 0 20px 18px;
+}
+
+.modalFooter button {
+  flex: 1;
+  padding: 11px;
+  border: 0;
+  border-radius: 12px;
+  background: #f1f3f5;
+  color: #475569;
+  font-weight: 700;
+}
+
+.modalFooter .saveButton {
+  background: #ff6508;
+  color: #fff;
+  box-shadow: 0 5px 12px rgba(255, 101, 8, 0.2);
+}
+
+.modalFooter .saveNotebook {
+  background: #a33ce9;
+  color: #fff;
+  box-shadow: 0 5px 12px rgba(163, 60, 233, 0.2);
+}
+
+@media (max-width: 600px) {
+  .activityTypes,
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .formRow {
+    gap: 8px;
+  }
+}

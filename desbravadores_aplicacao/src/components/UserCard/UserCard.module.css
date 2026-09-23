@@ -1,0 +1,88 @@
+.userCard {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid #edf0f3;
+  border-radius: 12px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.userCard:first-child {
+  border-color: #ffd6b8;
+  box-shadow: 0 2px 7px rgba(255, 101, 8, 0.08);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: #ff7b0b;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.userInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.userInfo strong,
+.userInfo span,
+.userRole small {
+  display: block;
+}
+
+.userInfo strong {
+  color: #111827;
+  font-size: 13px;
+}
+
+.userInfo span {
+  margin-top: 3px;
+  color: #8290a0;
+  font-size: 11px;
+}
+
+.userRole {
+  width: 118px;
+  text-align: right;
+}
+
+.userRole small {
+  margin-top: 4px;
+  color: #8290a0;
+  font-size: 10px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #dce9ff;
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.badge.director {
+  background: #f1ddff;
+  color: #8b21d1;
+}
+
+.deleteButton {
+  margin-left: 9px;
+  border: 0;
+  background: transparent;
+  color: #ff8b87;
+  font-size: 16px;
+  cursor: pointer;
+}

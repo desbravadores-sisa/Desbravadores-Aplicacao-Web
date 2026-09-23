@@ -1,4 +1,6 @@
-function CreateInviteModal({ form, styles, onChange, onRoleChange, onSubmit, onClose }) {
+import styles from "./CreateInviteModal.module.css";
+
+function CreateInviteModal({ form, onChange, onRoleChange, onSubmit, onClose }) {
   const roles = [
     ["Conselheiro", "Gerencia uma unidade no Kanban"],
     ["Diretoria", "Acesso completo ao sistema"]

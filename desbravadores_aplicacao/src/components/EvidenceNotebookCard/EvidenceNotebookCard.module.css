@@ -1,0 +1,84 @@
+.card {
+  padding: 18px;
+  border: 1px solid #e3e8ee;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.cardTitle {
+  color: #172033;
+  font-size: 14px;
+}
+
+.cardTitle i {
+  margin-right: 6px;
+  color: #ae3ff0;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #f1e4ff;
+  color: #9638df;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.cardBody {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 18px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.metaRow span:first-child {
+  color: #f15b18;
+}
+
+.description {
+  margin: 0;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.actionRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.actionRow button {
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 11px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primaryAction {
+  background: #ae3ff0;
+}
+
+.secondaryAction {
+  border: 1px solid #e3e8ee;
+  background: #fff;
+  color: #64748b;
+}

@@ -83,12 +83,12 @@ function Tarefas() {
       </header>
 
       <div className={styles.taskColumns}>
-        <section><div className={styles.columnHeader}><h2><i className="bx bx-notepad" /> Atividades Gerais</h2><span>{generalTasks.length + 4}</span></div><div className={styles.taskList}>{generalTasks.map((task) => <TaskCard key={task.id} task={task} styles={styles} onEdit={openEditTask} onDelete={openDeleteTask} />)}</div></section>
-        <section><div className={`${styles.columnHeader} ${styles.notebookHeader}`}><h2><i className="bx bx-book-open" /> Requisitos de Caderno</h2><span>{notebookTasks.length}</span></div><div className={styles.taskList}>{notebookTasks.map((task) => <TaskCard key={task.id} task={task} styles={styles} onEdit={openEditTask} onDelete={openDeleteTask} />)}</div></section>
+        <section><div className={styles.columnHeader}><h2><i className="bx bx-notepad" /> Atividades Gerais</h2><span>{generalTasks.length + 4}</span></div><div className={styles.taskList}>{generalTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onDelete={openDeleteTask} />)}</div></section>
+        <section><div className={`${styles.columnHeader} ${styles.notebookHeader}`}><h2><i className="bx bx-book-open" /> Requisitos de Caderno</h2><span>{notebookTasks.length}</span></div><div className={styles.taskList}>{notebookTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onDelete={openDeleteTask} />)}</div></section>
       </div>
 
-      {modal === "form" && <TaskFormModal task={draft} isNew={!draft.id} styles={styles} onChange={handleChange} onTypeChange={handleTypeChange} onSubmit={saveTask} onClose={() => setModal(null)} />}
-      {modal === "delete" && <DeleteTaskModal task={draft} styles={styles} onConfirm={deleteTask} onClose={() => setModal(null)} />}
+      {modal === "form" && <TaskFormModal task={draft} isNew={!draft.id} onChange={handleChange} onTypeChange={handleTypeChange} onSubmit={saveTask} onClose={() => setModal(null)} />}
+      {modal === "delete" && <DeleteTaskModal task={draft} onConfirm={deleteTask} onClose={() => setModal(null)} />}
     </main>
   );
 }

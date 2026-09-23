@@ -1,0 +1,50 @@
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.52);
+}
+
+.deleteModal {
+  width: min(360px, 100%);
+  padding: 20px;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+}
+
+.deleteModal h2 {
+  margin: 0 0 12px;
+  color: #273449;
+  font-size: 16px;
+}
+
+.deleteModal p {
+  margin: 0 0 16px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.deleteActions {
+  display: flex;
+  gap: 10px;
+}
+
+.deleteActions button {
+  flex: 1;
+  padding: 11px;
+  border: 0;
+  border-radius: 11px;
+  background: #f1f3f5;
+  color: #475569;
+  font-weight: 700;
+}
+
+.deleteActions .deleteConfirm {
+  background: #ef000b;
+  color: #fff;
+}
