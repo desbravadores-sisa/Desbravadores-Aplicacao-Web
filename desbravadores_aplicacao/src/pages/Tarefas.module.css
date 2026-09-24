@@ -223,10 +223,28 @@
 .taskModal {
   width: min(535px, 100%);
   max-height: calc(100vh - 24px);
-  overflow: auto;
-  border-radius: 13px;
-  background: #fff;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.taskModal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.taskModal::-webkit-scrollbar-track {
+  margin: 10px 0;
+  background: transparent;
+}
+
+.taskModal::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+.taskModal::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .modalHeader {
@@ -420,6 +438,10 @@
   margin: 0 0 12px;
   color: #273449;
   font-size: 16px;
+}
+
+.deleteBody {
+  padding: 20px 20px 0;
 }
 
 .deleteModal p {

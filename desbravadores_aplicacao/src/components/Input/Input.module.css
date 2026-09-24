@@ -5,7 +5,7 @@
 
 .label {
   display: block;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
   font-weight: 600;
   color: var(--color-text);
   font-family: var(--font-display);
@@ -16,12 +16,16 @@
 .input {
   width: 100%;
   box-sizing: border-box;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-sm-plus) var(--spacing-md);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   transition: border 0.2s;
   font-family: var(--font-body);
   font-size: var(--font-size-sm);
+}
+
+.input::placeholder {
+  color: #94a3b8;
 }
 
 .input:focus {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import EvidenceNotebookCard from "../components/EvidenceNotebookCard/EvidenceNotebookCard";
-import EvidenceNotebookModal from "../components/EvidenceNotebookModal/EvidenceNotebookModal";
+import Modal from "../components/Modal/Modal";
+import SectionHeader from "../components/SectionHeader/SectionHeader";
 import styles from "./Evidencias.module.css";
 
 const initialEvidences = [
@@ -110,10 +111,10 @@ function Evidencias() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.pageHeader}>
-        <h1>Evidências e Reconhecimentos</h1>
-        <p>Revise evidências de atividades e reconheça pontos de cadernos concluídos pelos desbravadores.</p>
-      </header>
+      <SectionHeader
+        title="Evidências e Reconhecimentos"
+        subtitle="Revise evidências de atividades e reconheça pontos de cadernos concluídos pelos desbravadores."
+      />
 
       <div className={styles.tabs} role="tablist">
         <button className={activeTab === "activities" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("activities")}>
@@ -170,45 +171,45 @@ function Evidencias() {
       )}
 
       {modal?.type === "approve" && (
-        <div className={styles.modalBackdrop} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeModal()}>
-          <form className={styles.modal} onSubmit={approveEvidence}>
-            <div className={styles.modalHeader}><div><small>DECISÃO DA DIRETORIA</small><h2>Aprovar evidência</h2></div><button type="button" aria-label="Fechar" onClick={closeModal}>×</button></div>
-            <div className={styles.modalBody}>
-              <EvidenceSummary evidence={modal.evidence} />
-              <label htmlFor="points">Pontos a conceder</label>
-              <p className={styles.helper}>A Diretoria pode manter ou ajustar a pontuação conforme a qualidade da entrega.</p>
-              <div className={styles.pointsInput}><input id="points" type="number" min="0" value={points} onChange={(event) => setPoints(event.target.value)} /><span>pts</span></div>
-              <div className={styles.infoBox}><i className="bx bx-edit-alt" /><span>Este valor entra na pontuação líquida da unidade e atualiza o ranking imediatamente.</span></div>
-            </div>
-            <div className={styles.modalFooter}><button type="button" onClick={closeModal}>Cancelar</button><button className={styles.approveButton} type="submit"><i className="bx bx-check-circle" /> Conceder {points || 0} pts</button></div>
-          </form>
-        </div>
+        <Modal className={styles.modal} title="Aprovar evidência" eyebrow="DECISÃO DA DIRETORIA" labelledBy="approve-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" onClick={closeModal}>Cancelar</button><button className={styles.approveButton} type="submit"><i className="bx bx-check-circle" /> Conceder {points || 0} pts</button></>} onClose={closeModal} onSubmit={approveEvidence}>
+          <EvidenceSummary evidence={modal.evidence} />
+          <label htmlFor="points">Pontos a conceder</label>
+          <p className={styles.helper}>A Diretoria pode manter ou ajustar a pontuação conforme a qualidade da entrega.</p>
+          <div className={styles.pointsInput}><input id="points" type="number" min="0" value={points} onChange={(event) => setPoints(event.target.value)} /><span>pts</span></div>
+          <div className={styles.infoBox}><i className="bx bx-edit-alt" /><span>Este valor entra na pontuação líquida da unidade e atualiza o ranking imediatamente.</span></div>
+        </Modal>
       )}
 
       {modal?.type === "correction" && (
-        <div className={styles.modalBackdrop} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeModal()}>
-          <form className={styles.modal} onSubmit={requestCorrection}>
-            <div className={styles.modalHeader}><div><small>DECISÃO DA DIRETORIA</small><h2>Solicitar correção</h2></div><button type="button" aria-label="Fechar" onClick={closeModal}>×</button></div>
-            <div className={styles.modalBody}>
-              <EvidenceSummary evidence={modal.evidence} />
-              <label htmlFor="comment">Motivo da solicitação de correção <b>*</b></label>
-              <p className={styles.helper}>Explique com clareza o que o conselheiro precisa complementar.</p>
-              <textarea id="comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Ex.: incluir lista de presença e foto de todos os participantes." required />
-              <div className={styles.warningBox}><i className="bx bx-shield-x" /><span>Se a entrega não for corrigida conforme solicitado, a Diretoria poderá aplicar penalidade à unidade.</span></div>
-            </div>
-            <div className={styles.modalFooter}><button type="button" onClick={closeModal}>Cancelar</button><button className={styles.correctionButton} type="submit" disabled={!comment.trim()}><i className="bx bx-chevron-right" /> Enviar para correção</button></div>
-          </form>
-        </div>
+        <Modal className={styles.modal} title="Solicitar correção" eyebrow="DECISÃO DA DIRETORIA" labelledBy="correction-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" onClick={closeModal}>Cancelar</button><button className={styles.correctionButton} type="submit" disabled={!comment.trim()}><i className="bx bx-chevron-right" /> Enviar para correção</button></>} onClose={closeModal} onSubmit={requestCorrection}>
+          <EvidenceSummary evidence={modal.evidence} />
+          <label htmlFor="comment">Motivo da solicitação de correção <b>*</b></label>
+          <p className={styles.helper}>Explique com clareza o que o conselheiro precisa complementar.</p>
+          <textarea id="comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Ex.: incluir lista de presença e foto de todos os participantes." required />
+          <div className={styles.warningBox}><i className="bx bx-shield-x" /><span>Se a entrega não for corrigida conforme solicitado, a Diretoria poderá aplicar penalidade à unidade.</span></div>
+        </Modal>
       )}
 
       {recognition && (
-        <EvidenceNotebookModal
-          notebook={recognition}
-          points={recognitionPoints}
-          onPointsChange={setRecognitionPoints}
+        <Modal
+          className={`${styles.modal} ${styles.notebookModal}`}
+          title={recognition.title}
+          eyebrow="RECONHECIMENTO DE CADERNO"
+          eyebrowClassName={styles.notebookModalEyebrow}
+          subtitle={`${recognition.unit} · ${recognition.leader}`}
+          subtitleClassName={styles.modalSubtitle}
+          labelledBy="recognize-notebook-title"
+          headerClassName={styles.modalHeader}
+          bodyClassName={styles.modalBody}
+          footerClassName={styles.modalFooter}
+          footer={<><button type="button" onClick={() => setRecognition(null)}>Cancelar</button><button className={styles.recognizeButton} type="submit"><i className="bx bx-star" /> Reconhecer {recognitionPoints || 0} pts</button></>}
           onSubmit={recognizeNotebook}
           onClose={() => setRecognition(null)}
-        />
+        >
+          <div className={styles.notebookInfoBox}><i className="bx bx-book-open" /><span>Reconhecer este caderno adiciona os pontos à pontuação da unidade. Esta ação é opcional, sem penalidade se não reconhecido.</span></div>
+          <label htmlFor="notebook-points">Pontos a reconhecer</label>
+          <div className={styles.notebookPointsInput}><input id="notebook-points" type="number" min="0" value={recognitionPoints} onChange={(event) => setRecognitionPoints(event.target.value)} /><span>pts</span></div>
+        </Modal>
       )}
     </main>
   );

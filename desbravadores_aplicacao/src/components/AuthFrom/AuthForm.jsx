@@ -39,19 +39,19 @@ function AuthForm({ type }) {
         </p>
 
         {type === "register" && (
-          <Input label="Nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} error={errors.nome} />
+          <Input label="Nome" type="text" placeholder="Digite seu nome completo" value={nome} onChange={(e) => setNome(e.target.value)} error={errors.nome} />
         )}
 
-        <Input label="E-mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} error={errors.email} />
+        <Input label="E-mail" type="email" placeholder="Digite seu e-mail" value={email} onChange={(e) => setEmail(e.target.value)} error={errors.email} />
 
         {type === "register" && (
-          <Input label="Telefone" type="tel" value={telefone} onChange={(e) => setTelefone(e.target.value)} error={errors.telefone} />
+          <Input label="Telefone" type="tel" placeholder="Digite seu telefone" value={telefone} onChange={(e) => setTelefone(e.target.value)} error={errors.telefone} />
         )}
 
-        <Input label="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} error={errors.senha} />
+        <Input label="Senha" type="password" placeholder="Digite a senha" value={senha} onChange={(e) => setSenha(e.target.value)} error={errors.senha} />
 
         {type === "register" && (
-          <Input label="Confirmar Senha" type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} error={errors.confirmarSenha} />
+          <Input label="Confirmar Senha" type="password" placeholder="Digite a senha novamente" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} error={errors.confirmarSenha} />
         )}
 
         <button type="submit" className={styles.button}>

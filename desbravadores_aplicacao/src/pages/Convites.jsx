@@ -1,6 +1,8 @@
 import { useState } from "react";
-import CreateInviteModal from "../components/CreateInviteModal/CreateInviteModal";
 import InviteCard from "../components/InviteCard/InviteCard";
+import Modal from "../components/Modal/Modal";
+import modalStyles from "../components/Modal/Modal.module.css";
+import SectionHeader from "../components/SectionHeader/SectionHeader";
 import UserCard from "../components/UserCard/UserCard";
 import styles from "./Convites.module.css";
 
@@ -40,15 +42,13 @@ function Convites() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.pageHeader}>
-        <div>
-          <h1>Convites &amp; Usuários</h1>
-          <p>Gerencie acessos e convites do sistema</p>
-        </div>
-        <button className={styles.newButton} type="button" onClick={() => setIsModalOpen(true)}>
-          <i className="bx bx-plus" /> Novo Convite
-        </button>
-      </header>
+      <SectionHeader
+        title="Convites & Usuários"
+        subtitle="Gerencie acessos e convites do sistema"
+        buttonIcon={<i className="bx bx-plus" />}
+        buttonText="Novo Convite"
+        onButtonClick={() => setIsModalOpen(true)}
+      />
 
       <div className={styles.columns}>
         <section className={styles.usersSection}>
@@ -79,13 +79,26 @@ function Convites() {
       </div>
 
       {isModalOpen && (
-        <CreateInviteModal
-          form={form}
-          onChange={handleChange}
-          onRoleChange={(role) => setForm({ ...form, role })}
-          onSubmit={handleSubmit}
+        <Modal
+          className={modalStyles.formModal}
+          title="Criar Convite"
+          labelledBy="create-invite-title"
+          headerClassName={modalStyles.formHeader}
+          bodyClassName={modalStyles.formBody}
+          footerClassName={modalStyles.formFooter}
+          footer={<><button type="button" onClick={() => setIsModalOpen(false)}>Cancelar</button><button className={modalStyles.primaryAction} type="submit">Gerar Link</button></>}
           onClose={() => setIsModalOpen(false)}
-        />
+          onSubmit={handleSubmit}
+        >
+          <label htmlFor="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="usuario@email.com" value={form.email} onChange={handleChange} required />
+          <label>Função</label>
+          <div className={styles.roleOptions}>
+            {[["Conselheiro", "Gerencia uma unidade no Kanban"], ["Diretoria", "Acesso completo ao sistema"]].map(([role, description]) => <button key={role} type="button" className={form.role === role ? styles.roleSelected : ""} onClick={() => setForm({ ...form, role })}><strong>{role}</strong><small>{description}</small></button>)}
+          </div>
+          {form.role === "Conselheiro" && <><label htmlFor="unit">Unidade vinculada</label><select id="unit" name="unit" value={form.unit} onChange={handleChange} required><option value="">Selecione uma unidade</option><option>Leões</option><option>Tigresas</option><option>Onças</option><option>Panteras</option></select></>}
+          <div className={styles.howItWorks}><i className="bx bx-link" /><div><strong>Como funciona</strong><span>• Um link único de cadastro será gerado<br />• Compartilhe o link com a pessoa convidada<br />• Cada link pode ser usado apenas uma vez<br />• Você pode excluir um convite a qualquer momento</span></div></div>
+        </Modal>
       )}
     </main>
   );

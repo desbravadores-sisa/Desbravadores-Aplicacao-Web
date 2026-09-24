@@ -25,14 +25,14 @@ function UnitCard({
 
 
       <div className={styles.leader}>
-        ♙ {leader}
+        <i className="bx bx-user" /> {leader}
       </div>
 
 
       <div className={styles.stats}>
 
         <div className={styles.stat}>
-          <span>🏆 Pontuação</span>
+          <span><i className="bx bx-trophy" /> Pontuação</span>
 
           <strong className={styles.score}>
             {score}
@@ -41,7 +41,7 @@ function UnitCard({
 
 
         <div className={styles.stat}>
-          <span>✓ Tarefas Concluídas</span>
+          <span><i className="bx bx-check-circle" /> Tarefas Concluídas</span>
 
           <strong>
             {completedTasks}/{totalTasks}
@@ -50,7 +50,7 @@ function UnitCard({
 
 
         <div className={styles.stat}>
-          <span>↗ Taxa de Conclusão</span>
+          <span><i className="bx bx-trending-up" /> Taxa de Conclusão</span>
 
           <strong>
             {completionRate}%

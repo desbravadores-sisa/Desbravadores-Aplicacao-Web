@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Cadernos from "./pages/Cadernos";
 import LoginPage from "./pages/LoginPage";
+import Perfil from "./pages/Perfil";
 import RegisterPage from "./pages/RegisterPage";
 import Unidades from "./pages/Unidades";
 import Convites from "./pages/Convites";
@@ -56,6 +57,15 @@ function App() {
             <>
               <Navbar />
               <Tarefas />
+            </>
+          }
+        />
+        <Route
+          path="/perfil"
+          element={
+            <>
+              <Navbar />
+              <Perfil />
             </>
           }
         />

@@ -1,0 +1,214 @@
+.page {
+  min-height: calc(100vh - 52px);
+  padding: 20px 24px 40px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.profileCard {
+  width: min(680px, 100%);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.photoArea {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.photo {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #f55b00;
+  color: #fff;
+  font-size: 32px;
+}
+
+.photo span {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.cameraButton {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  background: #fff;
+  color: #64748b;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.16);
+  cursor: pointer;
+}
+
+.cameraButton input {
+  display: none;
+}
+
+.profileHeader h1 {
+  margin: 0;
+  color: #172033;
+  font-size: 18px;
+}
+
+.profileHeader span {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.profileHeader p {
+  margin: 10px 0 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.tabs button {
+  padding: 12px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tabs .tabActive {
+  border-bottom-color: #f55b00;
+  background: #fff;
+  color: #172033;
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+}
+
+.form h2 {
+  margin: 0 0 4px;
+  color: #172033;
+  font-size: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  color: #172033;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid #dfe5ec;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.field div:focus-within {
+  border-color: #f55b00;
+  box-shadow: 0 0 0 2px rgba(245, 91, 0, 0.12);
+}
+
+.field i {
+  color: #a1abba;
+  font-size: 17px;
+}
+
+.field input {
+  width: 100%;
+  padding: 11px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #334155;
+  font: inherit;
+  font-size: 13px;
+}
+
+.saveButton {
+  margin-top: 2px;
+  padding: 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #f55b00;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 5px 11px rgba(245, 91, 0, 0.23);
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  background: #dc5100;
+}
+
+.feedback {
+  margin: -8px 24px 20px;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 620px) {
+  .page {
+    padding: 16px;
+  }
+
+  .profileHeader,
+  .form {
+    padding: 20px;
+  }
+
+  .profileHeader {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .photo {
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+  }
+
+  .profileHeader h1 {
+    font-size: 17px;
+  }
+
+  .tabs button {
+    padding: 14px 8px;
+    font-size: 13px;
+  }
+}

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import DeleteTaskModal from "../components/DeleteTaskModal/DeleteTaskModal";
+import Modal from "../components/Modal/Modal";
+import SectionHeader from "../components/SectionHeader/SectionHeader";
 import TaskCard from "../components/TaskCard/TaskCard";
-import TaskFormModal from "../components/TaskFormModal/TaskFormModal";
 import styles from "./Tarefas.module.css";
 
 const emptyTask = {
@@ -77,18 +77,56 @@ function Tarefas() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.pageHeader}>
-        <div><h1>Gerenciar Tarefas</h1><p>10 tarefas · <b>{generalTasks.length} gerais</b> · <strong>{notebookTasks.length} cadernos</strong></p></div>
-        <button className={styles.newTaskButton} type="button" onClick={openNewTask}><i className="bx bx-plus" /> Nova Tarefa</button>
-      </header>
+      <SectionHeader
+        title="Gerenciar Tarefas"
+        subtitle={<>10 tarefas · <b>{generalTasks.length} gerais</b> · <strong>{notebookTasks.length} cadernos</strong></>}
+        buttonIcon={<i className="bx bx-plus" />}
+        buttonText="Nova Tarefa"
+        onButtonClick={openNewTask}
+      />
 
       <div className={styles.taskColumns}>
         <section><div className={styles.columnHeader}><h2><i className="bx bx-notepad" /> Atividades Gerais</h2><span>{generalTasks.length + 4}</span></div><div className={styles.taskList}>{generalTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onDelete={openDeleteTask} />)}</div></section>
         <section><div className={`${styles.columnHeader} ${styles.notebookHeader}`}><h2><i className="bx bx-book-open" /> Requisitos de Caderno</h2><span>{notebookTasks.length}</span></div><div className={styles.taskList}>{notebookTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onDelete={openDeleteTask} />)}</div></section>
       </div>
 
-      {modal === "form" && <TaskFormModal task={draft} isNew={!draft.id} onChange={handleChange} onTypeChange={handleTypeChange} onSubmit={saveTask} onClose={() => setModal(null)} />}
-      {modal === "delete" && <DeleteTaskModal task={draft} onConfirm={deleteTask} onClose={() => setModal(null)} />}
+      {modal === "form" && (
+        <Modal
+          className={styles.taskModal}
+          title={draft.id ? "Editar Tarefa" : "Nova Tarefa"}
+          labelledBy="task-modal-title"
+          headerClassName={styles.modalHeader}
+          bodyClassName={styles.modalBody}
+          footerClassName={styles.modalFooter}
+          footer={<><button type="button" onClick={() => setModal(null)}>Cancelar</button><button className={draft.type === "notebook" ? styles.saveNotebook : styles.saveButton} type="submit">Salvar {draft.id ? "Alterações" : "Tarefa"}</button></>}
+          onClose={() => setModal(null)}
+          onSubmit={saveTask}
+        >
+          <label>Tipo de atividade</label>
+          <div className={styles.activityTypes}>
+            <button type="button" className={draft.type === "general" ? styles.typeSelected : ""} onClick={() => handleTypeChange("general")}><i className="bx bx-notepad" /><span><strong>Geral</strong><small>Entra no Kanban, requer evidência</small></span></button>
+            <button type="button" className={draft.type === "notebook" ? styles.typeNotebookSelected : ""} onClick={() => handleTypeChange("notebook")}><i className="bx bx-book-open" /><span><strong>Caderno</strong><small>Acompanhamento individual</small></span></button>
+          </div>
+          {draft.type === "notebook" && <><label htmlFor="linkedNotebook">Caderno vinculado <b>*</b></label><select id="linkedNotebook" name="linkedNotebook" value={draft.linkedNotebook} onChange={handleChange} required><option value="">Selecione o caderno</option><option>Amigo</option><option>Companheiro</option><option>Pesquisador</option><option>Pioneiro</option><option>Excursionista</option><option>Guia</option></select><div className={styles.formHint}><i className="bx bx-book-open" /> Somente desbravadores vinculados ao caderno selecionado poderão receber check-in.</div></>}
+          <label htmlFor="title">Título</label><input id="title" name="title" value={draft.title} onChange={handleChange} required />
+          <label htmlFor="description">Descrição</label><textarea id="description" name="description" value={draft.description} onChange={handleChange} required />
+          <label htmlFor="evidence">{draft.type === "general" ? "Instruções de Evidência" : "Orientações ao conselheiro"}</label><textarea id="evidence" name="evidence" value={draft.evidence} onChange={handleChange} required />
+          <div className={styles.formRow}><div><label htmlFor="points">Pontuação</label><input id="points" name="points" type="number" min="0" value={draft.points} onChange={handleChange} required /></div><div><label htmlFor="startDate">Data de Início</label><input id="startDate" name="startDate" type="date" value={draft.startDate} onChange={handleChange} required /></div><div><label htmlFor="deadline">Data Limite</label><input id="deadline" name="deadline" type="date" value={draft.deadline} onChange={handleChange} required /></div></div>
+        </Modal>
+      )}
+      {modal === "delete" && (
+        <Modal
+          className={styles.deleteModal}
+          title="Excluir Tarefa"
+          labelledBy="delete-task-title"
+          bodyClassName={styles.deleteBody}
+          footerClassName={styles.deleteActions}
+          footer={<><button type="button" onClick={() => setModal(null)}>Cancelar</button><button className={styles.deleteConfirm} type="button" onClick={deleteTask}>Excluir</button></>}
+          onClose={() => setModal(null)}
+        >
+          <p>Tem certeza que deseja excluir “{draft.title}”? Esta ação não pode ser desfeita.</p>
+        </Modal>
+      )}
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import NotebookCard from "../components/NotebookCard/NotebookCard";
+import SectionHeader from "../components/SectionHeader/SectionHeader";
 import styles from "./Cadernos.module.css";
 
 function Cadernos() {
@@ -86,13 +87,12 @@ function Cadernos() {
   return (
     <main className={styles.page}>
       <div className={styles.content}>
-        <header className={styles.header}>
-          <div className={styles.heading}>
-            <h1>Cadernos</h1>
-            <p>Gerencie ciclos, membros e requisitos de cada caderno.</p>
-          </div>
-          <button type="button" className={styles.primaryButton}>+&nbsp; Novo ciclo</button>
-        </header>
+        <SectionHeader
+          title="Cadernos"
+          subtitle="Gerencie ciclos, membros e requisitos de cada caderno."
+          buttonIcon={<i className="bx bx-plus" />}
+          buttonText="Novo ciclo"
+        />
 
         <div className={styles.tabs} role="tablist" aria-label="Visualização dos cadernos">
           <button type="button" className={`${styles.tab} ${styles.tabActive}`} role="tab" aria-selected="true">
