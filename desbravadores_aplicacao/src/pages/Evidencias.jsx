@@ -118,10 +118,10 @@ function Evidencias() {
 
       <div className={styles.tabs} role="tablist">
         <button className={activeTab === "activities" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("activities")}>
-          Evidências de Atividades <span>4</span>
+          Evidências de Atividades <span>{evidences.length}</span>
         </button>
         <button className={activeTab === "notebooks" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("notebooks")}>
-          <i className="bx bx-book-open" /> Reconhecimento de Cadernos <span className={styles.grayCount}>3</span>
+          <i className="bx bx-book-open" /> Reconhecimento de Cadernos <span className={styles.grayCount}>{notebooks.length}</span>
         </button>
       </div>
 
@@ -171,7 +171,7 @@ function Evidencias() {
       )}
 
       {modal?.type === "approve" && (
-        <Modal className={styles.modal} title="Aprovar evidência" eyebrow="DECISÃO DA DIRETORIA" labelledBy="approve-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" onClick={closeModal}>Cancelar</button><button className={styles.approveButton} type="submit"><i className="bx bx-check-circle" /> Conceder {points || 0} pts</button></>} onClose={closeModal} onSubmit={approveEvidence}>
+        <Modal className={styles.modal} title="Aprovar evidência" eyebrow="DECISÃO DA DIRETORIA" labelledBy="approve-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={styles.submitButton} type="submit"><i className="bx bx-check-circle" /> Conceder {points || 0} pts</button></>} onClose={closeModal} onSubmit={approveEvidence}>
           <EvidenceSummary evidence={modal.evidence} />
           <label htmlFor="points">Pontos a conceder</label>
           <p className={styles.helper}>A Diretoria pode manter ou ajustar a pontuação conforme a qualidade da entrega.</p>
@@ -181,7 +181,7 @@ function Evidencias() {
       )}
 
       {modal?.type === "correction" && (
-        <Modal className={styles.modal} title="Solicitar correção" eyebrow="DECISÃO DA DIRETORIA" labelledBy="correction-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" onClick={closeModal}>Cancelar</button><button className={styles.correctionButton} type="submit" disabled={!comment.trim()}><i className="bx bx-chevron-right" /> Enviar para correção</button></>} onClose={closeModal} onSubmit={requestCorrection}>
+        <Modal className={styles.modal} title="Solicitar correção" eyebrow="DECISÃO DA DIRETORIA" labelledBy="correction-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={`${styles.submitButton} ${styles.submitButtonDanger}`} type="submit" disabled={!comment.trim()}><i className="bx bx-chevron-right" /> Enviar para correção</button></>} onClose={closeModal} onSubmit={requestCorrection}>
           <EvidenceSummary evidence={modal.evidence} />
           <label htmlFor="comment">Motivo da solicitação de correção <b>*</b></label>
           <p className={styles.helper}>Explique com clareza o que o conselheiro precisa complementar.</p>
@@ -202,7 +202,7 @@ function Evidencias() {
           headerClassName={styles.modalHeader}
           bodyClassName={styles.modalBody}
           footerClassName={styles.modalFooter}
-          footer={<><button type="button" onClick={() => setRecognition(null)}>Cancelar</button><button className={styles.recognizeButton} type="submit"><i className="bx bx-star" /> Reconhecer {recognitionPoints || 0} pts</button></>}
+          footer={<><button className={styles.cancelAction} type="button" onClick={() => setRecognition(null)}>Cancelar</button><button className={styles.recognizeButton} type="submit"><i className="bx bx-star" /> Reconhecer {recognitionPoints || 0} pts</button></>}
           onSubmit={recognizeNotebook}
           onClose={() => setRecognition(null)}
         >
