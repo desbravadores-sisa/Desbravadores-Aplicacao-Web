@@ -445,6 +445,398 @@
 	color: #fff;
 }
 
+.deleteInviteModal {
+	width: min(420px, calc(100vw - 32px));
+	overflow: hidden;
+	border-radius: 14px;
+	background: #fff;
+	box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+}
+
+.deleteInviteHeader {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	padding: 18px 18px 10px;
+	border-bottom: 0;
+}
+
+.deleteInviteHeader h2 {
+	margin: 0;
+	color: #1f2937;
+	font-size: 19px;
+	font-weight: 800;
+}
+
+.deleteInviteHeader button {
+	display: none;
+}
+
+.deleteInviteBody {
+	padding: 0 18px 14px;
+}
+
+.deleteInviteText {
+	margin: 0;
+	color: #475569;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.deleteInviteText strong {
+	color: #111827;
+	font-weight: 700;
+}
+
+.deleteInviteFooter {
+	display: flex;
+	justify-content: flex-start;
+	gap: 10px;
+	padding: 0 18px 18px;
+}
+
+.deleteInviteFooter > button {
+	flex: 1 1 0;
+	border: 0;
+}
+
+.deleteInviteFooter > button:first-child {
+	border: 1px solid #e7edf4;
+}
+
+.deactivationModal {
+	width: min(456px, calc(100vw - 32px));
+	overflow: hidden;
+	border-radius: 13px;
+	background: #fff;
+	box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+}
+
+.deactivationHeader {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	padding: 17px 22px;
+	border-bottom: 1px solid #e8edf2;
+}
+
+.deactivationHeader small {
+	color: #f15b18;
+	font-size: 10px;
+	font-weight: 800;
+	letter-spacing: 1px;
+}
+
+.deactivationHeader h2 {
+	margin-top: 3px;
+	color: #172033;
+	font-size: 18px;
+}
+
+.deactivationHeader button {
+	border: 0;
+	background: transparent;
+	color: #64748b;
+	font-size: 24px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.deactivationBody {
+	display: grid;
+	gap: 7px;
+	padding: 20px 22px 18px;
+}
+
+.userSummaryCard {
+	padding: 14px 13px;
+	border: 1px solid #edf0f3;
+	border-radius: 12px;
+	background: #f8fafc;
+}
+
+.userSummaryHeader {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #e7edf3;
+}
+
+.avatarSmall {
+	display: grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: #ff7b0b;
+	color: #fff;
+	font-size: 16px;
+	font-weight: 800;
+}
+
+.userSummaryHeader strong,
+.userSummaryMeta strong {
+	display: block;
+	color: #172033;
+}
+
+.userSummaryHeader strong {
+	font-size: 13px;
+}
+
+.userSummaryHeader span,
+.userSummaryMeta small {
+	color: #64748b;
+	font-size: 11px;
+}
+
+.userSummaryMeta {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+	margin-top: 12px;
+}
+
+.userSummaryMeta small {
+	display: block;
+	margin-bottom: 5px;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.confirmationText {
+	margin: 0;
+	color: #172033;
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.5;
+}
+
+.warningBox {
+	display: flex;
+	align-items: flex-start;
+	gap: 9px;
+	padding: 13px;
+	border-radius: 12px;
+	border: 1px solid #f8c7c7;
+	background: #fff0f1;
+	color: #c3274b;
+	font-size: 11px;
+	line-height: 1.4;
+}
+
+.warningBox i {
+	font-size: 17px;
+}
+
+.warningBox span {
+	color: #c3274b;
+	font-size: 11px;
+	line-height: 1.45;
+}
+
+.deactivationFooter {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 10px;
+	padding: 0 22px 18px;
+}
+
+.deactivationFooter button {
+	min-width: 120px;
+	padding: 12px 18px;
+	border: 0;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.cancelButton {
+	border: 1px solid #e7edf4;
+	background: #e7edf4;
+	color: #1f2937;
+}
+
+.deactivateButton {
+	background: #ff3044;
+	color: #fff;
+	box-shadow: 0 6px 14px rgba(255, 48, 68, 0.18);
+}
+
+.inviteSuccessModal {
+	width: min(420px, calc(100vw - 32px));
+	overflow: hidden;
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+}
+
+.inviteSuccessHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 18px 20px 10px;
+	border-bottom: 0;
+}
+
+.inviteSuccessHeader h2 {
+	margin: 0;
+	color: #172033;
+	font-size: 17px;
+	font-weight: 800;
+}
+
+.inviteSuccessBody {
+	display: grid;
+	gap: 12px;
+	padding: 0 20px 16px;
+}
+
+.successHeaderRow {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 0 0 2px;
+}
+
+.successBadge {
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: #eafaf0;
+	color: #0d9b5f;
+	font-size: 16px;
+}
+
+.successHeaderRow strong {
+	color: #172033;
+	font-size: 13px;
+}
+
+.closeInviteSuccess {
+	margin-left: auto;
+	border: 0;
+	background: transparent;
+	color: #64748b;
+	font-size: 24px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.inviteMetadataRow {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+	padding: 14px 12px;
+	border-radius: 12px;
+	background: #f8fafc;
+}
+
+.inviteMetadataRow small {
+	display: block;
+	margin-bottom: 4px;
+	color: #64748b;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+.inviteMetadataRow strong {
+	display: block;
+	color: #172033;
+	font-size: 13px;
+}
+
+.linkFieldWrap {
+	display: grid;
+	gap: 8px;
+}
+
+.linkFieldWrap label {
+	color: #172033;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.linkField {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 10px 10px 12px;
+	border: 1px solid #dfe7f0;
+	border-radius: 11px;
+	background: #f8fafc;
+}
+
+.linkField span {
+	overflow: hidden;
+	flex: 1;
+	color: #64748b;
+	font-size: 10px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.copyButton {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 7px 10px;
+	border: 0;
+	border-radius: 9px;
+	background: #fff0df;
+	color: #d56a17;
+	font-size: 10px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.copyButton:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.helperCard {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	padding: 11px 12px;
+	border: 1px solid #f8d7a5;
+	border-radius: 12px;
+	background: #fff7ee;
+	color: #b7791f;
+	font-size: 10px;
+	line-height: 1.5;
+}
+
+.helperCard i {
+	font-size: 15px;
+}
+
+.inviteSuccessFooter {
+	display: grid;
+	padding: 0 20px 18px;
+}
+
+.inviteSuccessFooter button,
+.inviteSuccessFooter .primaryAction {
+	width: 100%;
+	padding: 12px 18px;
+	border: 0;
+	border-radius: 12px;
+	background: #ff6508;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	box-shadow: 0 8px 16px rgba(255, 101, 8, 0.18);
+}
+
 @media (max-width: 760px) {
 	.columns {
 		flex-direction: column;
