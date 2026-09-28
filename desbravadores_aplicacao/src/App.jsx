@@ -8,8 +8,6 @@ import Unidades from "./pages/Unidades";
 import Convites from "./pages/Convites";
 import Evidencias from "./pages/Evidencias";
 import Tarefas from "./pages/Tarefas";
-import CounselorTasks from "./pages/CounselorTasks";
-import CounselorDesbravadores from "./pages/CounselorDesbravadores";
 
 function App() {
   return (
@@ -59,24 +57,6 @@ function App() {
             <>
               <Navbar />
               <Tarefas />
-            </>
-          }
-        />
-        <Route
-          path="/minhas-tarefas"
-          element={
-            <>
-              <Navbar />
-              <CounselorTasks />
-            </>
-          }
-        />
-        <Route
-          path="/desbravadores"
-          element={
-            <>
-              <Navbar />
-              <CounselorDesbravadores />
             </>
           }
         />

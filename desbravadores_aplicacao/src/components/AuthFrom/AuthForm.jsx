@@ -33,14 +33,10 @@ function AuthForm({ type }) {
       api.post("/usuarios/login", { email: email, senha: senha }, { withCredentials: true })
         .then((resposta) => {
           const res = resposta.data;
-          sessionStorage.setItem("desbravadores.user", JSON.stringify({ nome: res.nome, tipoConta: res.tipoConta }));
-          const role = String(res.tipoConta).toLowerCase();
-          if (role === "conselheiro") {
-            navigate("/minhas-tarefas");
-          } else if (["diretoria", "diretor"].includes(role)) {
+          if (res.tipoConta === "Conselheiro") {
+            setErrors({ form: "O acesso de conselheiro ainda não está disponível." });
+          } else if (res.tipoConta === "Diretoria") {
             navigate("/unidades");
-          } else {
-            setErrors({ form: "Tipo de usuário sem acesso configurado." });
           }
         }).catch((erro) => {
           const status = erro.response?.status;
