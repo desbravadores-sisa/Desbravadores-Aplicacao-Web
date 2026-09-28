@@ -11,22 +11,13 @@ const notifications = [
 
 function Navbar() {
   const [openPopover, setOpenPopover] = useState(null);
-  const [user] = useState(() => {
-    try {
-      return JSON.parse(sessionStorage.getItem("desbravadores.user")) || {};
-    } catch {
-      return {};
-    }
-  });
   const profileAreaRef = useRef(null);
   const navigate = useNavigate();
   const unreadCount = notifications.filter((notification) => notification.unread).length;
-  const isCounselor = String(user.tipoConta || "").toLowerCase() === "conselheiro";
 
   function logout() {
       api.post("/usuarios/logoff")
       .then(() => {
-        sessionStorage.removeItem("desbravadores.user");
         navigate("/")
       })
       .catch((err) => {
@@ -64,20 +55,25 @@ function Navbar() {
       </div>
 
       <div className={styles.menu}>
-        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to={isCounselor ? "/minhas-tarefas" : "/tarefas"}>
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades">
+          <i className='bx bx-group'></i> Unidades
+        </NavLink>
+
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/tarefas">
           <i className='bx bx-check-square'></i> Tarefas
         </NavLink>
 
-        {isCounselor && <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/desbravadores">
-          <i className='bx bx-book-open'></i> Desbravadores
-        </NavLink>}
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias">
+          <i className='bx bx-list-check'></i> Evidências
+        </NavLink>
 
-        {!isCounselor && <>
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades"><i className='bx bx-group'></i> Unidades</NavLink>
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias"><i className='bx bx-list-check'></i> Evidências</NavLink>
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos"><i className='bx bx-book'></i> Cadernos</NavLink>
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites"><i className='bx bx-envelope'></i> Convites</NavLink>
-        </>}
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos">
+          <i className='bx bx-book'></i> Cadernos
+        </NavLink>
+
+        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites">
+          <i className='bx bx-envelope'></i> Convites
+        </NavLink>
       </div>
 
       <div className={styles.profile} ref={profileAreaRef}>
@@ -100,15 +96,15 @@ function Navbar() {
         >
           <span className={styles.avatar}>A</span>
           <span className={styles.profileInfo}>
-            <strong>{user.nome || "Ana Santos"}</strong>
-            <small>{isCounselor ? "Conselheiro" : "Diretoria"}</small>
+            <strong>Ana Santos</strong>
+            <small>Diretoria</small>
           </span>
           <i className="bx bx-chevron-down" />
         </button>
 
         {openPopover === "profile" && (
           <div className={`${styles.popover} ${styles.profilePopover}`}>
-            <div className={styles.popoverIdentity}><strong>{user.nome || "Ana Santos"}</strong><span>{isCounselor ? "Conselheiro" : "Diretoria"}</span></div>
+            <div className={styles.popoverIdentity}><strong>Ana Santos</strong><span>Diretoria</span></div>
             <button type="button" onClick={() => { setOpenPopover(null); navigate("/perfil"); }}><i className="bx bx-user" /> Meu Perfil</button>
             <button className={styles.logoutButton} type="button" onClick={() => {logout()}}><i className="bx bx-log-out" /> Sair</button>
           </div>
