@@ -1,6 +1,6 @@
 import styles from "./UserCard.module.css";
 
-function UserCard({ user, onRemove }) {
+function UserCard({ user, onRemove, canDeactivate = true }) {
   const badgeClass = user.role === "Diretoria" ? `${styles.badge} ${styles.director}` : styles.badge;
 
   return (
@@ -16,14 +16,16 @@ function UserCard({ user, onRemove }) {
         </span>
         <small>{user.unit}</small>
       </div>
-      <button
-        className={styles.deleteButton}
-        type="button"
-        aria-label={`Remover ${user.name}`}
-        onClick={() => onRemove(user.name)}
-      >
-        <i className="bx bx-trash" />
-      </button>
+      {canDeactivate && (
+        <button
+          className={styles.deleteButton}
+          type="button"
+          aria-label={`Inativar ${user.name}`}
+          onClick={() => onRemove(user)}
+        >
+          <i className="bx bx-trash" />
+        </button>
+      )}
     </article>
   );
 }

@@ -1,6 +1,6 @@
 import styles from "./InviteCard.module.css";
 
-function InviteCard({ invitation, onRemove }) {
+function InviteCard({ invitation, onRemove, expired = false }) {
   if (!invitation) {
     return <p className={styles.emptyState}>Nenhum convite ativo.</p>;
   }
@@ -12,7 +12,7 @@ function InviteCard({ invitation, onRemove }) {
   }
 
   return (
-    <article className={styles.inviteCard}>
+    <article className={`${styles.inviteCard} ${expired ? styles.expiredCard : ""}`}>
       <button className={styles.closeInvite} type="button" aria-label="Excluir convite" onClick={onRemove}>
         ×
       </button>
@@ -20,13 +20,16 @@ function InviteCard({ invitation, onRemove }) {
       <span className={styles.inviteMeta}>
         <b>{invitation.role}</b> {invitation.unit}
       </span>
-      <div className={styles.linkRow}>
-        <i className="bx bx-link" />
-        <span>{inviteLink}</span>
-        <button type="button" onClick={copyLink}>
-          <i className="bx bx-copy" /> Copiar
-        </button>
-      </div>
+      {!expired && (
+        <div className={styles.linkRow}>
+          <i className="bx bx-link" />
+          <span>{inviteLink}</span>
+          <button type="button" onClick={copyLink}>
+            <i className="bx bx-copy" /> Copiar
+          </button>
+        </div>
+      )}
+      {expired && <div className={styles.expiredBadge}>Expirado</div>}
     </article>
   );
 }
