@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
+import api from "../../service/api";
 
 const notifications = [
   { icon: "bx-check-circle", statusClass: "approved", title: "Tarefa aprovada", message: 'Sua evidência para "Treinamento de primeiros socorros" foi aprovada! +200 pontos', date: "09/04/2026", unread: true },
@@ -13,6 +14,16 @@ function Navbar() {
   const profileAreaRef = useRef(null);
   const navigate = useNavigate();
   const unreadCount = notifications.filter((notification) => notification.unread).length;
+
+  function logout() {
+    api.post("/usuarios/logoff")
+      .then(() => {
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  }
 
   useEffect(() => {
     function closePopover(event) {
@@ -95,7 +106,7 @@ function Navbar() {
           <div className={`${styles.popover} ${styles.profilePopover}`}>
             <div className={styles.popoverIdentity}><strong>Ana Santos</strong><span>Diretoria</span></div>
             <button type="button" onClick={() => { setOpenPopover(null); navigate("/perfil"); }}><i className="bx bx-user" /> Meu Perfil</button>
-            <button className={styles.logoutButton} type="button"><i className="bx bx-log-out" /> Sair</button>
+            <button className={styles.logoutButton} type="button" onClick={logout}><i className="bx bx-log-out" /> Sair</button>
           </div>
         )}
 
