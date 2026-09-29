@@ -49,6 +49,13 @@
   margin-bottom: var(--spacing-md);
 }
 
+.formError {
+  color: var(--color-destructive, red);
+  font-size: var(--font-size-sm);
+  margin: var(--spacing-xs) 0;
+  font-family: var(--font-body);
+}
+
 .button {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
