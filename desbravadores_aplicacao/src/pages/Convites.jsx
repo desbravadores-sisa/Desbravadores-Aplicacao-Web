@@ -33,6 +33,7 @@ const initialExpiredInvites = [
 
 function Convites() {
   const [users, setUsers] = useState(initialUsers);
+  const [userTab, setUserTab] = useState("active");
   const [activeTab, setActiveTab] = useState("active");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -43,7 +44,9 @@ function Convites() {
   const [form, setForm] = useState({ email: "", role: "Conselheiro", unit: "" });
   const [invitation, setInvitation] = useState({ email: "conselheiro.leoes@email.com", role: "Conselheiro", unit: "Leões" });
 
-  const visibleUsers = users.filter((user) => user.active === true);
+  const activeUsers = users.filter((user) => user.active === true);
+  const inactiveUsers = users.filter((user) => user.active === false);
+  const visibleUsers = userTab === "active" ? activeUsers : inactiveUsers;
 
   function handleChange(event) {
     setForm({ ...form, [event.target.name]: event.target.value });
@@ -134,27 +137,27 @@ function Convites() {
 
       <div className={styles.columns}>
         <section className={styles.usersSection}>
-          <div className={styles.sectionTitle}>
-            <h2><i className="bx bx-group" /> Usuários Ativos</h2>
-            <span className={styles.count}>{visibleUsers.length}</span>
+          <div className={styles.invitesHeader}>
+            <h2><i className="bx bx-group" /> Usuários</h2>
+            <div className={styles.tabs} role="tablist" aria-label="Filtrar usuários">
+              <button className={userTab === "active" ? styles.tabActive : ""} type="button" role="tab" aria-selected={userTab === "active"} onClick={() => setUserTab("active")}>Ativos ({activeUsers.length})</button>
+              <button className={userTab === "inactive" ? styles.tabActive : ""} type="button" role="tab" aria-selected={userTab === "inactive"} onClick={() => setUserTab("inactive")}>Inativos ({inactiveUsers.length})</button>
+            </div>
           </div>
           <div className={styles.userList}>
-            {/* {visibleUsers.map((user) => (
-              <UserCard key={user.name} user={user} onRemove={removeUser} />
-            ))} */}
-             {visibleUsers.map((user) => {
+            {visibleUsers.map((user) => {
               const isCurrentUser = user.id === currentUser.id;
 
               return (
                 <UserCard
                   key={user.id}
                   user={user}
-                  canDeactivate={!isCurrentUser}
+                  canDeactivate={user.active && !isCurrentUser}
                   onRemove={openDeactivateUserModal}
                 />
               );
             })}
-            {visibleUsers.length === 0 && <p className={styles.emptyState}>Nenhum usuário encontrado.</p>}
+            {visibleUsers.length === 0 && <p className={styles.emptyState}>{userTab === "active" ? "Nenhum usuário ativo." : "Nenhum usuário inativo."}</p>}
           </div>
         </section>
 
