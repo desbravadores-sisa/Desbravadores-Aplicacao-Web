@@ -116,6 +116,93 @@
   gap: 13px;
 }
 
+.cycleModal {
+  width: min(320px, 100%);
+  overflow: hidden;
+}
+
+.cycleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 18px 14px;
+}
+
+.cycleHeader h2 {
+  color: #172033;
+  font-size: 16px;
+}
+
+.cycleHeader button {
+  color: #718096;
+  font-size: 23px;
+}
+
+.cycleBody {
+  display: grid;
+  gap: 14px;
+  padding: 0 18px 14px;
+}
+
+.cycleNotice {
+  margin: 0;
+  padding: 11px 10px;
+  border: 1px solid #d7e7ff;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #275492;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.cycleFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cycleFields label {
+  display: block;
+  margin-bottom: 5px;
+  color: #526070;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cycleFields input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border: 1px solid #dbe3ed;
+  border-radius: 12px;
+  color: #334155;
+  font: inherit;
+  font-size: 12px;
+}
+
+.cycleFields input:focus {
+  border-color: #ff6508;
+  outline: 2px solid rgba(255, 101, 8, 0.12);
+}
+
+.cycleFooter {
+  display: block;
+  padding: 0 18px 18px;
+}
+
+.cycleSubmit {
+  width: 100%;
+  padding: 11px;
+  border: 0;
+  border-radius: 12px;
+  background: #f34808;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 850px) {
   .header {
     grid-template-columns: 1fr auto;
