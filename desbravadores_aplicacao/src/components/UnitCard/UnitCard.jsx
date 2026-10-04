@@ -3,6 +3,7 @@ import styles from "./UnitCard.module.css";
 function UnitCard({
   name,
   leader,
+  minimumAge,
   position,
   score,
   completedTasks,
@@ -27,6 +28,12 @@ function UnitCard({
       <div className={styles.leader}>
         <i className="bx bx-user" /> {leader}
       </div>
+
+      {minimumAge && (
+        <div className={styles.minimumAge}>
+          <i className="bx bx-user-check" /> Idade mínima: {minimumAge} anos
+        </div>
+      )}
 
 
       <div className={styles.stats}>
