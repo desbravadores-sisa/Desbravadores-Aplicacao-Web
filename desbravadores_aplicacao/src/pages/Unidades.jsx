@@ -15,23 +15,24 @@ const initialUnits = [
 function Unidades() {
   const [units, setUnits] = useState(initialUnits);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form, setForm] = useState({ unitName: "", leader: "" });
+  const [form, setForm] = useState({ unitName: "", leader: "", minimumAge: "" });
 
   function openModal() {
-    setForm({ unitName: "", leader: "" });
+    setForm({ unitName: "", leader: "", minimumAge: "" });
     setIsModalOpen(true);
   }
 
   function createUnit(event) {
     event.preventDefault();
     const name = form.unitName.trim();
-    if (!name) return;
+    if (!name || !form.minimumAge) return;
 
     setUnits((current) => [
       ...current,
       {
         name,
         leader: form.leader.trim() || "A definir",
+        minimumAge: Number(form.minimumAge),
         position: current.length + 1,
         score: 0,
         completedTasks: 0,
@@ -72,6 +73,8 @@ function Unidades() {
           <input id="unitName" name="unitName" placeholder="Ex: Tigres, Águias, Falcões..." value={form.unitName} onChange={(event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }))} required autoFocus />
           <label htmlFor="leader">Nome do Conselheiro (opcional)</label>
           <input id="leader" name="leader" placeholder="Ex: Carlos Silva" value={form.leader} onChange={(event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }))} />
+          <label htmlFor="minimumAge">Idade necessária</label>
+          <input id="minimumAge" name="minimumAge" type="number" min="1" max="100" placeholder="Ex: 10" value={form.minimumAge} onChange={(event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }))} required />
         </Modal>
       )}
     </main>

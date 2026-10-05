@@ -14,6 +14,8 @@ function Navbar() {
   const profileAreaRef = useRef(null);
   const navigate = useNavigate();
   const unreadCount = notifications.filter((notification) => notification.unread).length;
+  const [nomeUsuario,setNomeUsuario] = useState("")
+  const [cargo,setCargo] = useState("")
 
   function logout() {
     api.post("/usuarios/logoff")
@@ -24,6 +26,15 @@ function Navbar() {
         console.log(err.response);
       });
   }
+
+  api.get("/usuarios/buscarUsuario")
+    .then((res) => {
+      let resposta = res.data
+      setNomeUsuario(resposta.nome)
+      setCargo(resposta.tipoConta)
+    }).catch((err) => {
+      console.log(err.response)
+    })
 
   useEffect(() => {
     function closePopover(event) {
@@ -94,17 +105,17 @@ function Navbar() {
           aria-expanded={openPopover === "profile"}
           onClick={() => setOpenPopover((current) => current === "profile" ? null : "profile")}
         >
-          <span className={styles.avatar}>A</span>
+          <span className={styles.avatar}>{nomeUsuario.trim()[0]}</span>
           <span className={styles.profileInfo}>
-            <strong>Ana Santos</strong>
-            <small>Diretoria</small>
+            <strong>{nomeUsuario}</strong>
+            <small>{cargo}</small>
           </span>
           <i className="bx bx-chevron-down" />
         </button>
 
         {openPopover === "profile" && (
           <div className={`${styles.popover} ${styles.profilePopover}`}>
-            <div className={styles.popoverIdentity}><strong>Ana Santos</strong><span>Diretoria</span></div>
+            <div className={styles.popoverIdentity}><strong>{nomeUsuario}</strong><span>{cargo}</span></div>
             <button type="button" onClick={() => { setOpenPopover(null); navigate("/perfil"); }}><i className="bx bx-user" /> Meu Perfil</button>
             <button className={styles.logoutButton} type="button" onClick={logout}><i className="bx bx-log-out" /> Sair</button>
           </div>
