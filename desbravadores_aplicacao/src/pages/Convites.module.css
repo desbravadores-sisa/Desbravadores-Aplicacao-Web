@@ -98,6 +98,11 @@
 	gap: 11px;
 }
 
+.inviteList {
+	display: grid;
+	gap: 11px;
+}
+
 .userCard {
 	align-items: center;
 	min-height: 64px;
@@ -289,6 +294,18 @@
 
 .emptyState {
 	color: #94a3b8;
+	font-size: 12px;
+}
+
+.formError {
+	margin: 0;
+	color: #c3274b;
+	font-size: 12px;
+}
+
+.actionError {
+	margin: 0;
+	color: #c3274b;
 	font-size: 12px;
 }
 

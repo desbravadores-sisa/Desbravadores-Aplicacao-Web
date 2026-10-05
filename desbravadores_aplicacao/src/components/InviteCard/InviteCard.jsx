@@ -1,35 +1,31 @@
 import styles from "./InviteCard.module.css";
 
-function InviteCard({ invitation, onRemove, expired = false }) {
+function InviteCard({ invitation, currentTime, onRemove }) {
   if (!invitation) {
     return <p className={styles.emptyState}>Nenhum convite ativo.</p>;
   }
 
-  const inviteLink = `https://tigre-da-montanha.com/cadastro/convite/${invitation.email.split("@")[0]}`;
-
-  function copyLink() {
-    navigator.clipboard?.writeText(inviteLink);
-  }
+  const expirationDate = new Date(invitation.expiresAt);
+  const hasExpirationDate = Number.isFinite(expirationDate.getTime());
+  const isExpired = hasExpirationDate && expirationDate.getTime() <= currentTime;
+  const roleClass = invitation.role === "Diretoria" ? styles.directorBadge : styles.counselorBadge;
+  const formattedExpirationDate = hasExpirationDate
+    ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "long", timeStyle: "short" }).format(expirationDate)
+    : "Data não informada";
 
   return (
-    <article className={`${styles.inviteCard} ${expired ? styles.expiredCard : ""}`}>
-      <button className={styles.closeInvite} type="button" aria-label="Excluir convite" onClick={onRemove}>
+    <article className={`${styles.inviteCard} ${isExpired ? styles.expiredCard : ""}`}>
+      <button className={styles.closeInvite} type="button" aria-label={`Excluir convite de ${invitation.email}`} onClick={onRemove}>
         ×
       </button>
       <strong><i className="bx bx-envelope" /> {invitation.email}</strong>
-      <span className={styles.inviteMeta}>
-        <b>{invitation.role}</b> {invitation.unit}
-      </span>
-      {!expired && (
-        <div className={styles.linkRow}>
-          <i className="bx bx-link" />
-          <span>{inviteLink}</span>
-          <button type="button" onClick={copyLink}>
-            <i className="bx bx-copy" /> Copiar
-          </button>
-        </div>
-      )}
-      {expired && <div className={styles.expiredBadge}>Expirado</div>}
+      <div className={styles.inviteMeta}>
+        <span className={`${styles.roleBadge} ${roleClass}`}>{invitation.role}</span>
+        {invitation.role !== "Diretoria" && invitation.unit && <span className={styles.unitLabel}>{invitation.unit}</span>}
+      </div>
+      <time className={styles.inviteExpiration} dateTime={hasExpirationDate ? expirationDate.toISOString() : undefined}>
+        {isExpired ? "Expirou em" : "Expira em"} {formattedExpirationDate}
+      </time>
     </article>
   );
 }

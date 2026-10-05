@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import InviteCard from "../components/InviteCard/InviteCard";
 import Modal from "../components/Modal/Modal";
 import modalStyles from "../components/Modal/Modal.module.css";
@@ -6,69 +6,235 @@ import SectionHeader from "../components/SectionHeader/SectionHeader";
 import UserCard from "../components/UserCard/UserCard";
 import evidenceStyles from "./Evidencias.module.css";
 import styles from "./Convites.module.css";
+import api from "../service/api";
 
-const currentUser = {
-  id: "ana-santos",
-  name: "Ana Santos",
-  role: "Diretoria"
-};
+const profileIds = { Diretoria: 1, Conselheiro: 2 };
 
-const initialUsers = [
-  { id: "carlos-silva", name: "Carlos Silva", email: "conselheiro@tigre.com", role: "Conselheiro", unit: "Tigresas", initial: "C", active: true },
-  { id: "ana-santos", name: "Ana Santos", email: "diretoria@tigre.com", role: "Diretoria", unit: "Mín. 2 diretores", initial: "A", active: true },
-  { id: "pedro-costa", name: "Pedro Costa", email: "pedro@tigre.com", role: "Conselheiro", unit: "Leões", initial: "P", active: true },
-  { id: "maria-oliveira", name: "Maria Oliveira", email: "maria@tigre.com", role: "Conselheiro", unit: "Onças", initial: "M", active: true },
-  { id: "joao-almeida", name: "João Almeida", email: "joao@tigre.com", role: "Conselheiro", unit: "Panteras", initial: "J", active: true }
-];
+function getResponseItems(responseData, collectionName) {
+  if (Array.isArray(responseData)) return responseData;
+  if (Array.isArray(responseData?.[collectionName])) return responseData[collectionName];
+  return Array.isArray(responseData?.data) ? responseData.data : [];
+}
 
-const initialActiveInvites = [
-  { id: "active-1", email: "conselheiro.leoes@email.com", role: "Conselheiro", unit: "Leões" },
-  { id: "active-2", email: "diretoria2@email.com", role: "Diretoria", unit: "Diretoria" }
-];
+function mapApiUsers(responseData) {
+  return getResponseItems(responseData, "usuarios").map((usuario) => {
+    const name = usuario.nome?.trim() ?? "Usuário";
 
-const initialExpiredInvites = [
-  { id: "expired-1", email: "novoconselheiro@email.com", role: "Conselheiro", unit: "Tigresas", expired: true },
-  { id: "expired-2", email: "diretoria2@email.com", role: "Diretoria", unit: "Diretoria", expired: true }
-];
+    return {
+      id: usuario.id,
+      name,
+      email: usuario.email ?? "",
+      role: usuario.nomePerfil ?? "",
+      unit: usuario.nomeUnidade ?? "",
+      initial: name.charAt(0).toUpperCase(),
+      active: true
+    };
+  });
+}
+
+function mapApiInvites(responseData) {
+  return getResponseItems(responseData, "convites").map((invite) => ({
+    id: invite.id,
+    email: invite.email,
+    role: invite.tipoConta,
+    unit: invite.tipoConta === "Diretoria" ? "" : invite.nomeUnidade ?? "",
+    status: invite.statusConvite,
+    expiresAt: invite.dataExpiracao
+  }));
+}
+
+function isInviteExpired(expiresAt, currentTime) {
+  const expirationTime = Date.parse(expiresAt);
+  return Number.isFinite(expirationTime) && expirationTime <= currentTime;
+}
 
 function Convites() {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
+  const [invites, setInvites] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInvitesLoading, setIsInvitesLoading] = useState(true);
+  const [usersError, setUsersError] = useState("");
+  const [invitesError, setInvitesError] = useState("");
+  const [unitsError, setUnitsError] = useState("");
+  const [isUnitsLoading, setIsUnitsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [activeTab, setActiveTab] = useState("active");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
+  const [userDeleteError, setUserDeleteError] = useState("");
   const [inviteResult, setInviteResult] = useState(null);
   const [inviteToDelete, setInviteToDelete] = useState(null);
-  const [activeInvites, setActiveInvites] = useState(initialActiveInvites);
-  const [expiredInvites, setExpiredInvites] = useState(initialExpiredInvites);
+  const [isDeletingInvite, setIsDeletingInvite] = useState(false);
+  const [inviteDeleteError, setInviteDeleteError] = useState("");
   const [form, setForm] = useState({ email: "", role: "Conselheiro", unit: "" });
-  const [invitation, setInvitation] = useState({ email: "conselheiro.leoes@email.com", role: "Conselheiro", unit: "Leões" });
+  const submitLock = useRef(false);
+  const userDeleteLock = useRef(false);
+  const inviteDeleteLock = useRef(false);
 
-  const visibleUsers = users.filter((user) => user.active === true);
+  useEffect(() => {
+    function updateCurrentTime() {
+      setCurrentTime(Date.now());
+    }
+
+    updateCurrentTime();
+    const intervalId = window.setInterval(updateCurrentTime, 60_000);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadUsers() {
+      setIsLoading(true);
+      setUsersError("");
+
+      const [usersResult, currentUserResult, invitesResult, unitsResult] = await Promise.allSettled([
+        api.get("/usuarios"),
+        api.get("/usuarios/buscarUsuario"),
+        api.get("/convites"),
+        api.get("/unidades/diretor")
+      ]);
+
+      if (!isMounted) return;
+
+      if (usersResult.status === "fulfilled") {
+        setUsers(mapApiUsers(usersResult.value.data));
+      } else {
+        setUsersError("Não foi possível carregar os usuários.");
+        console.error("Erro ao buscar usuários:", usersResult.reason);
+      }
+
+      if (currentUserResult.status === "fulfilled") {
+        setCurrentUser(currentUserResult.value.data?.usuario ?? currentUserResult.value.data);
+      } else {
+        console.error("Erro ao identificar o usuário logado:", currentUserResult.reason);
+      }
+
+      if (invitesResult.status === "fulfilled") {
+        setInvites(mapApiInvites(invitesResult.value.data));
+      } else {
+        setInvitesError("Não foi possível carregar os convites.");
+        console.error("Erro ao buscar convites:", invitesResult.reason);
+      }
+
+      if (unitsResult.status === "fulfilled") {
+        const unitList = getResponseItems(unitsResult.value.data, "unidades");
+        setUnits(unitList.map((unit) => ({
+          id: unit.idUnidade ?? unit.id,
+          name: unit.nomeUnidade ?? unit.nome
+        })).filter((unit) => unit.id != null && unit.name));
+      } else {
+        setUnitsError("Não foi possível carregar as unidades.");
+        console.error("Erro ao buscar unidades:", unitsResult.reason);
+      }
+
+      setIsLoading(false);
+      setIsInvitesLoading(false);
+      setIsUnitsLoading(false);
+    }
+
+    loadUsers();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const visibleUsers = users.filter((user) => user.active);
+  const activeInvites = invites.filter((invite) => (
+    invite.status !== "ACEITO" && !isInviteExpired(invite.expiresAt, currentTime)
+  ));
+  const expiredInvites = invites.filter((invite) => (
+    invite.status !== "ACEITO" && isInviteExpired(invite.expiresAt, currentTime)
+  ));
+
+  function isCurrentUser(user) {
+    if (!currentUser) return true;
+
+    if (currentUser.id != null && user.id != null) {
+      return String(currentUser.id) === String(user.id);
+    }
+
+    if (currentUser.email && user.email) {
+      return currentUser.email.trim().toLowerCase() === user.email.trim().toLowerCase();
+    }
+
+    const currentUserName = currentUser.nome ?? currentUser.name;
+    return Boolean(currentUserName && user.name && currentUserName.trim().toLowerCase() === user.name.trim().toLowerCase());
+  }
 
   function handleChange(event) {
     setForm({ ...form, [event.target.name]: event.target.value });
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    if (!form.email || (form.role === "Conselheiro" && !form.unit)) return;
+    if (submitLock.current) return;
 
-    const generatedInvitation = {
-      id: `${Date.now()}`,
-      email: form.email,
-      role: form.role,
-      unit: form.role === "Diretoria" ? "Acesso completo" : form.unit,
-      link: "",
-      expiresInDays: 7,
-      createdAt: new Date().toISOString()
+    const selectedUnit = units.find((unit) => String(unit.id) === form.unit);
+    if (!form.email || !profileIds[form.role] || (form.role === "Conselheiro" && !selectedUnit)) {
+      setSubmitError("Preencha os dados do convite antes de continuar.");
+      return;
+    }
+
+    submitLock.current = true;
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    const requestBody = {
+      email: form.email.trim(),
+      idPerfil: profileIds[form.role],
+      idUnidade: form.role === "Diretoria" ? null : Number(selectedUnit.id)
     };
 
-    setActiveInvites((current) => [generatedInvitation, ...current]);
-    setInvitation({ email: generatedInvitation.email, role: generatedInvitation.role, unit: generatedInvitation.unit });
-    setInviteResult(generatedInvitation);
-    setActiveTab("active");
-    setIsModalOpen(false);
-    setForm({ email: "", role: "Conselheiro", unit: "" });
+    try {
+      const response = await api.post("/convites", requestBody);
+      const createdInvite = response.data?.convite ?? response.data ?? {};
+      const invitation = {
+        id: createdInvite.id ?? `pending-${Date.now()}`,
+        email: createdInvite.email ?? requestBody.email,
+        role: createdInvite.tipoConta ?? form.role,
+        unit: form.role === "Diretoria" ? "" : selectedUnit?.name ?? "",
+        status: createdInvite.statusConvite ?? "PENDENTE",
+        expiresAt: createdInvite.dataExpiracao ?? ""
+      };
+
+      setInvites((current) => [invitation, ...current]);
+      setInviteResult({
+        email: invitation.email,
+        role: invitation.role,
+        unit: invitation.unit,
+        link: createdInvite.link ?? createdInvite.url ?? "",
+        expiresInDays: createdInvite.expiresInDays ?? 7
+      });
+      setActiveTab("active");
+      setIsModalOpen(false);
+      setForm({ email: "", role: "Conselheiro", unit: "" });
+
+      const [invitesRefresh, usersRefresh] = await Promise.allSettled([
+        api.get("/convites"),
+        api.get("/usuarios")
+      ]);
+
+      if (invitesRefresh.status === "fulfilled") {
+        setInvites(mapApiInvites(invitesRefresh.value.data));
+        setInvitesError("");
+      }
+      if (usersRefresh.status === "fulfilled") {
+        setUsers(mapApiUsers(usersRefresh.value.data));
+        setUsersError("");
+      }
+    } catch (error) {
+      const serverMessage = error.response?.data?.message;
+      setSubmitError(typeof serverMessage === "string" ? serverMessage : "Não foi possível criar o convite. Tente novamente.");
+    } finally {
+      submitLock.current = false;
+      setIsSubmitting(false);
+    }
   }
 
   function copyInviteLink() {
@@ -82,44 +248,65 @@ function Convites() {
   }
 
   function openDeactivateUserModal(user) {
+    setUserDeleteError("");
     setSelectedUser(user);
   }
 
   function closeDeactivateUserModal() {
+    if (userDeleteLock.current) return;
     setSelectedUser(null);
+    setUserDeleteError("");
   }
 
-  function deactivateUser() {
-    if (!selectedUser) return;
+  async function deactivateUser() {
+    if (!selectedUser || selectedUser.id == null || userDeleteLock.current) return;
 
-    // function removeUser(name) {
-    //   setUsers(users.filter((user) => user.name !== name));
-    // }
+    userDeleteLock.current = true;
+    setIsDeletingUser(true);
+    setUserDeleteError("");
 
-    setUsers((currentUsers) => currentUsers.map((user) => (
-      user.name === selectedUser.name ? { ...user, active: false } : user
-    )));
-    closeDeactivateUserModal();
+    try {
+      await api.delete(`/usuarios?idUsuario=${encodeURIComponent(selectedUser.id)}`);
+      setUsers((currentUsers) => currentUsers.filter((user) => String(user.id) !== String(selectedUser.id)));
+      setSelectedUser(null);
+    } catch (error) {
+      const serverMessage = error.response?.data?.message;
+      setUserDeleteError(typeof serverMessage === "string" ? serverMessage : "Não foi possível inativar o usuário. Tente novamente.");
+    } finally {
+      userDeleteLock.current = false;
+      setIsDeletingUser(false);
+    }
   }
 
-  function openDeleteInviteModal(invite, tab) {
-    setInviteToDelete({ invite, tab });
+  function openDeleteInviteModal(invite) {
+    setInviteDeleteError("");
+    setInviteToDelete(invite);
   }
 
   function closeDeleteInviteModal() {
+    if (inviteDeleteLock.current) return;
     setInviteToDelete(null);
+    setInviteDeleteError("");
   }
 
-  function confirmDeleteInvite() {
-    if (!inviteToDelete) return;
+  async function confirmDeleteInvite() {
+    if (!inviteToDelete || inviteToDelete.id == null || inviteDeleteLock.current) return;
 
-    if (inviteToDelete.tab === "active") {
-      setActiveInvites((current) => current.filter((item) => item.id !== inviteToDelete.invite.id));
-    } else {
-      setExpiredInvites((current) => current.filter((item) => item.id !== inviteToDelete.invite.id));
+    inviteDeleteLock.current = true;
+    setIsDeletingInvite(true);
+    setInviteDeleteError("");
+
+    try {
+      await api.delete(`/convites?idConvite=${encodeURIComponent(inviteToDelete.id)}`);
+      setInvites((current) => current.filter((item) => String(item.id) !== String(inviteToDelete.id)));
+      setInviteToDelete(null);
+    } catch (error) {
+      const serverMessage = error.response?.data?.message;
+      setInviteDeleteError(typeof serverMessage === "string" ? serverMessage : "Não foi possível excluir o convite. Tente novamente.");
+    } finally {
+      inviteDeleteLock.current = false;
+      setIsDeletingInvite(false);
     }
-
-    closeDeleteInviteModal();
   }
 
   return (
@@ -135,26 +322,23 @@ function Convites() {
       <div className={styles.columns}>
         <section className={styles.usersSection}>
           <div className={styles.sectionTitle}>
-            <h2><i className="bx bx-group" /> Usuários Ativos</h2>
-            <span className={styles.count}>{visibleUsers.length}</span>
+            <h2>
+              <i className="bx bx-group" /> Usuários Ativos
+              <span className={styles.count}>{visibleUsers.length}</span>
+            </h2>
           </div>
           <div className={styles.userList}>
-            {/* {visibleUsers.map((user) => (
-              <UserCard key={user.name} user={user} onRemove={removeUser} />
-            ))} */}
-             {visibleUsers.map((user) => {
-              const isCurrentUser = user.id === currentUser.id;
-
-              return (
-                <UserCard
-                  key={user.id}
-                  user={user}
-                  canDeactivate={!isCurrentUser}
-                  onRemove={openDeactivateUserModal}
-                />
-              );
-            })}
-            {visibleUsers.length === 0 && <p className={styles.emptyState}>Nenhum usuário encontrado.</p>}
+            {isLoading && <p className={styles.emptyState}>Carregando usuários...</p>}
+            {!isLoading && usersError && <p className={styles.emptyState}>{usersError}</p>}
+            {!isLoading && !usersError && visibleUsers.map((user) => (
+              <UserCard
+                key={user.id ?? user.email}
+                user={user}
+                canDeactivate={!isCurrentUser(user)}
+                onRemove={openDeactivateUserModal}
+              />
+            ))}
+            {!isLoading && !usersError && visibleUsers.length === 0 && <p className={styles.emptyState}>Nenhum usuário encontrado.</p>}
           </div>
         </section>
 
@@ -166,12 +350,18 @@ function Convites() {
               <button className={activeTab === "expired" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("expired")}>Expirados ({expiredInvites.length})</button>
             </div>
           </div>
-          {activeTab === "active" && activeInvites.length > 0 ? activeInvites.map((item) => (
-            <InviteCard key={item.id} invitation={item} onRemove={() => openDeleteInviteModal(item, "active")} />
-          )) : activeTab === "active" && <p className={styles.emptyState}>Nenhum convite ativo.</p>}
-          {activeTab === "expired" && expiredInvites.length > 0 ? expiredInvites.map((item) => (
-            <InviteCard key={item.id} invitation={item} onRemove={() => openDeleteInviteModal(item, "expired")} expired />
-          )) : activeTab === "expired" && <p className={styles.emptyState}>Nenhum convite expirado.</p>}
+          <div className={styles.inviteList}>
+            {isInvitesLoading && <p className={styles.emptyState}>Carregando convites...</p>}
+            {!isInvitesLoading && invitesError && <p className={styles.emptyState}>{invitesError}</p>}
+            {!isInvitesLoading && !invitesError && activeTab === "active" && activeInvites.map((item) => (
+              <InviteCard key={item.id} invitation={item} currentTime={currentTime} onRemove={() => openDeleteInviteModal(item)} />
+            ))}
+            {!isInvitesLoading && !invitesError && activeTab === "active" && activeInvites.length === 0 && <p className={styles.emptyState}>Nenhum convite ativo.</p>}
+            {!isInvitesLoading && !invitesError && activeTab === "expired" && expiredInvites.map((item) => (
+              <InviteCard key={item.id} invitation={item} currentTime={currentTime} onRemove={() => openDeleteInviteModal(item)} />
+            ))}
+            {!isInvitesLoading && !invitesError && activeTab === "expired" && expiredInvites.length === 0 && <p className={styles.emptyState}>Nenhum convite expirado.</p>}
+          </div>
         </section>
       </div>
 
@@ -184,8 +374,8 @@ function Convites() {
           headerClassName={styles.deactivationHeader}
           bodyClassName={styles.deactivationBody}
           footerClassName={styles.deactivationFooter}
-          footer={<><button type="button" className={styles.cancelButton} onClick={closeDeactivateUserModal}>Cancelar</button><button className={styles.deactivateButton} type="button" onClick={deactivateUser}>Inativar usuário</button></>}
-          onClose={closeDeactivateUserModal}
+          footer={<><button type="button" className={styles.cancelButton} onClick={closeDeactivateUserModal} disabled={isDeletingUser}>Cancelar</button><button className={styles.deactivateButton} type="button" onClick={deactivateUser} disabled={isDeletingUser}>{isDeletingUser ? "Inativando..." : "Inativar usuário"}</button></>}
+          onClose={() => { if (!isDeletingUser) closeDeactivateUserModal(); }}
         >
           <div className={styles.userSummaryCard}>
             <div className={styles.userSummaryHeader}>
@@ -210,6 +400,7 @@ function Convites() {
           </div>
 
           <p className={styles.confirmationText}>Tem certeza que deseja inativar este usuário?</p>
+          {userDeleteError && <p className={styles.actionError} role="alert">{userDeleteError}</p>}
           <div className={styles.warningBox}>
             <i className="bx bx-shield-x" />
             <span>O usuário perderá o acesso ao sistema e deixará de aparecer entre os usuários ativos. O cadastro não deverá ser excluído permanentemente.</span>
@@ -225,10 +416,11 @@ function Convites() {
           headerClassName={styles.deleteInviteHeader}
           bodyClassName={styles.deleteInviteBody}
           footerClassName={styles.deleteInviteFooter}
-          footer={<><button type="button" className={evidenceStyles.cancelAction} onClick={closeDeleteInviteModal}>Cancelar</button><button className={evidenceStyles.submitButtonDanger} type="button" onClick={confirmDeleteInvite}>Excluir convite</button></>}
-          onClose={closeDeleteInviteModal}
+          footer={<><button type="button" className={evidenceStyles.cancelAction} onClick={closeDeleteInviteModal} disabled={isDeletingInvite}>Cancelar</button><button className={evidenceStyles.submitButtonDanger} type="button" onClick={confirmDeleteInvite} disabled={isDeletingInvite}>{isDeletingInvite ? "Excluindo..." : "Excluir convite"}</button></>}
+          onClose={() => { if (!isDeletingInvite) closeDeleteInviteModal(); }}
         >
-          <p className={styles.deleteInviteText}>Excluir o convite enviado para <strong>{inviteToDelete.invite.email}</strong>? O link deixará de funcionar.</p>
+          <p className={styles.deleteInviteText}>Excluir o convite enviado para <strong>{inviteToDelete.email}</strong>?</p>
+          {inviteDeleteError && <p className={styles.actionError} role="alert">{inviteDeleteError}</p>}
         </Modal>
       )}
 
@@ -256,10 +448,12 @@ function Convites() {
               <small>Função</small>
               <strong>{inviteResult.role}</strong>
             </div>
-            <div>
-              <small>Unidade</small>
-              <strong>{inviteResult.unit}</strong>
-            </div>
+            {inviteResult.role !== "Diretoria" && (
+              <div>
+                <small>Unidade</small>
+                <strong>{inviteResult.unit}</strong>
+              </div>
+            )}
           </div>
 
           <div className={styles.linkFieldWrap}>
@@ -287,7 +481,7 @@ function Convites() {
           headerClassName={modalStyles.formHeader}
           bodyClassName={modalStyles.formBody}
           footerClassName={modalStyles.formFooter}
-          footer={<><button type="button" onClick={() => setIsModalOpen(false)}>Cancelar</button><button className={modalStyles.primaryAction} type="submit">Gerar Link</button></>}
+          footer={<><button type="button" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>Cancelar</button><button className={modalStyles.primaryAction} type="submit" disabled={isSubmitting || (form.role === "Conselheiro" && (isUnitsLoading || units.length === 0))}>{isSubmitting ? "Enviando..." : "Gerar Convite"}</button></>}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
         >
@@ -297,7 +491,8 @@ function Convites() {
           <div className={styles.roleOptions}>
             {[["Conselheiro", "Gerencia uma unidade no Kanban"], ["Diretoria", "Acesso completo ao sistema"]].map(([role, description]) => <button key={role} type="button" className={form.role === role ? styles.roleSelected : ""} onClick={() => setForm({ ...form, role })}><strong>{role}</strong><small>{description}</small></button>)}
           </div>
-          {form.role === "Conselheiro" && <><label htmlFor="unit">Unidade vinculada</label><select id="unit" name="unit" value={form.unit} onChange={handleChange} required><option value="">Selecione uma unidade</option><option>Leões</option><option>Tigresas</option><option>Onças</option><option>Panteras</option></select></>}
+          {form.role === "Conselheiro" && <><label htmlFor="unit">Unidade vinculada</label><select id="unit" name="unit" value={form.unit} onChange={handleChange} required disabled={isUnitsLoading || units.length === 0}><option value="">{isUnitsLoading ? "Carregando unidades..." : "Selecione uma unidade"}</option>{units.map((unit) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}</select>{unitsError && <p className={styles.formError} role="alert">{unitsError}</p>}</>}
+          {submitError && <p className={styles.formError} role="alert">{submitError}</p>}
           <div className={styles.howItWorks}><i className="bx bx-link" /><div><strong>Como funciona</strong><span>• Um link único de cadastro será gerado<br />• Compartilhe o link com a pessoa convidada<br />• Cada link pode ser usado apenas uma vez<br />• Você pode excluir um convite a qualquer momento</span></div></div>
         </Modal>
       )}

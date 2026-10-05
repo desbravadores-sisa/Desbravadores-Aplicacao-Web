@@ -1,7 +1,9 @@
 .inviteCard {
   position: relative;
-  min-height: 92px;
-  padding: 15px 14px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  padding: 13px 40px 12px 14px;
   border: 1px solid #edf0f3;
   border-radius: 12px;
   background: #fff;
@@ -17,6 +19,7 @@
   display: block;
   color: #273449;
   font-size: 12px;
+  overflow-wrap: anywhere;
 }
 
 .inviteCard > strong i {
@@ -24,18 +27,47 @@
 }
 
 .inviteMeta {
-  display: inline-flex;
-  gap: 8px;
-  margin: 4px 0 10px 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 8px 0 0 8px;
   color: #64748b;
   font-size: 10px;
 }
 
-.inviteMeta b {
-  padding: 3px 7px;
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
   border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.counselorBadge {
   background: #dce9ff;
   color: #2563eb;
+}
+
+.directorBadge {
+  background: #f1ddff;
+  color: #8b21d1;
+}
+
+.unitLabel {
+  color: #64748b;
+}
+
+.inviteExpiration {
+  align-self: flex-end;
+  margin-top: auto;
+  padding-top: 10px;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .closeInvite {
@@ -47,47 +79,6 @@
   color: #ff7676;
   font-size: 18px;
   cursor: pointer;
-}
-
-.linkRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 9px;
-  border-radius: 9px;
-  background: #f8fafc;
-  color: #8290a0;
-  font-size: 10px;
-}
-
-.linkRow span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.linkRow button {
-  margin-left: auto;
-  padding: 5px 8px;
-  border: 0;
-  border-radius: 8px;
-  background: #fff0df;
-  color: #d56a17;
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.expiredBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 8px;
-  background: #fff0f1;
-  color: #c3274b;
-  font-size: 10px;
-  font-weight: 700;
 }
 
 .emptyState {
