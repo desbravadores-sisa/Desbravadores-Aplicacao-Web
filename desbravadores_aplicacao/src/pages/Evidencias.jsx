@@ -1,69 +1,34 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EvidenceNotebookCard from "../components/EvidenceNotebookCard/EvidenceNotebookCard";
 import Modal from "../components/Modal/Modal";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
 import styles from "./Evidencias.module.css";
-
-const initialEvidences = [
-  {
-    id: 1,
-    title: "Campori Regional - Preparação",
-    unit: "Tigresas",
-    leader: "Carlos Silva",
-    points: 300,
-    description: "Todos os documentos e autorizações foram coletados e organizados",
-    files: [
-      { name: "autorizacoes_pais.pdf", size: "239.3 KB", type: "pdf" },
-      { name: "lista_equipamentos.xlsx", size: "86.9 KB", type: "sheet" }
-    ]
-  },
-  {
-    id: 2,
-    title: "Noite de Talentos",
-    unit: "Leões",
-    leader: "Pedro Costa",
-    points: 120,
-    description: "Evento realizado com sucesso. Tivemos 15 apresentações e excelente presença dos pais.",
-    files: [
-      { name: "fotos_noite_talentos.jpg", size: "2050.8 KB", type: "image" },
-      { name: "lista_participantes.pdf", size: "92.8 KB", type: "pdf" }
-    ]
-  }
-];
-
-const initialNotebooks = [
-  {
-    id: 1,
-    title: "Caderno Pioneiro - Bloco de Sobrevivência",
-    unit: "Onças",
-    leader: "Maria Oliveira",
-    points: 60,
-    description: '"Carlos Eduardo e Fernanda concluíram todos os requisitos do bloco. Destaque para o acampamento liderado."',
-    completedAt: "18/07/2026, 06:30"
-  },
-  {
-    id: 2,
-    title: "Caderno Companheiro - Ciclo Completo",
-    unit: "Leões",
-    leader: "Pedro Costa",
-    points: 45,
-    description: '"Lucas Almeida concluiu todos os 7 requisitos do caderno Companheiro. Destaque para o projeto ambiental de plantio de mudas."',
-    completedAt: "01/07/2026, 11:00"
-  },
-  {
-    id: 3,
-    title: "Caderno Pesquisador - Concluído antecipadamente",
-    unit: "Tigresas",
-    leader: "Carlos Silva",
-    points: 60,
-    description: '"Helena Lima e Beatriz Santos concluíram o Caderno Pesquisador antes do prazo. Helena com destaque na caminhada de orientação por bússola."',
-    completedAt: "20/07/2026, 08:00"
-  }
-];
+import api from "../service/api";
+import { useSearchParams } from "react-router-dom";
+import { errorMessage, notifyRefresh } from "../service/feedback";
 
 function Evidencias() {
-  const [evidences, setEvidences] = useState(initialEvidences);
-  const [notebooks, setNotebooks] = useState(initialNotebooks);
+  const [params] = useSearchParams();
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const saving = useRef(false);
+  async function reload() {
+    const { data } = await api.get("/evidencias");
+    const groups = new Map();
+    for (const e of data || []) {
+      if (!groups.has(e.idTarefaUnidade)) groups.set(e.idTarefaUnidade, { id: e.id, idTarefaUnidade: e.idTarefaUnidade, title: e.nomeTarefa, unit: e.nomeUnidade, leader: "Conselheiro da unidade", points: e.pontuacao, description: e.nome, files: [] });
+      groups.get(e.idTarefaUnidade).files.push({ name: e.nome, url: e.urlAnexo, size: "", type: "file" });
+    }
+    setEvidences([...groups.values()]);
+  }
+  useEffect(() => { Promise.resolve().then(reload).catch(err => setError(errorMessage(err))); }, []);
+  useEffect(() => {
+    const id = params.get("tarefaUnidade");
+    if (id) document.getElementById(`evidence-${id}`)?.scrollIntoView({ block: "center" });
+  }, [params, evidences]);
+
+  const [evidences, setEvidences] = useState([]);
+  const [notebooks, setNotebooks] = useState([]);
   const [activeTab, setActiveTab] = useState("activities");
   const [modal, setModal] = useState(null);
   const [points, setPoints] = useState(300);
@@ -81,18 +46,18 @@ function Evidencias() {
     setModal(null);
   }
 
-  function approveEvidence(event) {
+  async function decide(event, approved) {
     event.preventDefault();
-    setEvidences((current) => current.map((item) => (
-      item.id === modal.evidence.id ? { ...item, points: Number(points) || 0 } : item
-    )));
-    closeModal();
+    if (saving.current) return;
+    saving.current = true; setBusy(true); setError("");
+    try {
+      await api.patch(`/evidencias/${modal.evidence.id}/${approved ? "approve" : "correction"}`, approved ? { pontuacao: Number(points) } : { justificativa: comment });
+      await reload(); notifyRefresh(); closeModal();
+    } catch (err) { setError(errorMessage(err)); }
+    finally { saving.current = false; setBusy(false); }
   }
-
-  function requestCorrection(event) {
-    event.preventDefault();
-    closeModal();
-  }
+  const approveEvidence = event => decide(event, true);
+  const requestCorrection = event => decide(event, false);
 
   function openRecognition(notebook) {
     setRecognition(notebook);
@@ -111,6 +76,7 @@ function Evidencias() {
 
   return (
     <main className={styles.page}>
+      {!modal && error && <p role="alert">{error}</p>}
       <SectionHeader
         title="Evidências e Reconhecimentos"
         subtitle="Revise evidências de atividades e reconheça pontos de cadernos concluídos pelos desbravadores."
@@ -126,7 +92,7 @@ function Evidencias() {
       </div>
 
       {activeTab === "activities" ? evidences.map((evidence) => (
-        <article className={styles.evidenceCard} key={evidence.id}>
+        <article id={`evidence-${evidence.idTarefaUnidade}`} className={styles.evidenceCard} key={evidence.id}>
           <div className={styles.evidenceTop}>
             <div className={styles.evidenceContent}>
               <div className={styles.labels}>
@@ -140,8 +106,8 @@ function Evidencias() {
               </div>
             </div>
             <div className={styles.actions}>
-              <button className={styles.approveButton} type="button" onClick={() => openModal("approve", evidence)}><i className="bx bx-check-circle" /> Analisar e aprovar</button>
-              <button className={styles.correctionButton} type="button" onClick={() => openModal("correction", evidence)}><i className="bx bx-x-circle" /> Solicitar correção</button>
+              <button className={styles.approveButton} type="button" disabled={busy} onClick={() => openModal("approve", evidence)}><i className="bx bx-check-circle" /> Analisar e aprovar</button>
+              <button className={styles.correctionButton} type="button" disabled={busy} onClick={() => openModal("correction", evidence)}><i className="bx bx-x-circle" /> Solicitar correção</button>
             </div>
           </div>
 
@@ -152,7 +118,7 @@ function Evidencias() {
             {evidence.files.map((file) => (
               <div className={styles.file} key={file.name}>
                 <i className={`bx ${file.type === "image" ? "bx-image" : file.type === "sheet" ? "bx-spreadsheet" : "bx-file-blank"}`} />
-                <div><strong>{file.name}</strong><span>{file.size}</span></div>
+                <div><strong><a href={/^https?:\/\//.test(file.url) ? file.url : undefined} target="_blank" rel="noreferrer">{file.name}</a></strong><span>{file.size}</span></div>
               </div>
             ))}
           </div>
@@ -171,8 +137,8 @@ function Evidencias() {
       )}
 
       {modal?.type === "approve" && (
-        <Modal className={styles.modal} title="Aprovar evidência" eyebrow="DECISÃO DA DIRETORIA" labelledBy="approve-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={styles.submitButton} type="submit"><i className="bx bx-check-circle" /> Conceder {points || 0} pts</button></>} onClose={closeModal} onSubmit={approveEvidence}>
-          <EvidenceSummary evidence={modal.evidence} />
+        <Modal className={styles.modal} title="Aprovar evidência" eyebrow="DECISÃO DA DIRETORIA" labelledBy="approve-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={styles.submitButton} disabled={busy} type="submit"><i className="bx bx-check-circle" /> Conceder {points || 0} pts</button></>} onClose={closeModal} onSubmit={approveEvidence}>
+          {error && <p role="alert">{error}</p>}<EvidenceSummary evidence={modal.evidence} />
           <label htmlFor="points">Pontos a conceder</label>
           <p className={styles.helper}>A Diretoria pode manter ou ajustar a pontuação conforme a qualidade da entrega.</p>
           <div className={styles.pointsInput}><input id="points" type="number" min="0" value={points} onChange={(event) => setPoints(event.target.value)} /><span>pts</span></div>
@@ -181,8 +147,8 @@ function Evidencias() {
       )}
 
       {modal?.type === "correction" && (
-        <Modal className={styles.modal} title="Solicitar correção" eyebrow="DECISÃO DA DIRETORIA" labelledBy="correction-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={`${styles.submitButton} ${styles.submitButtonDanger}`} type="submit" disabled={!comment.trim()}><i className="bx bx-chevron-right" /> Enviar para correção</button></>} onClose={closeModal} onSubmit={requestCorrection}>
-          <EvidenceSummary evidence={modal.evidence} />
+        <Modal className={styles.modal} title="Solicitar correção" eyebrow="DECISÃO DA DIRETORIA" labelledBy="correction-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={`${styles.submitButton} ${styles.submitButtonDanger}`} type="submit" disabled={busy || !comment.trim()}><i className="bx bx-chevron-right" /> Enviar para correção</button></>} onClose={closeModal} onSubmit={requestCorrection}>
+          {error && <p role="alert">{error}</p>}<EvidenceSummary evidence={modal.evidence} />
           <label htmlFor="comment">Motivo da solicitação de correção <b>*</b></label>
           <p className={styles.helper}>Explique com clareza o que o conselheiro precisa complementar.</p>
           <textarea id="comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Ex.: incluir lista de presença e foto de todos os participantes." required />

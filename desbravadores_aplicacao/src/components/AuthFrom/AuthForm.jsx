@@ -3,8 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./AuthForm.module.css";
 import Input from "../Input/Input";
 import api from "../../service/api";
+import { isDiretoria, useSession } from "../../service/session";
 
 function AuthForm({ type }) {
+  const { refresh } = useSession();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [nome, setNome] = useState("");
@@ -31,13 +33,10 @@ function AuthForm({ type }) {
 
     if (type === "login") {
       api.post("/usuarios/login", { email: email, senha: senha })
-        .then((resposta) => {
+        .then(async (resposta) => {
           const res = resposta.data;
-          if (res.tipoConta === "Conselheiro") {
-            setErrors({ form: "O acesso de conselheiro ainda não está disponível." });
-          } else if (res.tipoConta === "Diretoria") {
-            navigate("/unidades");
-          }
+          await refresh();
+          navigate(isDiretoria(res.tipoConta) ? "/unidades" : "/minhas-tarefas");
         })
         .catch((erro) => {
           const status = erro.response?.status;

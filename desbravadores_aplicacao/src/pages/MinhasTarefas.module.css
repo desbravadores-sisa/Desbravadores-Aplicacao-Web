@@ -1,0 +1,19 @@
+.page { padding: 32px; max-width: 1500px; margin: auto; }
+.board { display: grid; grid-template-columns: repeat(4, minmax(220px, 1fr)); gap: 18px; align-items: start; overflow-x: auto; padding: 8px; }
+.column { background: #f1f5f9; padding: 16px; border-radius: 14px; min-height: 240px; }
+.column h2 { font-size: 16px; margin: 0 0 16px; }
+.over { background: #dbeafe; }
+.card { position: relative; padding: 18px; margin-bottom: 14px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 5px #00000008; }
+.card h3 { font-size: 15px; margin: 8px 0; padding-right: 12px; }
+.card p { font-size: 13px; color: #475569; overflow-wrap: anywhere; }
+.card small { display: block; color: #64748b; margin: 8px 0; }
+.card button, .evidence button { border: 0; padding: 8px; border-radius: 6px; background: #eaf0ff; color: #2454b8; cursor: pointer; }
+.card label { display: block; margin-top: 12px; font-size: 12px; }
+.card select { display: block; width: 100%; margin-top: 4px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; }
+.card .dragHandle { position: absolute; right: 8px; top: 8px; cursor: grab; touch-action: none; }
+.card .feedback { background: #fff1e3; padding: 10px; border-radius: 6px; color: #9a3412; }
+.highlight { outline: 3px solid #3b82f6; }
+.empty { font-size: 13px; color: #64748b; }
+.form { display: grid; gap: 10px; margin-top: 20px; }
+.form input { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.evidence { padding: 10px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }

@@ -303,3 +303,9 @@
     padding: 0;
   }
 }
+.notificationBadge { position: absolute; top: 0; right: -4px; min-width: 18px; height: 18px; padding: 0 3px; border-radius: 10px; background: #e5484d; color: white; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.notificationList { max-height: 420px; overflow-y: auto; }
+.unread { background: #eef6ff; border-left: 3px solid #2563eb; }
+.notificationActions { display: flex; gap: 12px; margin-top: 8px; }
+.notificationActions button, .notificationAction { border: 0; background: transparent; color: #2563eb; cursor: pointer; font-size: 12px; padding: 8px; }
+.notificationEmpty { padding: 20px; color: #64748b; }
