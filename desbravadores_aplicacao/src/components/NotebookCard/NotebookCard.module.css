@@ -2,13 +2,37 @@
   background: white;
 
   border: 1px solid #dfe4ea;
-  border-top: 3px solid #ff7900;
+   border-top: 4px solid #ff7900; 
 
   border-radius: 12px;
 
   padding: 16px;
 
   box-sizing: border-box;
+}
+
+.amigo {
+  border-top-color: #244a9f;
+}
+
+.companheiro {
+  border-top-color: #b32a24;
+}
+
+.pesquisador {
+  border-top-color: #0f8844;
+}
+
+.pioneiro {
+  border-top-color: #939393;
+}
+
+.excursionista {
+  border-top-color: #933188;
+}
+
+.guia {
+  border-top-color: #e2bc01;
 }
 
 

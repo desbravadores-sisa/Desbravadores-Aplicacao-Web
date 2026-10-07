@@ -1,5 +1,14 @@
 import styles from "./NotebookCard.module.css";
 
+const cardClassByName = {
+  Amigo: styles.amigo,
+  Companheiro: styles.companheiro,
+  Pesquisador: styles.pesquisador,
+  Pioneiro: styles.pioneiro,
+  Excursionista: styles.excursionista,
+  Guia: styles.guia,
+};
+
 function NotebookCard({
   category,
   name,
@@ -12,7 +21,7 @@ function NotebookCard({
 
   return (
 
-    <div className={styles.card}>
+    <div className={`${styles.card} ${cardClassByName[name] ?? ""}`}>
 
       <div className={styles.category}>
         {category}

@@ -14,7 +14,7 @@ function Navbar() {
   const profileAreaRef = useRef(null);
   const navigate = useNavigate();
   const unreadCount = notifications.filter((notification) => notification.unread).length;
-  const [nomeUsuario,setNomeUsuario] = useState("")
+  const [nomeUsuario,setNomeUsuario] = useState("Usuario")
   const [cargo,setCargo] = useState("")
 
   function logout() {
@@ -32,6 +32,7 @@ function Navbar() {
       let resposta = res.data
       setNomeUsuario(resposta.nome)
       setCargo(resposta.tipoConta)
+      console.log(nomeUsuario)
     }).catch((err) => {
       console.log(err.response)
     })
@@ -105,7 +106,7 @@ function Navbar() {
           aria-expanded={openPopover === "profile"}
           onClick={() => setOpenPopover((current) => current === "profile" ? null : "profile")}
         >
-          <span className={styles.avatar}>{nomeUsuario.trim()[0]}</span>
+          <span className={styles.avatar}>{nomeUsuario != undefined ? nomeUsuario.trim()[0] : "" }</span>
           <span className={styles.profileInfo}>
             <strong>{nomeUsuario}</strong>
             <small>{cargo}</small>
