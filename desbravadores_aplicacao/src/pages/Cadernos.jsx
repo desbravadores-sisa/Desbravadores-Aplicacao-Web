@@ -6,6 +6,7 @@ import styles from "./Cadernos.module.css";
 
 const initialCadernos = [
   {
+    id: "amigo",
     category: "LEÕES E TIGRESAS",
     name: "Amigo",
     age: 10,
@@ -15,6 +16,7 @@ const initialCadernos = [
     status: "Ativo"
   },
   {
+    id: "companheiro",
     category: "LEÕES E TIGRESAS",
     name: "Companheiro",
     age: 11,
@@ -24,6 +26,7 @@ const initialCadernos = [
     status: "Ativo"
   },
   {
+    id: "pesquisador",
     category: "LEÕES E TIGRESAS",
     name: "Pesquisador",
     age: 12,
@@ -33,6 +36,7 @@ const initialCadernos = [
     status: "Concluído antecipadamente"
   },
   {
+    id: "pioneiro",
     category: "ONÇAS E PANTERAS",
     name: "Pioneiro",
     age: 13,
@@ -42,6 +46,7 @@ const initialCadernos = [
     status: "Ativo"
   },
   {
+    id: "excursionista",
     category: "ONÇAS E PANTERAS",
     name: "Excursionista",
     age: 14,
@@ -51,6 +56,7 @@ const initialCadernos = [
     status: "Ativo"
   },
   {
+    id: "guia",
     category: "ONÇAS E PANTERAS",
     name: "Guia",
     age: 15,
@@ -62,19 +68,28 @@ const initialCadernos = [
 ];
 
 const initialMembers = [
-  { id: 1, name: "Marina Costa", age: 10, unit: "Tigresas", joinedAt: "10/02/2026", status: "Em andamento", progress: 33 },
-  { id: 2, name: "Gabriel Souza", age: 10, unit: "Leões", joinedAt: "10/02/2026", status: "Em andamento", progress: 33 },
-  { id: 3, name: "Ana Clara", age: 11, unit: "Tigresas", joinedAt: "15/03/2026", status: "Em andamento", progress: 33 },
-  { id: 4, name: "Pedro Henrique", age: 11, unit: "Leões", joinedAt: "20/02/2026", status: "Em andamento", progress: 33 },
-  { id: 5, name: "Lucas Almeida", age: 11, unit: "Leões", joinedAt: "05/01/2026", status: "Concluído antecipadamente", progress: 100 },
-  { id: 6, name: "Sofia Martins", age: 11, unit: "Tigresas", joinedAt: "12/02/2026", status: "Em andamento", progress: 33 },
-  { id: 7, name: "Helena Lima", age: 12, unit: "Tigresas", joinedAt: "10/02/2026", status: "Concluído antecipadamente", progress: 100 },
-  { id: 8, name: "Rafael Torres", age: 12, unit: "Leões", joinedAt: "10/02/2026", status: "Concluído antecipadamente", progress: 100 },
-  { id: 9, name: "Beatriz Santos", age: 12, unit: "Tigresas", joinedAt: "10/02/2026", status: "Concluído antecipadamente", progress: 100 },
-  { id: 10, name: "Carlos Eduardo", age: 13, unit: "Onças", joinedAt: "15/02/2026", status: "Em andamento", progress: 33 }
+  { id: 1, name: "Marina Costa", age: 10, unit: "Tigresas", joinedAt: "10/02/2026", completedNotebooks: ["amigo", "companheiro", "pesquisador", "pioneiro", "excursionista", "guia"] },
+  { id: 2, name: "Gabriel Souza", age: 10, unit: "Leões", joinedAt: "10/02/2026", completedNotebooks: [] },
+  { id: 3, name: "Ana Clara", age: 11, unit: "Tigresas", joinedAt: "15/03/2026", completedNotebooks: [] },
+  { id: 4, name: "Pedro Henrique", age: 11, unit: "Leões", joinedAt: "20/02/2026", completedNotebooks: [] },
+  { id: 5, name: "Lucas Almeida", age: 11, unit: "Leões", joinedAt: "05/01/2026", completedNotebooks: ["companheiro"] },
+  { id: 6, name: "Sofia Martins", age: 11, unit: "Tigresas", joinedAt: "12/02/2026", completedNotebooks: [] },
+  { id: 7, name: "Helena Lima", age: 12, unit: "Tigresas", joinedAt: "10/02/2026", completedNotebooks: ["pesquisador"] },
+  { id: 8, name: "Rafael Torres", age: 12, unit: "Leões", joinedAt: "10/02/2026", completedNotebooks: ["pesquisador"] },
+  { id: 9, name: "Beatriz Santos", age: 12, unit: "Tigresas", joinedAt: "10/02/2026", completedNotebooks: ["pesquisador"] },
+  { id: 10, name: "Carlos Eduardo", age: 13, unit: "Onças", joinedAt: "15/02/2026", completedNotebooks: [] }
 ];
 
-const emptyMember = { name: "", age: "", unit: "" };
+const notebookVisuals = {
+  amigo: { name: "Amigo", abbreviation: "AM", color: "var(--notebook-amigo)", textColor: "#fff" },
+  companheiro: { name: "Companheiro", abbreviation: "CO", color: "var(--notebook-companheiro)", textColor: "#fff" },
+  pesquisador: { name: "Pesquisador", abbreviation: "PE", color: "var(--notebook-pesquisador)", textColor: "#fff" },
+  pioneiro: { name: "Pioneiro", abbreviation: "PI", color: "var(--notebook-pioneiro)", textColor: "#172033" },
+  excursionista: { name: "Excursionista", abbreviation: "EX", color: "var(--notebook-excursionista)", textColor: "#fff" },
+  guia: { name: "Guia", abbreviation: "GU", color: "var(--notebook-guia)", textColor: "#172033" }
+};
+
+const emptyMember = { name: "", birthDate: "", unit: "" };
 const units = ["Tigresas", "Leões", "Onças", "Panteras"];
 
 function formatDate(date) {
@@ -106,6 +121,21 @@ function parseDateInput(value) {
   return isValidDate ? `${year}-${month}-${day}` : "";
 }
 
+function getAgeFromBirthDate(birthDate) {
+  const [year, month, day] = birthDate.split("-").map(Number);
+  const today = new Date();
+  let age = today.getFullYear() - year;
+
+  if (
+    today.getMonth() + 1 < month
+    || (today.getMonth() + 1 === month && today.getDate() < day)
+  ) {
+    age -= 1;
+  }
+
+  return age;
+}
+
 function getNotebookForAge(age, cadernos) {
   return cadernos.find((caderno) => caderno.age === Number(age)) || cadernos[0];
 }
@@ -122,6 +152,9 @@ function Cadernos() {
   const [members, setMembers] = useState(initialMembers);
   const [memberModal, setMemberModal] = useState(null);
   const [memberForm, setMemberForm] = useState(emptyMember);
+  const memberBirthDate = parseDateInput(memberForm.birthDate);
+  const memberAge = memberBirthDate ? getAgeFromBirthDate(memberBirthDate) : null;
+  const memberAgeOutOfRange = memberAge !== null && (memberAge < 10 || memberAge > 15);
 
   function handleCycleChange(event) {
     const { name, value } = event.target;
@@ -153,20 +186,35 @@ function Cadernos() {
   }
 
   function openMember(member) {
-    setMemberForm({ name: member.name, age: String(member.age), unit: member.unit });
+    setMemberForm({
+      name: member.name,
+      birthDate: member.birthDate ? formatDate(member.birthDate) : "",
+      unit: member.unit
+    });
     setMemberModal({ type: "edit", member });
   }
 
   function saveMember(event) {
     event.preventDefault();
-    if (!memberForm.name.trim() || !memberForm.age || !memberForm.unit) return;
+    const isNewMember = memberModal.type === "new";
+    const age = memberAge ?? (isNewMember ? null : memberModal.member.age);
 
-    const notebook = getNotebookForAge(memberForm.age, cadernos);
+    if (
+      !memberForm.name.trim()
+      || !age
+      || !memberForm.unit
+      || (isNewMember && !memberBirthDate)
+      || (memberForm.birthDate && !memberBirthDate)
+      || memberAgeOutOfRange
+    ) return;
+
+    const notebook = getNotebookForAge(age, cadernos);
     const memberData = {
       name: memberForm.name.trim(),
-      age: Number(memberForm.age),
+      age,
       unit: memberForm.unit,
-      notebook: notebook.name
+      notebook: notebook.name,
+      ...(memberBirthDate ? { birthDate: memberBirthDate } : {})
     };
 
     if (memberModal.type === "new") {
@@ -174,8 +222,7 @@ function Cadernos() {
         id: Date.now(),
         ...memberData,
         joinedAt: notebook.startDate,
-        status: "Em andamento",
-        progress: 0
+        completedNotebooks: []
       }]);
     } else {
       setMembers((current) => current.map((member) => (
@@ -207,8 +254,8 @@ function Cadernos() {
         <SectionHeader
           title="Cadernos"
           subtitle="Gerencie os ciclos e os membros do clube."
-          buttonIcon={<i className="bx bx-plus" />}
-          buttonText="Novo ciclo"
+          buttonIcon={activeTab === "notebooks" ? <i className="bx bx-plus" /> : null}
+          buttonText={activeTab === "notebooks" ? "Novo ciclo" : null}
           onButtonClick={() => setCycleModalOpen(true)}
         />
 
@@ -250,13 +297,22 @@ function Cadernos() {
 
             <div className={styles.memberTableWrap}>
               <table className={styles.memberTable}>
+                <colgroup>
+                  <col className={styles.memberColumnName} />
+                  <col className={styles.memberColumnAge} />
+                  <col className={styles.memberColumnUnit} />
+                  <col className={styles.memberColumnCurrentNotebook} />
+                  <col className={styles.memberColumnCompletedNotebooks} />
+                  <col className={styles.memberColumnJoinedAt} />
+                  <col className={styles.memberColumnActions} />
+                </colgroup>
                 <thead>
                   <tr>
                     <th>Desbravador</th>
                     <th>Idade</th>
                     <th>Unidade</th>
                     <th>Caderno atual</th>
-                    <th>Situação no caderno</th>
+                    <th>Cadernos concluídos</th>
                     <th>Ingresso</th>
                     <th>Ações</th>
                   </tr>
@@ -264,17 +320,42 @@ function Cadernos() {
                 <tbody>
                   {members.map((member) => {
                     const notebook = getNotebookForAge(member.age, cadernos);
+                    const completedNotebooks = member.completedNotebooks
+                      .map((notebookId) => notebookVisuals[notebookId])
+                      .filter(Boolean);
                     return (
                       <tr key={member.id}>
-                        <td><span className={styles.memberAvatar}>{getInitials(member.name)}</span><strong>{member.name}</strong></td>
-                        <td>{member.age} anos</td>
-                        <td>{member.unit}</td>
-                        <td><strong>{notebook.name}</strong></td>
-                        <td><span className={`${styles.memberStatus} ${member.progress === 100 ? styles.memberStatusComplete : ""}`}>{member.status}</span></td>
-                        <td>{member.joinedAt}</td>
-                        <td>
+                        <td data-label="Desbravador"><span className={styles.memberAvatar}>{getInitials(member.name)}</span><strong>{member.name}</strong></td>
+                        <td data-label="Idade">{member.age} anos</td>
+                        <td data-label="Unidade">{member.unit}</td>
+                        <td data-label="Caderno atual"><strong>{notebook.name}</strong></td>
+                        <td data-label="Cadernos concluídos">
+                          {completedNotebooks.length === 0 ? (
+                            <span className={styles.noCompletedNotebooks}>Nenhum</span>
+                          ) : (
+                            <ul className={styles.completedNotebooks} aria-label="Cadernos concluídos">
+                              {completedNotebooks.map((completedNotebook) => (
+                                <li key={completedNotebook.name}>
+                                  <span
+                                    className={styles.completedNotebookBadge}
+                                    style={{
+                                      backgroundColor: completedNotebook.color,
+                                      color: completedNotebook.textColor
+                                    }}
+                                    role="img"
+                                    title={`${completedNotebook.name} concluído`}
+                                    aria-label={`${completedNotebook.name} concluído`}
+                                  >
+                                    {completedNotebook.abbreviation}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </td>
+                        <td data-label="Ingresso">{member.joinedAt}</td>
+                        <td data-label="Ações">
                           <div className={styles.memberActions}>
-                            <button type="button" className={styles.historyButton} onClick={() => openMember(member)}><i className="bx bx-history" /> Histórico</button>
                             <button type="button" aria-label={`Editar ${member.name}`} onClick={() => openMember(member)}><i className="bx bx-pencil" /></button>
                             <button type="button" aria-label={`Excluir ${member.name}`} onClick={() => setMembers((current) => current.filter((item) => item.id !== member.id))}><i className="bx bx-trash" /></button>
                           </div>
@@ -305,11 +386,21 @@ function Cadernos() {
           <input id="member-name" name="name" placeholder="Nome do desbravador" value={memberForm.name} onChange={(event) => setMemberForm((current) => ({ ...current, name: event.target.value }))} required autoFocus />
           <div className={styles.memberFormRow}>
             <div>
-              <label htmlFor="member-age">Idade</label>
-              <select id="member-age" value={memberForm.age} onChange={(event) => setMemberForm((current) => ({ ...current, age: event.target.value }))} required>
-                <option value="">Selecione</option>
-                {[10, 11, 12, 13, 14, 15].map((age) => <option key={age} value={age}>{age} anos</option>)}
-              </select>
+              <label htmlFor="member-birth-date">Data de aniversário</label>
+              <input
+                id="member-birth-date"
+                name="birthDate"
+                type="text"
+                inputMode="numeric"
+                maxLength={10}
+                placeholder="dd/mm/aaaa"
+                value={memberForm.birthDate}
+                onChange={(event) => setMemberForm((current) => ({
+                  ...current,
+                  birthDate: formatDateInput(event.target.value)
+                }))}
+                required={memberModal.type === "new" || Boolean(memberModal.member.birthDate)}
+              />
             </div>
             <div>
               <label htmlFor="member-unit">Unidade</label>
@@ -319,20 +410,16 @@ function Cadernos() {
               </select>
             </div>
           </div>
-          {memberForm.age && (
+          {memberForm.birthDate && !memberBirthDate && (
+            <span className={styles.memberFormError} role="alert">Informe uma data válida no formato dd/mm/aaaa.</span>
+          )}
+          {memberAgeOutOfRange && (
+            <span className={styles.memberFormError} role="alert">A idade calculada precisa estar entre 10 e 15 anos para vincular um caderno.</span>
+          )}
+          {memberBirthDate && !memberAgeOutOfRange && (
             <div className={styles.autoNotebookNotice}>
               <strong><i className="bx bx-info-circle" /> Caderno automático</strong>
-              <span>Com {memberForm.age} anos, este desbravador pertence ao caderno {getNotebookForAge(memberForm.age, cadernos).name}. Após o cadastro, o vínculo será criado automaticamente.</span>
-            </div>
-          )}
-          {memberModal.type !== "new" && (
-            <div className={styles.memberHistory}>
-              <h3><i className="bx bx-history" /> Histórico de cadernos</h3>
-              <div className={styles.historyItem}>
-                <strong>{getNotebookForAge(memberForm.age || memberModal.member.age, cadernos).name}</strong>
-                <span>{getNotebookForAge(memberForm.age || memberModal.member.age, cadernos).startDate} — {getNotebookForAge(memberForm.age || memberModal.member.age, cadernos).endDate}</span>
-                <b>{memberModal.member.progress}%</b>
-              </div>
+              <span>Com {memberAge} anos, este desbravador pertence ao caderno {getNotebookForAge(memberAge, cadernos).name}. Após o cadastro, o vínculo será criado automaticamente.</span>
             </div>
           )}
         </Modal>

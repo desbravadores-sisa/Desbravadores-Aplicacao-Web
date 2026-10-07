@@ -224,7 +224,7 @@
 .membersHeading p {
   margin: 0;
   color: #7890a8;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .registerButton {
@@ -238,13 +238,13 @@
   color: #fff;
   box-shadow: 0 5px 12px rgba(255, 101, 8, 0.2);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .memberTableWrap {
-  overflow-x: auto;
+  min-width: 0;
   border: 1px solid #e1e8f0;
   border-radius: 10px;
   background: #fff;
@@ -252,27 +252,35 @@
 
 .memberTable {
   width: 100%;
-  min-width: 860px;
   border-collapse: collapse;
   color: #526070;
-  font-size: 10px;
+  font-size: 11px;
 }
 
+.memberColumnName { width: 20%; }
+.memberColumnAge { width: 8%; }
+.memberColumnUnit { width: 10%; }
+.memberColumnCurrentNotebook { width: 14%; }
+.memberColumnCompletedNotebooks { width: 20%; }
+.memberColumnJoinedAt { width: 16%; }
+.memberColumnActions { width: 12%; }
+
 .memberTable th {
-  padding: 10px 14px;
+  padding: 10px 8px;
   background: #f8fafc;
   color: #7890a8;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.02em;
+  line-height: 1.35;
   text-align: left;
   text-transform: uppercase;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .memberTable td {
   height: 49px;
-  padding: 0 14px;
+  padding: 0 8px;
   border-top: 1px solid #edf1f5;
   white-space: nowrap;
 }
@@ -297,19 +305,29 @@
   font-weight: 800;
 }
 
-.memberStatus {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 10px;
-  background: #eff6ff;
-  color: #2563eb;
-  font-size: 9px;
-  font-weight: 700;
+.completedNotebooks {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.memberStatusComplete {
-  background: #ecfdf5;
-  color: #059669;
+.completedNotebookBadge {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.noCompletedNotebooks {
+  color: #94a3b8;
+  font-size: 11px;
 }
 
 .memberActions {
@@ -325,15 +343,6 @@
   color: #9aabc0;
   cursor: pointer;
   font-size: 15px;
-}
-
-.memberActions .historyButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  color: #f05a22;
-  font-size: 10px;
-  font-weight: 700;
 }
 
 .memberModal {
@@ -390,6 +399,12 @@
   outline: 2px solid rgba(255, 101, 8, 0.12);
 }
 
+.memberFormError {
+  color: #b42318;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 .memberFormRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -421,47 +436,6 @@
 .autoNotebookNotice i {
   font-size: 13px;
   vertical-align: -2px;
-}
-
-.memberHistory {
-  display: grid;
-  gap: 9px;
-  margin-top: 7px;
-}
-
-.memberHistory h3 {
-  margin: 0;
-  color: #172033;
-  font-size: 13px;
-}
-
-.memberHistory h3 i {
-  margin-right: 5px;
-  color: #f05a22;
-}
-
-.historyItem {
-  position: relative;
-  display: grid;
-  gap: 3px;
-  padding: 10px;
-  border: 1px solid #dbe3ed;
-  border-radius: 11px;
-  color: #7890a8;
-  font-size: 10px;
-}
-
-.historyItem strong {
-  color: #334155;
-  font-size: 11px;
-}
-
-.historyItem b {
-  position: absolute;
-  top: 18px;
-  right: 12px;
-  color: #ed5b16;
-  font-size: 12px;
 }
 
 .memberModalFooter {
@@ -503,6 +477,86 @@
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .memberTableWrap {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .memberTable,
+  .memberTable tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .memberTable colgroup {
+    display: none;
+  }
+
+  .memberTable thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .memberTable tbody {
+    display: grid;
+    gap: 9px;
+  }
+
+  .memberTable tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
+    border: 1px solid #e1e8f0;
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .memberTable td,
+  .memberTable td:first-child {
+    display: block;
+    min-width: 0;
+    height: auto;
+    padding: 8px 10px;
+    border-top: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .memberTable td::before {
+    display: block;
+    margin-bottom: 4px;
+    color: #7890a8;
+    content: attr(data-label);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .memberTable td:first-child strong {
+    color: #172033;
+  }
+
+  .memberTable td:nth-child(5) {
+    grid-column: span 2;
+  }
+
+  .completedNotebooks {
+    flex-wrap: wrap;
+  }
+
+  .memberActions {
+    gap: 12px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -532,5 +586,17 @@
 
   .registerButton {
     align-self: flex-start;
+  }
+
+  .memberTable tr {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .memberTable td:nth-child(5) {
+    grid-column: span 2;
+  }
+
+  .memberTable td[data-label="Ações"] {
+    grid-column: span 2;
   }
 }

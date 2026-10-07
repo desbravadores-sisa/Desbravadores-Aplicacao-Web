@@ -12,27 +12,27 @@
 }
 
 .amigo {
-  border-top-color: #244a9f;
+  border-top-color: var(--notebook-amigo);
 }
 
 .companheiro {
-  border-top-color: #b32a24;
+  border-top-color: var(--notebook-companheiro);
 }
 
 .pesquisador {
-  border-top-color: #0f8844;
+  border-top-color: var(--notebook-pesquisador);
 }
 
 .pioneiro {
-  border-top-color: #939393;
+  border-top-color: var(--notebook-pioneiro);
 }
 
 .excursionista {
-  border-top-color: #933188;
+  border-top-color: var(--notebook-excursionista);
 }
 
 .guia {
-  border-top-color: #e2bc01;
+  border-top-color: var(--notebook-guia);
 }
 
 
