@@ -48,7 +48,7 @@
 
 .formHeader button {
   color: #334155;
-  font-size: 24px;
+  font-size: var(--font-size-24px);
   line-height: 1;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .formBody label {
-  margin-top: 1px;
+  margin-top: var(--spacing-1px);
   color: #526070;
   font-size: var(--font-size-xs);
   font-weight: 700;

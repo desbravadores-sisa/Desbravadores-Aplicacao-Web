@@ -4,9 +4,9 @@
   border: 1px solid #dfe4ea;
    border-top: 4px solid #ff7900; 
 
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 
-  padding: 16px;
+  padding: var(--spacing-md);
 
   box-sizing: border-box;
 }
@@ -37,12 +37,12 @@
 
 
 .category {
-  font-size: 11px;
+  font-size: var(--font-size-11px);
   font-weight: 700;
 
   color: #7b8aa0;
 
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-sm);
 }
 
 
@@ -55,11 +55,11 @@
 .titleArea h2 {
   margin: 0;
 
-  font-size: 19px;
+  font-size: var(--font-size-19px);
 }
 
 .titleArea span {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   color: #526070;
 }
 
@@ -82,7 +82,7 @@
   height: 1px;
   background: #e5e7eb;
 
-  margin: 16px 0;
+  margin: var(--spacing-md) 0;
 }
 
 
@@ -91,7 +91,7 @@
 
   grid-template-columns: 1fr;
 
-  gap: 15px;
+  gap: var(--spacing-15px);
 }
 
 .info span {
@@ -99,13 +99,13 @@
 
   color: #718096;
 
-  font-size: 11px;
+  font-size: var(--font-size-11px);
 
-  margin-bottom: 5px;
+  margin-bottom: var(--spacing-5px);
 }
 
 .info strong {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
 }
 
 
@@ -117,20 +117,20 @@
 }
 
 .footer p {
-  margin: 3px 0;
+  margin: var(--spacing-3px) 0;
 
-  font-size: 11px;
+  font-size: var(--font-size-11px);
 
   color: #526070;
 }
 
 
 .status {
-  font-size: 11px;
+  font-size: var(--font-size-11px);
 
-  padding: 6px 10px;
+  padding: var(--spacing-6px) var(--spacing-10px);
 
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
 
   background: #eff6ff;
   color: #155eef;
@@ -150,11 +150,11 @@
 .button {
   width: 100%;
 
-  margin-top: 16px;
+  margin-top: var(--spacing-md);
 
-  padding: 10px;
+  padding: var(--spacing-10px);
 
-  border-radius: 10px;
+  border-radius: var(--radius-sm-plus);
 
   border: 1px solid #ffb27d;
 

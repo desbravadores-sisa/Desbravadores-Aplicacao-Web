@@ -1,7 +1,7 @@
 .page {
   flex: 1;
   min-height: calc(100vh - 44px);
-  padding: 20px 24px 48px;
+  padding: var(--spacing-md-plus) var(--spacing-lg) var(--spacing-48px);
   background: #f8fafc;
   box-sizing: border-box;
   text-align: left;
@@ -16,14 +16,14 @@
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: end;
-  gap: 22px;
-  margin-bottom: 20px;
+  gap: var(--spacing-22px);
+  margin-bottom: var(--spacing-md-plus);
 }
 
 .heading h1 {
-  margin: 0 0 4px;
+  margin: 0 0 var(--spacing-xs);
   color: #111827;
-  font-size: 25px;
+  font-size: var(--font-size-25px);
   line-height: 1.2;
   letter-spacing: 0;
   font-weight: 800;
@@ -31,15 +31,15 @@
 
 .heading p {
   color: #64748b;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   line-height: 1.5;
 }
 
 .primaryButton {
   border: 0;
-  border-radius: 12px;
-  padding: 9px 15px;
-  font-size: 12px;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-9px) var(--spacing-15px);
+  font-size: var(--font-size-xs);
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -50,21 +50,21 @@
 
 .tabs {
   display: inline-flex;
-  gap: 2px;
-  padding: 3px;
-  margin-bottom: 25px;
+  gap: var(--spacing-2px);
+  padding: var(--spacing-3px);
+  margin-bottom: var(--spacing-25px);
   border: 1px solid #e1e8f0;
-  border-radius: 11px;
+  border-radius: var(--radius-md-minus);
   background: #eef3f8;
 }
 
 .tab {
   border: 0;
-  border-radius: 8px;
-  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm) var(--spacing-14px);
   background: transparent;
   color: #475569;
-  font-size: 11px;
+  font-size: var(--font-size-11px);
   font-weight: 600;
   cursor: pointer;
 }
@@ -76,15 +76,15 @@
 }
 
 .section {
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  padding-left: 10px;
+  margin-bottom: var(--spacing-sm-plus);
+  padding-left: var(--spacing-10px);
   border-left: 3px solid #ff6508;
 }
 
@@ -95,25 +95,25 @@
 .sectionTitle {
   margin: 0;
   color: #172033;
-  font-size: 14px;
+  font-size: var(--font-size-14px);
   font-weight: 800;
 }
 
 .sectionSubtitle {
-  margin-top: 2px;
+  margin-top: var(--spacing-2px);
   color: #7890a8;
-  font-size: 10px;
+  font-size: var(--font-size-2xs);
 }
 
 .sectionCount {
   color: #7890a8;
-  font-size: 10px;
+  font-size: var(--font-size-2xs);
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 13px;
+  gap: var(--spacing-13px);
 }
 
 .cycleModal {
@@ -125,47 +125,47 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 18px 14px;
+  padding: var(--spacing-18px) var(--spacing-18px) var(--spacing-14px);
 }
 
 .cycleHeader h2 {
   color: #172033;
-  font-size: 16px;
+  font-size: var(--font-size-md);
 }
 
 .cycleHeader button {
   color: #718096;
-  font-size: 23px;
+  font-size: var(--font-size-23px);
 }
 
 .cycleBody {
   display: grid;
-  gap: 14px;
-  padding: 0 18px 14px;
+  gap: var(--spacing-14px);
+  padding: 0 var(--spacing-18px) var(--spacing-14px);
 }
 
 .cycleNotice {
   margin: 0;
-  padding: 11px 10px;
+  padding: var(--spacing-11px) var(--spacing-10px);
   border: 1px solid #d7e7ff;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: #eff6ff;
   color: #275492;
-  font-size: 11px;
+  font-size: var(--font-size-11px);
   line-height: 1.35;
 }
 
 .cycleFields {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: var(--spacing-10px);
 }
 
 .cycleFields label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: var(--spacing-5px);
   color: #526070;
-  font-size: 10px;
+  font-size: var(--font-size-2xs);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -173,12 +173,12 @@
 .cycleFields input {
   width: 100%;
   box-sizing: border-box;
-  padding: 9px 10px;
+  padding: var(--spacing-9px) var(--spacing-10px);
   border: 1px solid #dbe3ed;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: #334155;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
 }
 
 .cycleFields input:focus {
@@ -188,17 +188,17 @@
 
 .cycleFooter {
   display: block;
-  padding: 0 18px 18px;
+  padding: 0 var(--spacing-18px) var(--spacing-18px);
 }
 
 .cycleSubmit {
   width: 100%;
-  padding: 11px;
+  padding: var(--spacing-11px);
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: #f34808;
   color: #fff;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   cursor: pointer;
 }
@@ -211,34 +211,34 @@
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm-plus);
 }
 
 .membersHeading h2 {
-  margin: 0 0 3px;
+  margin: 0 0 var(--spacing-3px);
   color: #172033;
-  font-size: 14px;
+  font-size: var(--font-size-14px);
 }
 
 .membersHeading p {
   margin: 0;
   color: #7890a8;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
 }
 
 .registerButton {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 9px 14px;
+  gap: var(--spacing-5px);
+  padding: var(--spacing-9px) var(--spacing-14px);
   border: 0;
-  border-radius: 11px;
+  border-radius: var(--radius-md-minus);
   background: #ff6508;
   color: #fff;
   box-shadow: 0 5px 12px rgba(255, 101, 8, 0.2);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -246,7 +246,7 @@
 .memberTableWrap {
   min-width: 0;
   border: 1px solid #e1e8f0;
-  border-radius: 10px;
+  border-radius: var(--radius-sm-plus);
   background: #fff;
 }
 
@@ -254,7 +254,7 @@
   width: 100%;
   border-collapse: collapse;
   color: #526070;
-  font-size: 11px;
+  font-size: var(--font-size-11px);
 }
 
 .memberColumnName { width: 20%; }
@@ -266,10 +266,10 @@
 .memberColumnActions { width: 12%; }
 
 .memberTable th {
-  padding: 10px 8px;
+  padding: var(--spacing-10px) var(--spacing-sm);
   background: #f8fafc;
   color: #7890a8;
-  font-size: 10px;
+  font-size: var(--font-size-2xs);
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.35;
@@ -280,7 +280,7 @@
 
 .memberTable td {
   height: 49px;
-  padding: 0 8px;
+  padding: 0 var(--spacing-sm);
   border-top: 1px solid #edf1f5;
   white-space: nowrap;
 }
@@ -288,7 +288,7 @@
 .memberTable td:first-child {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--spacing-9px);
   color: #172033;
 }
 
@@ -301,14 +301,14 @@
   border-radius: 50%;
   background: #ffedd5;
   color: #ed5b16;
-  font-size: 9px;
+  font-size: var(--font-size-9px);
   font-weight: 800;
 }
 
 .completedNotebooks {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--spacing-3px);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -321,19 +321,19 @@
   flex: 0 0 20px;
   place-items: center;
   border-radius: 50%;
-  font-size: 7px;
+  font-size: var(--font-size-7px);
   font-weight: 800;
 }
 
 .noCompletedNotebooks {
   color: #94a3b8;
-  font-size: 11px;
+  font-size: var(--font-size-11px);
 }
 
 .memberActions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-10px);
 }
 
 .memberActions button {
@@ -342,7 +342,7 @@
   background: transparent;
   color: #9aabc0;
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--font-size-15px);
 }
 
 .memberModal {
@@ -354,28 +354,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 20px 14px;
+  padding: var(--spacing-18px) var(--spacing-md-plus) var(--spacing-14px);
 }
 
 .memberModalHeader h2 {
   color: #172033;
-  font-size: 16px;
+  font-size: var(--font-size-md);
 }
 
 .memberModalHeader button {
   color: #718096;
-  font-size: 23px;
+  font-size: var(--font-size-23px);
 }
 
 .memberModalBody {
   display: grid;
-  gap: 9px;
-  padding: 0 20px 12px;
+  gap: var(--spacing-9px);
+  padding: 0 var(--spacing-md-plus) var(--spacing-sm-plus);
 }
 
 .memberModalBody label {
   color: #526070;
-  font-size: 10px;
+  font-size: var(--font-size-2xs);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -384,13 +384,13 @@
 .memberModalBody select {
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 12px;
+  padding: var(--spacing-10px) var(--spacing-sm-plus);
   border: 1px solid #dbe3ed;
-  border-radius: 11px;
+  border-radius: var(--radius-md-minus);
   background: #f8fafc;
   color: #334155;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
 }
 
 .memberModalBody input:focus,
@@ -401,31 +401,31 @@
 
 .memberFormError {
   color: #b42318;
-  font-size: 10px;
+  font-size: var(--font-size-2xs);
   line-height: 1.4;
 }
 
 .memberFormRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: var(--spacing-10px);
 }
 
 .memberFormRow > div {
   display: grid;
-  gap: 9px;
+  gap: var(--spacing-9px);
 }
 
 .autoNotebookNotice {
   display: grid;
-  gap: 5px;
-  margin-top: 4px;
-  padding: 10px;
+  gap: var(--spacing-5px);
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-10px);
   border: 1px solid #d7e7ff;
-  border-radius: 10px;
+  border-radius: var(--radius-sm-plus);
   background: #eff6ff;
   color: #275492;
-  font-size: 10px;
+  font-size: var(--font-size-2xs);
   line-height: 1.35;
 }
 
@@ -434,23 +434,23 @@
 }
 
 .autoNotebookNotice i {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   vertical-align: -2px;
 }
 
 .memberModalFooter {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 0 20px 18px;
+  gap: var(--spacing-10px);
+  padding: 0 var(--spacing-md-plus) var(--spacing-18px);
 }
 
 .memberModalFooter button {
-  padding: 10px;
+  padding: var(--spacing-10px);
   border: 0;
-  border-radius: 11px;
+  border-radius: var(--radius-md-minus);
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--font-size-11px);
   font-weight: 700;
 }
 
@@ -499,7 +499,7 @@
     width: 1px;
     height: 1px;
     padding: 0;
-    margin: -1px;
+    margin: var(--spacing-negative-1px);
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
@@ -508,7 +508,7 @@
 
   .memberTable tbody {
     display: grid;
-    gap: 9px;
+    gap: var(--spacing-9px);
   }
 
   .memberTable tr {
@@ -516,7 +516,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     overflow: hidden;
     border: 1px solid #e1e8f0;
-    border-radius: 10px;
+    border-radius: var(--radius-sm-plus);
     background: #fff;
   }
 
@@ -525,7 +525,7 @@
     display: block;
     min-width: 0;
     height: auto;
-    padding: 8px 10px;
+    padding: var(--spacing-sm) var(--spacing-10px);
     border-top: 0;
     white-space: normal;
     overflow-wrap: anywhere;
@@ -533,10 +533,10 @@
 
   .memberTable td::before {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: var(--spacing-xs);
     color: #7890a8;
     content: attr(data-label);
-    font-size: 8px;
+    font-size: var(--font-size-8px);
     font-weight: 700;
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -555,20 +555,20 @@
   }
 
   .memberActions {
-    gap: 12px;
+    gap: var(--spacing-sm-plus);
   }
 }
 
 @media (max-width: 600px) {
   .page {
-    padding: 18px 16px 32px;
+    padding: var(--spacing-18px) var(--spacing-md) var(--spacing-xl);
   }
 
   .header {
     display: flex;
     align-items: stretch;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-10px);
   }
 
   .primaryButton {

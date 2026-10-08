@@ -21,27 +21,56 @@
   --color-muted: #666666;
 
   /* Tamanhos de fonte */
+  --font-size-7px: 7px;
+  --font-size-8px: 8px;
+  --font-size-9px: 9px;
   --font-size-2xs: 10px;
+  --font-size-11px: 11px;
   --font-size-xs: 12px;
   --font-size-sm: 13px;
+  --font-size-14px: 14px;
+  --font-size-15px: 15px;
   --font-size-md: 16px;
   --font-size-lg: 18px;
+  --font-size-19px: 19px;
+  --font-size-23px: 23px;
+  --font-size-24px: 24px;
+  --font-size-25px: 25px;
   --font-size-xl: 27px;
 
   /* Espaçamentos */
+  --spacing-negative-1px: -1px;
+  --spacing-1px: 1px;
+  --spacing-2px: 2px;
+  --spacing-3px: 3px;
   --spacing-xs: 4px;
+  --spacing-5px: 5px;
+  --spacing-6px: 6px;
   --spacing-sm: 8px;
+  --spacing-9px: 9px;
+  --spacing-10px: 10px;
+  --spacing-11px: 11px;
   --spacing-sm-plus: 12px;
+  --spacing-13px: 13px;
+  --spacing-14px: 14px;
+  --spacing-15px: 15px;
   --spacing-md: 16px;
+  --spacing-18px: 18px;
   --spacing-md-plus: 20px;
+  --spacing-22px: 22px;
   --spacing-lg: 24px;
+  --spacing-25px: 25px;
   --spacing-xl: 32px;
+  --spacing-48px: 48px;
 
   /* Radius */
   --radius-sm: 8px;
+  --radius-sm-plus: 10px;
+  --radius-md-minus: 11px;
   --radius-md: 12px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+  --radius-pill: 20px;
 }
 
 body {
