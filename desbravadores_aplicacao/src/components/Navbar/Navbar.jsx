@@ -11,11 +11,47 @@ const notifications = [
 
 function Navbar() {
   const [openPopover, setOpenPopover] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const profileAreaRef = useRef(null);
+  const menuToggleRef = useRef(null);
+  const drawerRef = useRef(null);
+  const drawerCloseRef = useRef(null);
   const navigate = useNavigate();
   const unreadCount = notifications.filter((notification) => notification.unread).length;
-  const [nomeUsuario,setNomeUsuario] = useState("")
+  const [nomeUsuario,setNomeUsuario] = useState("Usuario")
   const [cargo,setCargo] = useState("")
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const menuToggle = menuToggleRef.current;
+    document.body.style.overflow = "hidden";
+    drawerCloseRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      menuToggle?.focus();
+    };
+  }, [mobileMenuOpen]);
+
+  function trapDrawerFocus(event) {
+    if (event.key !== "Tab" || !drawerRef.current) return;
+
+    const focusableItems = drawerRef.current.querySelectorAll(
+      'a[href], button:not([disabled])'
+    );
+    const firstItem = focusableItems[0];
+    const lastItem = focusableItems[focusableItems.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstItem) {
+      event.preventDefault();
+      lastItem.focus();
+    } else if (!event.shiftKey && document.activeElement === lastItem) {
+      event.preventDefault();
+      firstItem.focus();
+    }
+  }
 
   function logout() {
     api.post("/usuarios/logoff")
@@ -32,6 +68,7 @@ function Navbar() {
       let resposta = res.data
       setNomeUsuario(resposta.nome)
       setCargo(resposta.tipoConta)
+      console.log(nomeUsuario)
     }).catch((err) => {
       console.log(err.response)
     })
@@ -44,7 +81,10 @@ function Navbar() {
     }
 
     function closeOnEscape(event) {
-      if (event.key === "Escape") setOpenPopover(null);
+      if (event.key === "Escape") {
+        setOpenPopover(null);
+        setMobileMenuOpen(false);
+      }
     }
 
     document.addEventListener("mousedown", closePopover);
@@ -56,7 +96,7 @@ function Navbar() {
   }, []);
 
   return (
-    <nav className={styles.navbar}>
+    <nav className={`${styles.navbar} ${mobileMenuOpen ? styles.menuActive : ""}`}>
 
       <div className={styles.logoArea}>
         <div className={styles.logo}>
@@ -65,26 +105,65 @@ function Navbar() {
         <span className={styles.title}>Tigre da Montanha</span>
       </div>
 
-      <div className={styles.menu}>
-        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades">
-          <i className='bx bx-group'></i> Unidades
-        </NavLink>
+      <button
+        className={styles.menuToggle}
+        ref={menuToggleRef}
+        type="button"
+        aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+        aria-expanded={mobileMenuOpen}
+        aria-controls="primary-navigation"
+        onClick={() => setMobileMenuOpen((isOpen) => !isOpen)}
+      >
+        <i className={`bx ${mobileMenuOpen ? "bx-x" : "bx-menu"}`} aria-hidden="true" />
+      </button>
 
-        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/tarefas">
-          <i className='bx bx-check-square'></i> Tarefas
-        </NavLink>
+      <div
+        className={`${styles.drawer} ${mobileMenuOpen ? styles.drawerOpen : ""}`}
+        ref={drawerRef}
+        id="primary-navigation"
+        role={mobileMenuOpen ? "dialog" : undefined}
+        aria-modal={mobileMenuOpen ? "true" : undefined}
+        aria-label={mobileMenuOpen ? "Navegação principal" : undefined}
+        onKeyDown={trapDrawerFocus}
+      >
+        <div className={styles.drawerHeader}>
+          <div className={styles.logoArea}>
+            <div className={styles.logo}>
+              <i className='bx bx-landscape' aria-hidden="true"></i>
+            </div>
+            <span className={styles.title}>Tigre da Montanha</span>
+          </div>
+          <button
+            className={styles.drawerClose}
+            ref={drawerCloseRef}
+            type="button"
+            aria-label="Fechar menu"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <i className="bx bx-x" aria-hidden="true" />
+          </button>
+        </div>
+        <nav className={styles.menu} aria-label="Navegação principal">
+          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades" onClick={() => setMobileMenuOpen(false)}>
+            <i className='bx bx-group'></i> Unidades
+          </NavLink>
 
-        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias">
-          <i className='bx bx-list-check'></i> Evidências
-        </NavLink>
+          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/tarefas" onClick={() => setMobileMenuOpen(false)}>
+            <i className='bx bx-check-square'></i> Tarefas
+          </NavLink>
 
-        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos">
-          <i className='bx bx-book'></i> Cadernos
-        </NavLink>
+          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias" onClick={() => setMobileMenuOpen(false)}>
+            <i className='bx bx-list-check'></i> Evidências
+          </NavLink>
 
-        <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites">
-          <i className='bx bx-envelope'></i> Convites
-        </NavLink>
+          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos" onClick={() => setMobileMenuOpen(false)}>
+            <i className='bx bx-book'></i> Cadernos
+          </NavLink>
+
+          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites" onClick={() => setMobileMenuOpen(false)}>
+            <i className='bx bx-envelope'></i> Convites
+          </NavLink>
+        </nav>
       </div>
 
       <div className={styles.profile} ref={profileAreaRef}>
@@ -105,7 +184,7 @@ function Navbar() {
           aria-expanded={openPopover === "profile"}
           onClick={() => setOpenPopover((current) => current === "profile" ? null : "profile")}
         >
-          <span className={styles.avatar}>{nomeUsuario.trim()[0]}</span>
+          <span className={styles.avatar}>{nomeUsuario != undefined ? nomeUsuario.trim()[0] : "" }</span>
           <span className={styles.profileInfo}>
             <strong>{nomeUsuario}</strong>
             <small>{cargo}</small>
@@ -129,6 +208,14 @@ function Navbar() {
         )}
       </div>
 
+      {mobileMenuOpen && (
+        <button
+          className={styles.backdrop}
+          type="button"
+          aria-label="Fechar menu"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
     </nav>
   );
 }
