@@ -12,6 +12,11 @@
   margin: 0 auto;
 }
 
+.notebooksContent {
+  width: 100%;
+  margin: 0;
+}
+
 .header {
   display: grid;
   grid-template-columns: 1fr auto;

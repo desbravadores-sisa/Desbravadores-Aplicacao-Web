@@ -8,6 +8,10 @@
   background: rgba(15, 23, 42, 0.52);
 }
 
+.stackedBackdrop {
+  z-index: 20;
+}
+
 .dialog {
   max-width: 100%;
   max-height: calc(100vh - 40px);

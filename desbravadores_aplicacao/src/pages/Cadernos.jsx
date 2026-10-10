@@ -2,83 +2,13 @@ import { useState } from "react";
 import NotebookCard from "../components/NotebookCard/NotebookCard";
 import Modal from "../components/Modal/Modal";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
+import {
+  getMembersForNotebook,
+  getNotebookForAge,
+  initialCadernos,
+  initialMembers
+} from "../data/cadernos";
 import styles from "./Cadernos.module.css";
-
-const initialCadernos = [
-  {
-    id: "amigo",
-    category: "LEÕES E TIGRESAS",
-    name: "Amigo",
-    age: 10,
-    linkedMembers: 2,
-    startDate: "10/02/2026",
-    endDate: "10/02/2027",
-    status: "Ativo"
-  },
-  {
-    id: "companheiro",
-    category: "LEÕES E TIGRESAS",
-    name: "Companheiro",
-    age: 11,
-    linkedMembers: 4,
-    startDate: "10/02/2026",
-    endDate: "10/02/2027",
-    status: "Ativo"
-  },
-  {
-    id: "pesquisador",
-    category: "LEÕES E TIGRESAS",
-    name: "Pesquisador",
-    age: 12,
-    linkedMembers: 3,
-    startDate: "10/02/2026",
-    endDate: "10/02/2027",
-    status: "Concluído antecipadamente"
-  },
-  {
-    id: "pioneiro",
-    category: "ONÇAS E PANTERAS",
-    name: "Pioneiro",
-    age: 13,
-    linkedMembers: 3,
-    startDate: "15/02/2026",
-    endDate: "15/02/2027",
-    status: "Ativo"
-  },
-  {
-    id: "excursionista",
-    category: "ONÇAS E PANTERAS",
-    name: "Excursionista",
-    age: 14,
-    linkedMembers: 2,
-    startDate: "18/02/2026",
-    endDate: "18/02/2027",
-    status: "Ativo"
-  },
-  {
-    id: "guia",
-    category: "ONÇAS E PANTERAS",
-    name: "Guia",
-    age: 15,
-    linkedMembers: 3,
-    startDate: "10/02/2025",
-    endDate: "10/02/2026",
-    status: "Encerrado"
-  }
-];
-
-const initialMembers = [
-  { id: 1, name: "Marina Costa", age: 10, unit: "Tigresas", joinedAt: "10/02/2026", completedNotebooks: ["amigo", "companheiro", "pesquisador", "pioneiro", "excursionista", "guia"] },
-  { id: 2, name: "Gabriel Souza", age: 10, unit: "Leões", joinedAt: "10/02/2026", completedNotebooks: [] },
-  { id: 3, name: "Ana Clara", age: 11, unit: "Tigresas", joinedAt: "15/03/2026", completedNotebooks: [] },
-  { id: 4, name: "Pedro Henrique", age: 11, unit: "Leões", joinedAt: "20/02/2026", completedNotebooks: [] },
-  { id: 5, name: "Lucas Almeida", age: 11, unit: "Leões", joinedAt: "05/01/2026", completedNotebooks: ["companheiro"] },
-  { id: 6, name: "Sofia Martins", age: 11, unit: "Tigresas", joinedAt: "12/02/2026", completedNotebooks: [] },
-  { id: 7, name: "Helena Lima", age: 12, unit: "Tigresas", joinedAt: "10/02/2026", completedNotebooks: ["pesquisador"] },
-  { id: 8, name: "Rafael Torres", age: 12, unit: "Leões", joinedAt: "10/02/2026", completedNotebooks: ["pesquisador"] },
-  { id: 9, name: "Beatriz Santos", age: 12, unit: "Tigresas", joinedAt: "10/02/2026", completedNotebooks: ["pesquisador"] },
-  { id: 10, name: "Carlos Eduardo", age: 13, unit: "Onças", joinedAt: "15/02/2026", completedNotebooks: [] }
-];
 
 const notebookVisuals = {
   amigo: { name: "Amigo", abbreviation: "AM", color: "var(--notebook-amigo)", textColor: "#fff" },
@@ -134,10 +64,6 @@ function getAgeFromBirthDate(birthDate) {
   }
 
   return age;
-}
-
-function getNotebookForAge(age, cadernos) {
-  return cadernos.find((caderno) => caderno.age === Number(age)) || cadernos[0];
 }
 
 function getInitials(name) {
@@ -214,6 +140,7 @@ function Cadernos() {
       age,
       unit: memberForm.unit,
       notebook: notebook.name,
+      cadernoId: notebook.id,
       ...(memberBirthDate ? { birthDate: memberBirthDate } : {})
     };
 
@@ -250,7 +177,7 @@ function Cadernos() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.content}>
+      <div className={`${styles.content} ${activeTab === "notebooks" ? styles.notebooksContent : ""}`}>
         <SectionHeader
           title="Cadernos"
           subtitle="Gerencie os ciclos e os membros do clube."
@@ -279,7 +206,11 @@ function Cadernos() {
             </div>
             <div className={styles.grid}>
               {grupo.items.map((caderno) => (
-                <NotebookCard key={caderno.name} {...caderno} />
+                <NotebookCard
+                  key={caderno.name}
+                  {...caderno}
+                  linkedMembers={getMembersForNotebook(caderno, members).length}
+                />
               ))}
             </div>
           </section>

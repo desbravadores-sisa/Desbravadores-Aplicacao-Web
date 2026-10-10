@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+import StatusBadge from "../StatusBadge/StatusBadge";
 import styles from "./NotebookCard.module.css";
 
 const cardClassByName = {
@@ -10,6 +12,7 @@ const cardClassByName = {
 };
 
 function NotebookCard({
+  id,
   category,
   name,
   age,
@@ -18,6 +21,7 @@ function NotebookCard({
   endDate,
   status
 }) {
+  const navigate = useNavigate();
 
   return (
 
@@ -67,20 +71,16 @@ function NotebookCard({
           <p>Término: {endDate}</p>
         </div>
 
-        <span className={`${styles.status} ${
-          status === "Ativo"
-            ? styles.statusActive
-            : status === "Concluído antecipadamente"
-              ? styles.statusCompleted
-              : styles.statusClosed
-        }`}>
-          ● {status}
-        </span>
+        <StatusBadge status={status} />
 
       </div>
 
 
-      <button className={styles.button}>
+      <button
+        className={styles.button}
+        type="button"
+        onClick={() => navigate(`/cadernos/${id}`)}
+      >
         Ver Caderno →
       </button>
 

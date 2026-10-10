@@ -1,0 +1,79 @@
+.card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #e1e8f0;
+  border-radius: 17px;
+  background: #fff;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title {
+  width: 100%;
+  min-width: 0;
+  padding: 2px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #172033;
+  font: inherit;
+  font-size: var(--font-size-md);
+  font-weight: 800;
+}
+
+.title:focus-visible {
+  box-shadow: 0 2px 0 var(--color-primary);
+}
+
+.deleteButton {
+  display: grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #ff3347;
+  font-size: 19px;
+}
+
+.deleteButton:hover {
+  background: #fff1f2;
+}
+
+.description {
+  width: 100%;
+  min-height: 54px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  outline: 0;
+  background: #f8fafc;
+  color: #64748b;
+  font: inherit;
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.description:focus {
+  border-color: #ffd2ae;
+  background: #fff;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}

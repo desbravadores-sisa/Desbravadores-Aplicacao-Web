@@ -55,7 +55,7 @@
 .titleArea h2 {
   margin: 0;
 
-  font-size: var(--font-size-19px);
+  font-size: var(--font-size-lg);
 }
 
 .titleArea span {
@@ -122,28 +122,6 @@
   font-size: var(--font-size-11px);
 
   color: #526070;
-}
-
-
-.status {
-  font-size: var(--font-size-11px);
-
-  padding: var(--spacing-6px) var(--spacing-10px);
-
-  border-radius: var(--radius-pill);
-
-  background: #eff6ff;
-  color: #155eef;
-}
-
-.statusCompleted {
-  background: #e7fbf2;
-  color: #07875f;
-}
-
-.statusClosed {
-  background: #eef2f6;
-  color: #64748b;
 }
 
 

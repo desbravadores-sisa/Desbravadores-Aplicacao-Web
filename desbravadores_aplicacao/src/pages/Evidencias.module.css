@@ -167,7 +167,7 @@
 .evidenceContent h2 {
   margin: 0 0 10px;
   color: #172033;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   line-height: 1.3;
   font-weight: 700;
   overflow-wrap: anywhere;
