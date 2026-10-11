@@ -8,6 +8,11 @@
   box-sizing: border-box;
 }
 
+.expiredCard {
+  border-color: #f8d7d7;
+  background: #fff9f9;
+}
+
 .inviteCard > strong {
   display: block;
   color: #273449;
@@ -72,6 +77,17 @@
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+}
+
+.expiredBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #fff0f1;
+  color: #c3274b;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .emptyState {
