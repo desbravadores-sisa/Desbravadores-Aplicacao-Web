@@ -1,88 +1,66 @@
+import { useEffect, useState } from "react";
 import NotebookCard from "../components/NotebookCard/NotebookCard";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
+import api from "../service/api";
 import styles from "./Cadernos.module.css";
 
+const CORES_GRUPO = ["orange", "blue", "green", "purple"];
+
+function formatarData(dataIso) {
+  if (!dataIso) return "—";
+  const [ano, mes, dia] = dataIso.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
 function Cadernos() {
-  const cadernos = [
-    {
-      category: "LEÕES E TIGRESAS",
-      name: "Amigo",
-      age: 10,
-      linkedMembers: 2,
-      // Em outras palavras: o dado não precisa aparecer na tela inicial, mas ele deve permanecer no model para o futuro da página interna do caderno.
-      // requirements: 6,
-      startDate: "10/02/2026",
-      endDate: "10/02/2027",
-      status: "Ativo"
-    },
+  const [grupos, setGrupos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(null);
 
-    {
-      category: "LEÕES E TIGRESAS",
-      name: "Companheiro",
-      age: 11,
-      linkedMembers: 4,
-      // requirements: 7,
-      startDate: "10/02/2026",
-      endDate: "10/02/2027",
-      status: "Ativo"
-    },
+  useEffect(() => {
+    let ativo = true;
 
-    {
-      category: "LEÕES E TIGRESAS",
-      name: "Pesquisador",
-      age: 12,
-      linkedMembers: 3,
-      // requirements: 6,
-      startDate: "10/02/2026",
-      endDate: "10/02/2027",
-      status: "Concluído antecipadamente"
-    },
-    {
-      category: "ONÇAS E PANTERAS",
-      name: "Pioneiro",
-      age: 13,
-      linkedMembers: 3,
-      // requirements: 6,
-      startDate: "15/02/2026",
-      endDate: "15/02/2027",
-      status: "Ativo"
-    },
-    {
-      category: "ONÇAS E PANTERAS",
-      name: "Excursionista",
-      age: 14,
-      linkedMembers: 2,
-      // requirements: 5,
-      startDate: "18/02/2026",
-      endDate: "18/02/2027",
-      status: "Ativo"
-    },
-    {
-      category: "ONÇAS E PANTERAS",
-      name: "Guia",
-      age: 15,
-      linkedMembers: 3,
-      // requirements: 6,
-      startDate: "10/02/2025",
-      endDate: "10/02/2026",
-      status: "Encerrado"
+    async function carregarCadernos() {
+      try {
+        const { data, status } = await api.get("/cadernos/resumo");
+        if (!ativo) return;
+
+        const gruposMapeados = (status === 204 || !data ? [] : data).map((grupo, indice) => ({
+          name: grupo.nomeGrupo ?? "Outros",
+          subtitle: "",
+          color: CORES_GRUPO[indice % CORES_GRUPO.length],
+          items: (grupo.cadernos ?? []).map((caderno) => ({
+            id: caderno.idCaderno,
+            category: (grupo.nomeGrupo ?? "").toUpperCase(),
+            name: caderno.nome,
+            age: caderno.idadeAlvo,
+            linkedMembers: caderno.totalVinculados,
+            requirements: caderno.totalRequisitos,
+            startDate: formatarData(caderno.dataInicio),
+            endDate: formatarData(caderno.dataFim),
+            status: caderno.status
+          }))
+        }));
+
+        setGrupos(gruposMapeados);
+      } catch (err) {
+        if (!ativo) return;
+        const status = err.response?.status;
+        setErro(
+          status === 403
+            ? "Acesso restrito à diretoria."
+            : "Não foi possível carregar os cadernos. Verifique se a API está no ar."
+        );
+      } finally {
+        if (ativo) setCarregando(false);
+      }
     }
-  ];
 
-  const grupos = [
-    {
-      name: "Leões e Tigresas",
-      subtitle: "Cadernos para 10 a 12 anos",
-      items: cadernos.filter((caderno) => caderno.category === "LEÕES E TIGRESAS"),
-      color: "orange"
-    },
-    {
-      name: "Onças e Panteras",
-      subtitle: "Cadernos para 13 a 15 anos",
-      items: cadernos.filter((caderno) => caderno.category === "ONÇAS E PANTERAS"),
-      color: "blue"
-    }
-  ];
+    carregarCadernos();
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   return (
     <main className={styles.page}>
@@ -103,7 +81,13 @@ function Cadernos() {
           </button>
         </div>
 
-        {grupos.map((grupo) => (
+        {carregando && <p>Carregando cadernos...</p>}
+        {erro && <p role="alert">{erro}</p>}
+        {!carregando && !erro && grupos.length === 0 && (
+          <p>Nenhum caderno cadastrado para o clube.</p>
+        )}
+
+        {!carregando && !erro && grupos.map((grupo) => (
           <section className={styles.section} key={grupo.name}>
             <div className={`${styles.sectionHeader} ${styles[grupo.color]}`}>
               <div>
@@ -114,7 +98,7 @@ function Cadernos() {
             </div>
             <div className={styles.grid}>
               {grupo.items.map((caderno) => (
-                <NotebookCard key={caderno.name} {...caderno} />
+                <NotebookCard key={caderno.id} {...caderno} />
               ))}
             </div>
           </section>

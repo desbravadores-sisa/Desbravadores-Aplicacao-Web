@@ -63,7 +63,9 @@ function NotebookCard({
             ? styles.statusActive
             : status === "Concluído antecipadamente"
               ? styles.statusCompleted
-              : styles.statusClosed
+              : status === "Encerrado"
+                ? styles.statusClosed
+                : styles.statusNotStarted
         }`}>
           ● {status}
         </span>
