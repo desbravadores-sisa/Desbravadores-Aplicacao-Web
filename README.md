@@ -35,7 +35,7 @@ A branch **`consolidacao/sprint-final`** reúne o trabalho de todas as branches 
 
 ### Conselheiro
 
-O login funciona na API, mas **o front ainda bloqueia o acesso** com a mensagem "ainda não disponível". As telas do protótipo para o conselheiro ainda não foram implementadas: Kanban da unidade, check-in das crianças nas tarefas de caderno e envio de evidências.
+O login leva a **`/minhas-tarefas`**, o Kanban da unidade, que veio da `feature/nathan` e está ligado a `GET /tarefas/kanban` e `PATCH /tarefas/{id}/status`. Os cards se movem entre A fazer, Em andamento e Em revisão; a coluna Concluído é só leitura, porque quem conclui é a Diretoria ao aprovar a evidência. Ainda faltam o check-in das crianças nas tarefas de caderno, o envio de evidências e a tela "Desbravadores" do Nathan, que hoje é só mock.
 
 ---
 
@@ -68,7 +68,7 @@ desbravadores_aplicacao/src/
 1. **Merge** de `consolidacao/sprint-final` na `main`, depois que os PRs do banco e do backend forem aprovados.
 2. **Cadernos (depende do back):** endpoint que aplica o ciclo novo a todos os cadernos (e desativa o anterior); histórico de cadernos concluídos por desbravador; vínculo explícito desbravador ↔ caderno, se o time decidir por ele. `POST /desbravadores` e `POST /ciclos` ainda exigem `idClube` no corpo (o front envia o do usuário logado).
 3. ~~**Unidades:** dashboard da unidade~~ ✅ feito em 12/10.
-4. **Conselheiro:** liberar o login e criar as telas de Kanban, check-in e envio de evidência.
+4. **Conselheiro:** ~~login e Kanban~~ ✅. Faltam o check-in e o envio de evidência.
 5. **Convites:** ajustar ao protótipo (sem aba "Expirados", sem texto de validade).
 6. **Confirmação antes de excluir** em todas as telas (o protótipo exige; hoje existe só em Convites, Tarefas e Unidades).
 7. Qualidade: testes de componentes e tratar os avisos do `oxlint` (`catch (err)` sem uso).
