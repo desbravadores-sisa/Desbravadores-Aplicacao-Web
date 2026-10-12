@@ -14,7 +14,7 @@ Frontend do sistema de gestão do Clube de Desbravadores **Tigre da Montanha** (
 
 ## Em que pé estamos (11/10/2026)
 
-A branch **`consolidacao/sprint-final`** reúne o trabalho de todas as branches e está **integrada ao backend**. As telas da Diretoria consomem a API real e não há mais dados fixos (mock) no código. A validação foi feita de ponta a ponta: MySQL real, API e navegador.
+A branch **`consolidacao/sprint-final`** reúne o trabalho de todas as branches **e os 27 commits mais recentes da `main`** (Ver Caderno, Membros, Novo Ciclo, menu responsivo etc.). Ela está **integrada ao backend**: as telas da Diretoria consomem a API real e não há mais dados fixos (mock) no código. A validação foi feita de ponta a ponta: MySQL real, API e navegador.
 
 > A `main` ainda **não** recebeu essa consolidação. Ela entra via Pull Request (veja "Próximos passos").
 
@@ -23,13 +23,15 @@ A branch **`consolidacao/sprint-final`** reúne o trabalho de todas as branches 
 | Tela | O que funciona com a API | O que falta (comparado ao protótipo) |
 |---|---|---|
 | Login / Cadastro por convite | Login com cookie de sessão; cadastro pelo link `/cadastro?token=` | Recuperação de senha |
-| Unidades | Listar (pontuação, conselheiro, progresso), criar, excluir | Botão **"Ver Detalhes"**: dashboard da unidade com gráficos e edição de nome e faixa etária |
+| Unidades | Listar (pontuação, conselheiro, progresso), criar com idade necessária, excluir | Botão **"Ver Detalhes"**: dashboard da unidade com gráficos e edição. A idade mínima só aparece no card quando `GET /unidades/diretor` passar a devolvê-la (hoje vem `null`) |
 | Tarefas | Listar, criar (distribuída a todas as unidades), editar, excluir | — |
 | Evidências | Listar, aprovar com ajuste de pontos, pedir correção, reconhecer caderno, excluir | — (o envio da evidência é feito pelo conselheiro) |
-| Cadernos | Resumo por grupo (ciclo, vinculados, requisitos) | **"Novo ciclo"**, aba **"Membros"** e **"Ver Caderno"** (requisitos e vínculos) ainda sem ação |
+| Cadernos | Resumo por grupo (ciclo, vinculados, requisitos, cores por caderno); **"Novo ciclo"** cria o ciclo (`POST /ciclos`) | Aplicar o ciclo novo a todos os cadernos (falta endpoint no back) |
+| Cadernos → Membros | Listar, cadastrar com data de aniversário (idade calculada), editar, excluir (`/desbravadores`) | Cadernos concluídos por desbravador (sem endpoint); confirmação antes de excluir |
+| Cadernos → Ver Caderno | Cabeçalho do ciclo; requisitos (tarefas `CADERNO`) com adicionar, editar e excluir com confirmação; vinculados calculados por idade; progresso individual via checklists | Vincular/desvincular de forma explícita (hoje só na tela, não persiste: **decisão do time**) |
 | Convites | Criar (Conselheiro ou Diretoria), copiar o link real, listar, excluir | Alinhar ao protótipo: remover a aba "Expirados" e os textos de validade |
 | Perfil | Ver e editar nome, e-mail e telefone; trocar senha | Upload da foto (hoje é só visual) |
-| Navbar | Usuário logado, notificações reais e "marcar como lidas" | — |
+| Navbar | Menu responsivo; usuário logado, notificações reais e "marcar como lidas" | — |
 
 ### Conselheiro
 
@@ -64,7 +66,7 @@ desbravadores_aplicacao/src/
 ## Próximos passos (frontend)
 
 1. **Merge** de `consolidacao/sprint-final` na `main`, depois que os PRs do banco e do backend forem aprovados.
-2. **Cadernos:** implementar "Novo ciclo" (`POST /ciclos`), a aba "Membros" (`/desbravadores`, CRUD já pronto no back) e "Ver Caderno", onde os requisitos são as tarefas do tipo `CADERNO` em `/tarefas`.
+2. **Cadernos (depende do back):** endpoint que aplica o ciclo novo a todos os cadernos (e desativa o anterior); histórico de cadernos concluídos por desbravador; vínculo explícito desbravador ↔ caderno, se o time decidir por ele. `POST /desbravadores` e `POST /ciclos` ainda exigem `idClube` no corpo (o front envia o do usuário logado).
 3. **Unidades:** criar o dashboard da unidade ("Ver Detalhes") com a edição `PUT /unidades`; os gráficos dependem de um endpoint novo no back.
 4. **Conselheiro:** liberar o login e criar as telas de Kanban, check-in e envio de evidência.
 5. **Convites:** ajustar ao protótipo (sem aba "Expirados", sem texto de validade).
