@@ -23,7 +23,7 @@ A branch **`consolidacao/sprint-final`** reúne o trabalho de todas as branches 
 | Tela | O que funciona com a API | O que falta (comparado ao protótipo) |
 |---|---|---|
 | Login / Cadastro por convite | Login com cookie de sessão; cadastro pelo link `/cadastro?token=` | Recuperação de senha |
-| Unidades | Listar (pontuação, conselheiro, progresso), criar com idade necessária, excluir | Botão **"Ver Detalhes"**: dashboard da unidade com gráficos e edição. A idade mínima só aparece no card quando `GET /unidades/diretor` passar a devolvê-la (hoje vem `null`) |
+| Unidades | Listar (pontuação, conselheiro, progresso, idade mínima), criar, excluir; **"Ver Detalhes" → dashboard** (`/unidades/:id`): cards, ganhos × descontos por semana, curva do saldo, atividades abertas e edição (`GET /unidades/{id}/dashboard`, `PUT /unidades`) | — |
 | Tarefas | Listar, criar (distribuída a todas as unidades), editar, excluir | — |
 | Evidências | Listar, aprovar com ajuste de pontos, pedir correção, reconhecer caderno, excluir | — (o envio da evidência é feito pelo conselheiro) |
 | Cadernos | Resumo por grupo (ciclo, vinculados, requisitos, cores por caderno); **"Novo ciclo"** cria o ciclo (`POST /ciclos`) | Aplicar o ciclo novo a todos os cadernos (falta endpoint no back) |
@@ -67,7 +67,7 @@ desbravadores_aplicacao/src/
 
 1. **Merge** de `consolidacao/sprint-final` na `main`, depois que os PRs do banco e do backend forem aprovados.
 2. **Cadernos (depende do back):** endpoint que aplica o ciclo novo a todos os cadernos (e desativa o anterior); histórico de cadernos concluídos por desbravador; vínculo explícito desbravador ↔ caderno, se o time decidir por ele. `POST /desbravadores` e `POST /ciclos` ainda exigem `idClube` no corpo (o front envia o do usuário logado).
-3. **Unidades:** criar o dashboard da unidade ("Ver Detalhes") com a edição `PUT /unidades`; os gráficos dependem de um endpoint novo no back.
+3. ~~**Unidades:** dashboard da unidade~~ ✅ feito em 12/10.
 4. **Conselheiro:** liberar o login e criar as telas de Kanban, check-in e envio de evidência.
 5. **Convites:** ajustar ao protótipo (sem aba "Expirados", sem texto de validade).
 6. **Confirmação antes de excluir** em todas as telas (o protótipo exige; hoje existe só em Convites, Tarefas e Unidades).
