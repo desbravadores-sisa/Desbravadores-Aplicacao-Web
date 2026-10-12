@@ -64,7 +64,7 @@ function Navbar() {
 
   useEffect(() => {
     let ativo = true;
-    api.get("/usuarios/perfil")
+    api.get("/usuarios/buscarUsuario")
       .then(({ data }) => { if (ativo && data) setUsuario({ nome: data.nome || "", tipoConta: data.tipoConta || "", fotoUrl: data.fotoUrl || null }); })
       .catch(() => {});
     api.get("/notificacoes")
