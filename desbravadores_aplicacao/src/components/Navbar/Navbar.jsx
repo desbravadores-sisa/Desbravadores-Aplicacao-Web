@@ -28,6 +28,7 @@ function Navbar() {
   const [notifications, setNotifications] = useState([]);
   const [usuario, setUsuario] = useState({ nome: "", tipoConta: "" });
   const unreadCount = notifications.filter((notification) => notification.unread).length;
+  const isConselheiro = usuario.tipoConta.toLowerCase() === "conselheiro";
 
   useEffect(() => {
     if (!mobileMenuOpen) return undefined;
@@ -171,25 +172,33 @@ function Navbar() {
           </button>
         </div>
         <nav className={styles.menu} aria-label="Navegação principal">
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-group'></i> Unidades
-          </NavLink>
+          {isConselheiro ? (
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/minhas-tarefas" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-check-square'></i> Minhas Tarefas
+            </NavLink>
+          ) : (
+            <>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-group'></i> Unidades
+            </NavLink>
 
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/tarefas" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-check-square'></i> Tarefas
-          </NavLink>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/tarefas" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-check-square'></i> Tarefas
+            </NavLink>
 
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-list-check'></i> Evidências
-          </NavLink>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-list-check'></i> Evidências
+            </NavLink>
 
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-book'></i> Cadernos
-          </NavLink>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-book'></i> Cadernos
+            </NavLink>
 
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-envelope'></i> Convites
-          </NavLink>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-envelope'></i> Convites
+            </NavLink>
+            </>
+          )}
         </nav>
       </div>
 
