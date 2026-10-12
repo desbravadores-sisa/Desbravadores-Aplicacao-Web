@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/Modal/Modal";
 import modalStyles from "../components/Modal/Modal.module.css";
-import { enviarEvidencia, getCheckin, getKanbanBoard, marcarCheckin, updateTaskStatus } from "../service/api";
+import { enviarCheckinParaRevisao, enviarEvidencia, getCheckin, getKanbanBoard, marcarCheckin, updateTaskStatus } from "../service/api";
 import styles from "./CounselorTasks.module.css";
 
 // Tela original de Nathan (feature/nathan, a2dbf60), ligada ao contrato real da API:
@@ -264,6 +264,19 @@ function TaskActionModal({ task, onClose, onChanged }) {
     }
   }
 
+  async function enviarCheckin() {
+    try {
+      setEnviando(true);
+      setErro("");
+      setCheckin(await enviarCheckinParaRevisao(task.id));
+      onChanged();
+    } catch (err) {
+      setErro(err.response?.data?.message || "Não foi possível enviar para revisão.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   async function enviar(event) {
     event.preventDefault();
     if (!arquivo) {
@@ -290,6 +303,10 @@ function TaskActionModal({ task, onClose, onChanged }) {
   const concluida = status === LOCKED;
   const emRevisao = status === REVIEW;
   const podeEnviar = !isNotebook && !concluida && !emRevisao;
+  const statusCheckin = checkin?.statusKanban ?? status;
+  // Check-in parcial: o conselheiro pode mandar para a Diretoria com parte das crianças.
+  const podeEnviarCheckin = isNotebook && checkin && checkin.marcados > 0
+    && statusCheckin !== REVIEW && statusCheckin !== LOCKED;
 
   return (
     <Modal
@@ -305,6 +322,13 @@ function TaskActionModal({ task, onClose, onChanged }) {
           <button type="button" onClick={onClose}>Cancelar</button>
           <button className={modalStyles.primaryAction} type="submit" disabled={enviando}>
             {enviando ? "Enviando..." : "Enviar evidência"}
+          </button>
+        </>
+      ) : podeEnviarCheckin ? (
+        <>
+          <button type="button" onClick={onClose}>Fechar</button>
+          <button className={modalStyles.primaryAction} type="button" onClick={enviarCheckin} disabled={enviando}>
+            {enviando ? "Enviando..." : "Enviar para revisão"}
           </button>
         </>
       ) : (
@@ -336,9 +360,11 @@ function TaskActionModal({ task, onClose, onChanged }) {
               ))}
             </ul>
             <p className={styles.hint}>
-              {concluida
+              {statusCheckin === LOCKED
                 ? "Tarefa reconhecida pela Diretoria."
-                : "Quando todas forem marcadas, a tarefa vai para “Em revisão” e a Diretoria reconhece o caderno."}
+                : statusCheckin === REVIEW
+                  ? "Em revisão pela Diretoria. Você ainda pode ajustar quem cumpriu."
+                  : "Com todas marcadas, a tarefa vai sozinha para “Em revisão”. Também dá para enviar só com parte das crianças."}
             </p>
           </>
         ) : !erro && <p className={styles.hint}>Carregando check-in...</p>

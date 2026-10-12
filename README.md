@@ -38,7 +38,7 @@ A branch **`consolidacao/sprint-final`** reúne o trabalho de todas as branches 
 O login leva a **`/minhas-tarefas`**, o Kanban da unidade (da `feature/nathan`, ligado a `GET /tarefas/kanban` e `PATCH /tarefas/{id}/status`). Os cards se arrastam entre A fazer e Em andamento. **Clicar num card** abre:
 
 - tarefa de clube → **enviar evidência** (foto ou PDF até 5 MB, comentário opcional); a tarefa vai para Em revisão;
-- tarefa de caderno → **check-in** das crianças vinculadas; com todas marcadas, vai para Em revisão.
+- tarefa de caderno → **check-in** das crianças vinculadas; com todas marcadas vai sozinha para Em revisão, e o botão **"Enviar para revisão"** manda com parte delas.
 
 Em revisão e Concluído não aceitam arraste: quem decide é a Diretoria. A tela **`/desbravadores`** (layout do Nathan, agora com dados reais) mostra as crianças da unidade, o progresso por caderno e os requisitos individuais, com "Marcar cumprido" usando o mesmo check-in.
 

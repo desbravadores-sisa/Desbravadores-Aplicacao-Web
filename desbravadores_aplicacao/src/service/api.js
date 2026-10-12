@@ -22,6 +22,11 @@ export function marcarCheckin(taskId, idDesbravador, concluiu) {
     return api.put(`/tarefas/${taskId}/checkin/${idDesbravador}`, { concluiu }).then((response) => response.data);
 }
 
+/** Envia para a Diretoria um check-in com parte das crianças marcadas. */
+export function enviarCheckinParaRevisao(taskId) {
+    return api.post(`/tarefas/${taskId}/checkin/enviar`).then((response) => response.data);
+}
+
 /** Envia a evidência (foto/PDF) de uma tarefa de clube; a tarefa vai para "Em revisão". */
 export function enviarEvidencia(taskId, arquivo, comentario) {
     const form = new FormData();
