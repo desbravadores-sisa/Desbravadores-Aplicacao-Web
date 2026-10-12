@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Modal from "../components/Modal/Modal";
 import modalStyles from "../components/Modal/Modal.module.css";
 import UnitCard from "../components/UnitCard/UnitCard";
@@ -7,6 +8,7 @@ import api from "../service/api";
 import styles from "./Unidades.module.css";
 
 function Unidades() {
+  const navigate = useNavigate();
   const [units, setUnits] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
@@ -105,6 +107,7 @@ function Unidades() {
             totalTasks={unit.totalTarefas || 0}
             completionRate={unit.totalTarefas > 0 ? Math.round((unit.tarefasConcluidas / unit.totalTarefas) * 100) : 0}
             onDelete={() => deleteUnit(unit.id)}
+            onDetails={() => navigate(`/unidades/${unit.id}`)}
           />
         ))}
       </div>

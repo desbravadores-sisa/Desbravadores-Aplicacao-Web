@@ -8,7 +8,8 @@ function UnitCard({
   score,
   completedTasks,
   totalTasks,
-  completionRate
+  completionRate,
+  onDetails
 }) {
 
   return (
@@ -79,7 +80,7 @@ function UnitCard({
       </div>
 
 
-      <button className={styles.button}>
+      <button type="button" className={styles.button} onClick={onDetails}>
         Ver Detalhes
       </button>
 

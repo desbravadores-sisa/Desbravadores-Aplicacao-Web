@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import Perfil from "./pages/Perfil";
 import RegisterPage from "./pages/RegisterPage";
 import Unidades from "./pages/Unidades";
+import UnidadeDashboard from "./pages/UnidadeDashboard";
 import Convites from "./pages/Convites";
 import Evidencias from "./pages/Evidencias";
 import Tarefas from "./pages/Tarefas";
@@ -22,6 +23,15 @@ function App() {
             <>
               <Navbar />
               <Unidades />
+            </>
+          }
+        />
+        <Route
+          path="/unidades/:unidadeId"
+          element={
+            <>
+              <Navbar />
+              <UnidadeDashboard />
             </>
           }
         />
