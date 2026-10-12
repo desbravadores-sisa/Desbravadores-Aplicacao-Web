@@ -1,26 +1,29 @@
 import styles from "./InviteCard.module.css";
 
-function InviteCard({ invitation, onRemove, expired = false }) {
+function InviteCard({ invitation, onRemove }) {
   if (!invitation) {
     return <p className={styles.emptyState}>Nenhum convite ativo.</p>;
   }
 
-  const inviteLink = `https://tigre-da-montanha.com/cadastro/convite/${invitation.email.split("@")[0]}`;
+  // Link real de cadastro: o token vem da API (GET/POST /convites)
+  const inviteLink = invitation.token ? `${window.location.origin}/cadastro?token=${invitation.token}` : null;
+  const role = invitation.role ?? invitation.tipoConta;
+  const unit = invitation.unit ?? invitation.nomeUnidade ?? "";
 
   function copyLink() {
-    navigator.clipboard?.writeText(inviteLink);
+    if (inviteLink) navigator.clipboard?.writeText(inviteLink);
   }
 
   return (
-    <article className={`${styles.inviteCard} ${expired ? styles.expiredCard : ""}`}>
+    <article className={styles.inviteCard}>
       <button className={styles.closeInvite} type="button" aria-label="Excluir convite" onClick={onRemove}>
         ×
       </button>
       <strong><i className="bx bx-envelope" /> {invitation.email}</strong>
       <span className={styles.inviteMeta}>
-        <b>{invitation.role}</b> {invitation.unit}
+        <b>{role}</b> {unit}
       </span>
-      {!expired && (
+      {inviteLink && (
         <div className={styles.linkRow}>
           <i className="bx bx-link" />
           <span>{inviteLink}</span>
@@ -29,7 +32,6 @@ function InviteCard({ invitation, onRemove, expired = false }) {
           </button>
         </div>
       )}
-      {expired && <div className={styles.expiredBadge}>Expirado</div>}
     </article>
   );
 }

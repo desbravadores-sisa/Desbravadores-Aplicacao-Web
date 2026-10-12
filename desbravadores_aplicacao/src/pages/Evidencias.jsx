@@ -1,79 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EvidenceNotebookCard from "../components/EvidenceNotebookCard/EvidenceNotebookCard";
 import Modal from "../components/Modal/Modal";
+import modalStyles from "../components/Modal/Modal.module.css";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
+import api, { urlArquivo } from "../service/api";
 import styles from "./Evidencias.module.css";
 
-const initialEvidences = [
-  {
-    id: 1,
-    title: "Campori Regional - Preparação",
-    unit: "Tigresas",
-    leader: "Carlos Silva",
-    points: 300,
-    description: "Todos os documentos e autorizações foram coletados e organizados",
-    files: [
-      { name: "autorizacoes_pais.pdf", size: "239.3 KB", type: "pdf" },
-      { name: "lista_equipamentos.xlsx", size: "86.9 KB", type: "sheet" }
-    ]
-  },
-  {
-    id: 2,
-    title: "Noite de Talentos",
-    unit: "Leões",
-    leader: "Pedro Costa",
-    points: 120,
-    description: "Evento realizado com sucesso. Tivemos 15 apresentações e excelente presença dos pais.",
-    files: [
-      { name: "fotos_noite_talentos.jpg", size: "2050.8 KB", type: "image" },
-      { name: "lista_participantes.pdf", size: "92.8 KB", type: "pdf" }
-    ]
-  }
-];
-
-const initialNotebooks = [
-  {
-    id: 1,
-    title: "Caderno Pioneiro - Bloco de Sobrevivência",
-    unit: "Onças",
-    leader: "Maria Oliveira",
-    points: 60,
-    description: '"Carlos Eduardo e Fernanda concluíram todos os requisitos do bloco. Destaque para o acampamento liderado."',
-    completedAt: "18/07/2026, 06:30"
-  },
-  {
-    id: 2,
-    title: "Caderno Companheiro - Ciclo Completo",
-    unit: "Leões",
-    leader: "Pedro Costa",
-    points: 45,
-    description: '"Lucas Almeida concluiu todos os 7 requisitos do caderno Companheiro. Destaque para o projeto ambiental de plantio de mudas."',
-    completedAt: "01/07/2026, 11:00"
-  },
-  {
-    id: 3,
-    title: "Caderno Pesquisador - Concluído antecipadamente",
-    unit: "Tigresas",
-    leader: "Carlos Silva",
-    points: 60,
-    description: '"Helena Lima e Beatriz Santos concluíram o Caderno Pesquisador antes do prazo. Helena com destaque na caminhada de orientação por bússola."',
-    completedAt: "20/07/2026, 08:00"
-  }
-];
-
 function Evidencias() {
-  const [evidences, setEvidences] = useState(initialEvidences);
-  const [notebooks, setNotebooks] = useState(initialNotebooks);
+  const [evidences, setEvidences] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(null);
   const [activeTab, setActiveTab] = useState("activities");
   const [modal, setModal] = useState(null);
-  const [points, setPoints] = useState(300);
+  const [points, setPoints] = useState(0);
   const [comment, setComment] = useState("");
   const [recognition, setRecognition] = useState(null);
   const [recognitionPoints, setRecognitionPoints] = useState(0);
+  const [evidenceToDismiss, setEvidenceToDismiss] = useState(null);
+
+  useEffect(() => {
+    carregarEvidencias();
+  }, []);
+
+  async function carregarEvidencias() {
+    try {
+      setCarregando(true);
+      const { data, status } = await api.get("/evidencias");
+      if (status === 204 || !data) {
+        setEvidences([]);
+      } else {
+        setEvidences(data);
+      }
+      setErro(null);
+    } catch (err) {
+      const status = err.response?.status;
+      if (status === 403) {
+        setErro("Acesso restrito à diretoria.");
+      } else {
+        setErro("Não foi possível carregar as evidências. Verifique se a API está no ar.");
+      }
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   function openModal(type, evidence) {
     setModal({ type, evidence });
-    setPoints(evidence.points);
+    setPoints(evidence.pontuacao || 0);
     setComment("");
   }
 
@@ -81,33 +54,73 @@ function Evidencias() {
     setModal(null);
   }
 
-  function approveEvidence(event) {
+  async function approveEvidence(event) {
     event.preventDefault();
-    setEvidences((current) => current.map((item) => (
-      item.id === modal.evidence.id ? { ...item, points: Number(points) || 0 } : item
-    )));
-    closeModal();
+    try {
+      await api.put(`/evidencias/${modal.evidence.id}`, {
+        pontuacao: Number(points) || 0,
+        comentarioFeedback: comment || null,
+        status: "APROVADA",
+      });
+      closeModal();
+      await carregarEvidencias();
+    } catch (err) {
+      setErro("Não foi possível aprovar a evidência.");
+    }
   }
 
-  function requestCorrection(event) {
+  async function requestCorrection(event) {
     event.preventDefault();
-    closeModal();
+    try {
+      await api.put(`/evidencias/${modal.evidence.id}`, {
+        comentarioFeedback: comment,
+        status: "CORRECAO_SOLICITADA",
+      });
+      closeModal();
+      await carregarEvidencias();
+    } catch (err) {
+      setErro("Não foi possível solicitar correção.");
+    }
   }
 
   function openRecognition(notebook) {
     setRecognition(notebook);
-    setRecognitionPoints(notebook.points);
+    setRecognitionPoints(notebook.pontuacao || 0);
   }
 
-  function recognizeNotebook(event) {
+  async function recognizeNotebook(event) {
     event.preventDefault();
-    setNotebooks((current) => current.filter((notebook) => notebook.id !== recognition.id));
-    setRecognition(null);
+    try {
+      await api.put(`/evidencias/${recognition.id}`, {
+        pontuacao: Number(recognitionPoints) || 0,
+        status: "RECONHECIDO",
+      });
+      setRecognition(null);
+      await carregarEvidencias();
+    } catch (err) {
+      setErro("Não foi possível reconhecer o caderno.");
+    }
   }
 
-  function dismissNotebook(id) {
-    setNotebooks((current) => current.filter((notebook) => notebook.id !== id));
+  function requestDismissNotebook(id) {
+    setEvidenceToDismiss(evidences.find((e) => e.id === id) || { id });
   }
+
+  async function dismissNotebook() {
+    const evidence = evidenceToDismiss;
+    if (!evidence) return;
+    setEvidenceToDismiss(null);
+    try {
+      await api.delete(`/evidencias/${evidence.id}`);
+      await carregarEvidencias();
+    } catch (err) {
+      setErro("Não foi possível dispensar a evidência.");
+    }
+  }
+
+  const isNotebook = (e) => e.tipoEvidencia === "CADERNO" || e.fkCaderno;
+  const pendingEvidences = evidences.filter((e) => !isNotebook(e) && (!e.status || e.status === "PENDENTE"));
+  const notebookEvidences = evidences.filter((e) => isNotebook(e) && e.status !== "RECONHECIDO");
 
   return (
     <main className={styles.page}>
@@ -116,58 +129,87 @@ function Evidencias() {
         subtitle="Revise evidências de atividades e reconheça pontos de cadernos concluídos pelos desbravadores."
       />
 
-      <div className={styles.tabs} role="tablist">
-        <button className={activeTab === "activities" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("activities")}>
-          Evidências de Atividades <span>{evidences.length}</span>
-        </button>
-        <button className={activeTab === "notebooks" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("notebooks")}>
-          <i className="bx bx-book-open" /> Reconhecimento de Cadernos <span className={styles.grayCount}>{notebooks.length}</span>
-        </button>
-      </div>
+      {carregando && <p>Carregando evidências...</p>}
+      {erro && <p role="alert">{erro}</p>}
 
-      {activeTab === "activities" ? evidences.map((evidence) => (
-        <article className={styles.evidenceCard} key={evidence.id}>
-          <div className={styles.evidenceTop}>
-            <div className={styles.evidenceContent}>
-              <div className={styles.labels}>
-                <span className={styles.pending}>PENDENTE</span>
-                <span className={styles.pointsPreview}>{evidence.points} pontos previstos</span>
-              </div>
-              <h2>{evidence.title}</h2>
-              <div className={styles.metadata}>
-                <span><i className="bx bx-group" /> {evidence.unit}</span>
-                <span><i className="bx bx-user" /> {evidence.leader}</span>
-              </div>
-            </div>
-            <div className={styles.actions}>
-              <button className={styles.approveButton} type="button" onClick={() => openModal("approve", evidence)}><i className="bx bx-check-circle" /> Analisar e aprovar</button>
-              <button className={styles.correctionButton} type="button" onClick={() => openModal("correction", evidence)}><i className="bx bx-x-circle" /> Solicitar correção</button>
-            </div>
+      {!carregando && !erro && (
+        <>
+          <div className={styles.tabs} role="tablist">
+            <button className={activeTab === "activities" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("activities")}>
+              Evidências de Atividades <span>{pendingEvidences.length}</span>
+            </button>
+            <button className={activeTab === "notebooks" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("notebooks")}>
+              <i className="bx bx-book-open" /> Reconhecimento de Cadernos <span className={styles.grayCount}>{notebookEvidences.length}</span>
+            </button>
           </div>
 
-          <p className={styles.description}>{evidence.description}</p>
-          <div className={styles.fileDivider} />
-          <h3>Arquivos enviados ({evidence.files.length})</h3>
-          <div className={styles.files}>
-            {evidence.files.map((file) => (
-              <div className={styles.file} key={file.name}>
-                <i className={`bx ${file.type === "image" ? "bx-image" : file.type === "sheet" ? "bx-spreadsheet" : "bx-file-blank"}`} />
-                <div><strong>{file.name}</strong><span>{file.size}</span></div>
-              </div>
-            ))}
-          </div>
-        </article>
-      )) : notebooks.length > 0 ? notebooks.map((notebook) => (
-        // <EvidenceNotebookCard notebook={notebook} styles={styles} onRecognize={openRecognition} onDismiss={dismissNotebook} />
-        // Removemos esse prop porque a página não deve injetar sua folha de estilos em um filho; o componente deve importar e controlar seu próprio módulo para manter o CSS isolado, reutilizável e previsível.
-        <EvidenceNotebookCard
-          key={notebook.id}
-          notebook={notebook}
-          onRecognize={openRecognition}
-          onDismiss={dismissNotebook}
-        />
-      )) : (
-        <div className={styles.emptyTab}>Nenhum reconhecimento de caderno pendente.</div>
+          {activeTab === "activities" ? (
+            pendingEvidences.length > 0 ? (
+              pendingEvidences.map((evidence) => (
+                <article className={styles.evidenceCard} key={evidence.id}>
+                  <div className={styles.evidenceTop}>
+                    <div className={styles.evidenceContent}>
+                      <div className={styles.labels}>
+                        <span className={styles.pending}>PENDENTE</span>
+                        <span className={styles.pointsPreview}>{evidence.pontuacao || 0} pontos previstos</span>
+                      </div>
+                      <h2>{evidence.titulo || evidence.descricao || `Evidência #${evidence.id}`}</h2>
+                      <div className={styles.metadata}>
+                        <span><i className="bx bx-group" /> {evidence.nomeUnidade || "Unidade não informada"}</span>
+                        <span><i className="bx bx-user" /> {evidence.nomeConselheiro || "Conselheiro não informado"}</span>
+                      </div>
+                    </div>
+                    <div className={styles.actions}>
+                      <button className={styles.approveButton} type="button" onClick={() => openModal("approve", evidence)}>
+                        <i className="bx bx-check-circle" /> Analisar e aprovar
+                      </button>
+                      <button className={styles.correctionButton} type="button" onClick={() => openModal("correction", evidence)}>
+                        <i className="bx bx-x-circle" /> Solicitar correção
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className={styles.description}>{evidence.comentarioFeedback || evidence.descricao || "Sem descrição disponível."}</p>
+                  {evidence.urlS3 === "checkin:caderno" ? (
+                    <>
+                      <div className={styles.fileDivider} />
+                      <h3>Check-in do conselheiro</h3>
+                      <p className={styles.description}>Todas as crianças vinculadas cumpriram este requisito do caderno.</p>
+                    </>
+                  ) : evidence.urlS3 && (
+                    <>
+                      <div className={styles.fileDivider} />
+                      <h3>Arquivo enviado</h3>
+                      <div className={styles.files}>
+                        <a className={styles.file} href={urlArquivo(evidence.urlS3)} target="_blank" rel="noreferrer">
+                          {/\.(jpe?g|png|webp)$/i.test(evidence.urlS3)
+                            ? <img className={styles.fileThumb} src={urlArquivo(evidence.urlS3)} alt="" />
+                            : <i className="bx bx-file-blank" />}
+                          <div><strong>{evidence.urlS3.split("/").pop() || "Arquivo"}</strong><span>Clique para visualizar</span></div>
+                        </a>
+                      </div>
+                    </>
+                  )}
+                </article>
+              ))
+            ) : (
+              <p className={styles.emptyTab}>Nenhuma evidência pendente.</p>
+            )
+          ) : (
+            notebookEvidences.length > 0 ? (
+              notebookEvidences.map((notebook) => (
+                <EvidenceNotebookCard
+                  key={notebook.id}
+                  notebook={notebook}
+                  onRecognize={openRecognition}
+                  onDismiss={requestDismissNotebook}
+                />
+              ))
+            ) : (
+              <div className={styles.emptyTab}>Nenhum reconhecimento de caderno pendente.</div>
+            )
+          )}
+        </>
       )}
 
       {modal?.type === "approve" && (
@@ -193,10 +235,10 @@ function Evidencias() {
       {recognition && (
         <Modal
           className={`${styles.modal} ${styles.notebookModal}`}
-          title={recognition.title}
+          title={recognition.titulo || `Caderno #${recognition.id}`}
           eyebrow="RECONHECIMENTO DE CADERNO"
           eyebrowClassName={styles.notebookModalEyebrow}
-          subtitle={`${recognition.unit} · ${recognition.leader}`}
+          subtitle={`${recognition.nomeUnidade || "Unidade"} · ${recognition.nomeConselheiro || "Conselheiro"}`}
           subtitleClassName={styles.modalSubtitle}
           labelledBy="recognize-notebook-title"
           headerClassName={styles.modalHeader}
@@ -211,12 +253,25 @@ function Evidencias() {
           <div className={styles.notebookPointsInput}><input id="notebook-points" type="number" min="0" value={recognitionPoints} onChange={(event) => setRecognitionPoints(event.target.value)} /><span>pts</span></div>
         </Modal>
       )}
+      {evidenceToDismiss && (
+        <Modal
+          className={modalStyles.confirmModal}
+          title="Não reconhecer caderno"
+          labelledBy="dismiss-evidence-title"
+          headerClassName={modalStyles.confirmHeader}
+          footerClassName={modalStyles.confirmActions}
+          footer={<><button type="button" onClick={() => setEvidenceToDismiss(null)}>Cancelar</button><button className={modalStyles.confirmDanger} type="button" onClick={dismissNotebook}>Excluir</button></>}
+          onClose={() => setEvidenceToDismiss(null)}
+        >
+          <p>Tem certeza que deseja excluir “{evidenceToDismiss.titulo || `Caderno #${evidenceToDismiss.id}`}”? Esta ação não pode ser desfeita.</p>
+        </Modal>
+      )}
     </main>
   );
 }
 
 function EvidenceSummary({ evidence }) {
-  return <div className={styles.summary}><strong>{evidence.title}</strong><span>Unidade {evidence.unit} · {evidence.points} pontos previstos</span></div>;
+  return <div className={styles.summary}><strong>{evidence.titulo || `Evidência #${evidence.id}`}</strong><span>Unidade {evidence.nomeUnidade || "não informada"} · {evidence.pontuacao || 0} pontos previstos</span></div>;
 }
 
 export default Evidencias;

@@ -1,13 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import api from "../../service/api";
+import api, { urlArquivo } from "../../service/api";
 
-const notifications = [
-  { icon: "bx-check-circle", statusClass: "approved", title: "Tarefa aprovada", message: 'Sua evidência para "Treinamento de primeiros socorros" foi aprovada! +200 pontos', date: "09/04/2026", unread: true },
-  { icon: "bx-info-circle", statusClass: "available", title: "Nova tarefa disponível", message: 'A tarefa "Organizar reunião de pais" foi adicionada ao seu quadro', date: "01/04/2026", unread: true },
-  { icon: "bx-error-circle", statusClass: "rejected", title: "Evidência reprovada", message: "A evidência enviada precisa de ajustes. Verifique os comentários.", date: "28/03/2026", unread: false }
-];
+// Aparência de cada notificação conforme o tipo de referência gravado pela API
+const NOTIFICATION_STYLE = {
+  EVIDENCIA_APROVADA: { icon: "bx-check-circle", statusClass: "approved" },
+  EVIDENCIA_CORRECAO: { icon: "bx-error-circle", statusClass: "rejected" },
+};
+const DEFAULT_STYLE = { icon: "bx-info-circle", statusClass: "available" };
+
+function formatarData(iso) {
+  if (!iso) return "";
+  const [data] = String(iso).split("T");
+  const [ano, mes, dia] = data.split("-");
+  return dia && mes && ano ? `${dia}/${mes}/${ano}` : "";
+}
 
 function Navbar() {
   const [openPopover, setOpenPopover] = useState(null);
@@ -17,9 +25,10 @@ function Navbar() {
   const drawerRef = useRef(null);
   const drawerCloseRef = useRef(null);
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [usuario, setUsuario] = useState({ nome: "", tipoConta: "", fotoUrl: null });
   const unreadCount = notifications.filter((notification) => notification.unread).length;
-  const [nomeUsuario,setNomeUsuario] = useState("Usuario")
-  const [cargo,setCargo] = useState("")
+  const isConselheiro = usuario.tipoConta.toLowerCase() === "conselheiro";
 
   useEffect(() => {
     if (!mobileMenuOpen) return undefined;
@@ -53,6 +62,35 @@ function Navbar() {
     }
   }
 
+  useEffect(() => {
+    let ativo = true;
+    api.get("/usuarios/perfil")
+      .then(({ data }) => { if (ativo && data) setUsuario({ nome: data.nome || "", tipoConta: data.tipoConta || "", fotoUrl: data.fotoUrl || null }); })
+      .catch(() => {});
+    api.get("/notificacoes")
+      .then(({ data, status }) => {
+        if (!ativo) return;
+        const lista = status === 204 || !Array.isArray(data) ? [] : data;
+        setNotifications(lista.map((n) => ({
+          id: n.id,
+          ...(NOTIFICATION_STYLE[n.tipoReferencia] || DEFAULT_STYLE),
+          title: n.titulo,
+          message: n.mensagem,
+          date: formatarData(n.dataCriacao),
+          unread: !n.lida,
+        })));
+      })
+      .catch(() => { if (ativo) setNotifications([]); });
+    return () => { ativo = false; };
+  }, []);
+
+  function markAllAsRead() {
+    if (unreadCount === 0) return;
+    api.patch("/notificacoes/lidas")
+      .then(() => setNotifications((atual) => atual.map((n) => ({ ...n, unread: false }))))
+      .catch(() => {});
+  }
+
   function logout() {
     api.post("/usuarios/logoff")
       .then(() => {
@@ -62,16 +100,6 @@ function Navbar() {
         console.log(err.response);
       });
   }
-
-  api.get("/usuarios/buscarUsuario")
-    .then((res) => {
-      let resposta = res.data
-      setNomeUsuario(resposta.nome)
-      setCargo(resposta.tipoConta)
-      console.log(nomeUsuario)
-    }).catch((err) => {
-      console.log(err.response)
-    })
 
   useEffect(() => {
     function closePopover(event) {
@@ -144,25 +172,38 @@ function Navbar() {
           </button>
         </div>
         <nav className={styles.menu} aria-label="Navegação principal">
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-group'></i> Unidades
-          </NavLink>
+          {isConselheiro ? (
+            <>
+              <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/minhas-tarefas" onClick={() => setMobileMenuOpen(false)}>
+                <i className='bx bx-check-square'></i> Minhas Tarefas
+              </NavLink>
+              <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/desbravadores" onClick={() => setMobileMenuOpen(false)}>
+                <i className='bx bx-group'></i> Desbravadores
+              </NavLink>
+            </>
+          ) : (
+            <>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-group'></i> Unidades
+            </NavLink>
 
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/tarefas" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-check-square'></i> Tarefas
-          </NavLink>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/tarefas" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-check-square'></i> Tarefas
+            </NavLink>
 
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-list-check'></i> Evidências
-          </NavLink>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/evidencias" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-list-check'></i> Evidências
+            </NavLink>
 
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-book'></i> Cadernos
-          </NavLink>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/cadernos" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-book'></i> Cadernos
+            </NavLink>
 
-          <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites" onClick={() => setMobileMenuOpen(false)}>
-            <i className='bx bx-envelope'></i> Convites
-          </NavLink>
+            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/convites" onClick={() => setMobileMenuOpen(false)}>
+              <i className='bx bx-envelope'></i> Convites
+            </NavLink>
+            </>
+          )}
         </nav>
       </div>
 
@@ -184,17 +225,21 @@ function Navbar() {
           aria-expanded={openPopover === "profile"}
           onClick={() => setOpenPopover((current) => current === "profile" ? null : "profile")}
         >
-          <span className={styles.avatar}>{nomeUsuario != undefined ? nomeUsuario.trim()[0] : "" }</span>
+          <span className={styles.avatar}>
+            {usuario.fotoUrl
+              ? <img className={styles.avatarImage} src={urlArquivo(usuario.fotoUrl)} alt="" />
+              : (usuario.nome || "?").charAt(0).toUpperCase()}
+          </span>
           <span className={styles.profileInfo}>
-            <strong>{nomeUsuario}</strong>
-            <small>{cargo}</small>
+            <strong>{usuario.nome}</strong>
+            <small>{usuario.tipoConta}</small>
           </span>
           <i className="bx bx-chevron-down" />
         </button>
 
         {openPopover === "profile" && (
           <div className={`${styles.popover} ${styles.profilePopover}`}>
-            <div className={styles.popoverIdentity}><strong>{nomeUsuario}</strong><span>{cargo}</span></div>
+            <div className={styles.popoverIdentity}><strong>{usuario.nome}</strong><span>{usuario.tipoConta}</span></div>
             <button type="button" onClick={() => { setOpenPopover(null); navigate("/perfil"); }}><i className="bx bx-user" /> Meu Perfil</button>
             <button className={styles.logoutButton} type="button" onClick={logout}><i className="bx bx-log-out" /> Sair</button>
           </div>
@@ -202,8 +247,9 @@ function Navbar() {
 
         {openPopover === "notifications" && (
           <div className={`${styles.popover} ${styles.notificationsPopover}`}>
-            <div className={styles.notificationsHeader}><strong>Notificações</strong><span>{unreadCount} não lidas</span></div>
-            {notifications.map((notification) => <Notification key={notification.title} icon={notification.icon} className={styles[notification.statusClass]} title={notification.title} message={notification.message} date={notification.date} />)}
+            <div className={styles.notificationsHeader}><strong>Notificações</strong><span>{unreadCount} não lidas</span>{unreadCount > 0 && <button type="button" onClick={markAllAsRead}>Marcar como lidas</button>}</div>
+            {notifications.length === 0 && <p className={styles.notificationItem}>Nenhuma notificação.</p>}
+            {notifications.map((notification) => <Notification key={notification.id} icon={notification.icon} className={styles[notification.statusClass]} title={notification.title} message={notification.message} date={notification.date} />)}
           </div>
         )}
       </div>
