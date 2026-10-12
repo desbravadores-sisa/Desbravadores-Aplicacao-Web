@@ -97,6 +97,7 @@
   gap: 8px;
   min-width: 180px;
   margin-top: 2px;
+  box-sizing: border-box;
 }
 
 .primaryAction,
@@ -158,6 +159,17 @@
   color: #687487;
   font-size: 11px;
   line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .cardHeader {
+    flex-direction: column;
+  }
+
+  .actionColumn {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 @keyframes fadeInCard {

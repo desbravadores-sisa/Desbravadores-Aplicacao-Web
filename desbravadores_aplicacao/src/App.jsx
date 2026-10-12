@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Cadernos from "./pages/Cadernos";
+import CadernoDetalhe from "./pages/CadernoDetalhe";
 import LoginPage from "./pages/LoginPage";
 import Perfil from "./pages/Perfil";
 import RegisterPage from "./pages/RegisterPage";
@@ -30,6 +31,15 @@ function App() {
             <>
               <Navbar />
               <Cadernos />
+            </>
+          }
+        />
+        <Route
+          path="/cadernos/:cadernoId"
+          element={
+            <>
+              <Navbar />
+              <CadernoDetalhe />
             </>
           }
         />

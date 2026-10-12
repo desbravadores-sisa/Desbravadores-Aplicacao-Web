@@ -1,0 +1,40 @@
+.track {
+  width: 88px;
+  height: 9px;
+  overflow: hidden;
+  appearance: none;
+  border-radius: var(--radius-pill);
+  background: #edf2f7;
+}
+
+.track::-webkit-progress-bar {
+  border-radius: inherit;
+  background: #edf2f7;
+}
+
+.track::-webkit-progress-value {
+  border-radius: inherit;
+  background: #cbd5e1;
+  transition: width 180ms ease;
+}
+
+.track::-moz-progress-bar {
+  border-radius: inherit;
+  background: #cbd5e1;
+}
+
+.highlight::-webkit-progress-value {
+  background: #ff9900;
+}
+
+.highlight::-moz-progress-bar {
+  background: #ff9900;
+}
+
+.complete::-webkit-progress-value {
+  background: #00b783;
+}
+
+.complete::-moz-progress-bar {
+  background: #00b783;
+}

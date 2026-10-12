@@ -8,7 +8,6 @@ function AuthForm({ type }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [errors, setErrors] = useState({});
 
@@ -29,8 +28,9 @@ function AuthForm({ type }) {
     if (Object.keys(newErrors).length > 0) {
       return;
     }
+
     if (type === "login") {
-      api.post("/usuarios/login", { email: email, senha: senha }, { withCredentials: true })
+      api.post("/usuarios/login", { email: email, senha: senha })
         .then((resposta) => {
           const res = resposta.data;
           if (res.tipoConta === "Conselheiro") {
@@ -38,7 +38,8 @@ function AuthForm({ type }) {
           } else if (res.tipoConta === "Diretoria") {
             navigate("/unidades");
           }
-        }).catch((erro) => {
+        })
+        .catch((erro) => {
           const status = erro.response?.status;
           if (status === 401) {
             setErrors({ senha: "E-mail ou senha inválidos." });
@@ -48,21 +49,21 @@ function AuthForm({ type }) {
         });
     } else if (type === "register") {
       api.post("/usuarios/cadastro", { nome: nome, email: email, senha: senha, token: token })
-      .then((resposta) => {
-        navigate("/");
-      })
-      .catch((erro) => {
-        const status = erro.response?.status;
-        const messages = {
-          400: "Verifique os dados informados e tente novamente.",
-          404: "O convite não foi encontrado. Solicite um novo convite.",
-          409: "Este e-mail já está cadastrado ou o convite já foi utilizado.",
-          410: "O convite está expirado ou já foi aceito.",
-          422: "O convite expirou ou o e-mail não corresponde ao convite.",
-        };
+        .then(() => {
+          navigate("/");
+        })
+        .catch((erro) => {
+          const status = erro.response?.status;
+          const messages = {
+            400: "Verifique os dados informados e tente novamente.",
+            404: "O convite não foi encontrado. Solicite um novo convite.",
+            409: "Este e-mail já está cadastrado ou o convite já foi utilizado.",
+            410: "O convite está expirado ou já foi aceito.",
+            422: "O convite expirou ou o e-mail não corresponde ao convite.",
+          };
 
-        setErrors({ form: messages[status] || "Não foi possível cadastrar sua conta. Tente novamente." });
-      });
+          setErrors({ form: messages[status] || "Não foi possível cadastrar sua conta. Tente novamente." });
+        });
     }
   };
 

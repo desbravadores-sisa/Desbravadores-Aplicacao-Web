@@ -1,0 +1,119 @@
+.page {
+  min-height: calc(100vh - 72px);
+  padding: 26px 36px 36px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.container {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 20px 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #526070;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.backLink:hover {
+  color: var(--color-primary);
+}
+
+.detailSurface {
+  overflow: hidden;
+  border: 1px solid #e1e8f0;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 2px 3px rgba(15, 23, 42, 0.08);
+}
+
+.message {
+  padding: 36px 24px;
+  border: 1px solid #e1e8f0;
+  border-radius: 20px;
+  background: #fff;
+  color: #64748b;
+  text-align: center;
+}
+
+.message h1 {
+  margin-bottom: 8px;
+  color: #172033;
+  font-size: var(--font-size-xl);
+}
+
+.message p {
+  font-size: var(--font-size-sm);
+}
+
+.confirmModal {
+  width: min(430px, 100%);
+  overflow: hidden;
+}
+
+.confirmHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 12px;
+}
+
+.confirmHeader h2 {
+  color: #172033;
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+}
+
+.confirmHeader button {
+  color: #718096;
+  font-size: 24px;
+}
+
+.confirmBody {
+  padding: 8px 24px 22px;
+  color: #64748b;
+  font-size: var(--font-size-sm);
+  line-height: 1.55;
+}
+
+.confirmBody strong {
+  color: #334155;
+}
+
+.confirmFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 24px 22px;
+}
+
+.confirmFooter button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #e1e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #526070;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.confirmFooter .confirmDanger {
+  border-color: #dc2626;
+  background: #dc2626;
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 20px 16px 28px;
+  }
+}

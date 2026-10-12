@@ -1,0 +1,160 @@
+.header {
+  padding: 26px 30px 24px;
+  border-bottom: 1px solid #edf1f5;
+  background: linear-gradient(110deg, #fff7ed 0%, #fffaf5 38%, #fff 78%);
+}
+
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.identity {
+  display: flex;
+  min-width: 0;
+  gap: 17px;
+}
+
+.bookIcon {
+  display: grid;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 17px;
+  background: #ff4d00;
+  box-shadow: 0 8px 14px rgba(255, 101, 8, 0.2);
+  color: white;
+  font-size: 27px;
+}
+
+.titleBlock {
+  min-width: 0;
+}
+
+.eyebrowRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 1px 0 7px;
+}
+
+.eyebrow {
+  color: #f04400;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.11em;
+}
+
+.titleBlock h1 {
+  color: #172033;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.titleBlock p {
+  margin-top: 9px;
+  color: #718096;
+  font-size: var(--font-size-sm);
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+}
+
+.actions button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 17px;
+  border-radius: 17px;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.secondaryButton {
+  border: 1px solid #ffd2ae;
+  background: rgba(255, 255, 255, 0.9);
+  color: #e54e00;
+}
+
+.primaryButton {
+  border: 1px solid #f04400;
+  background: #ff4d00;
+  box-shadow: 0 7px 13px rgba(255, 101, 8, 0.2);
+  color: white;
+}
+
+.actions button:hover {
+  filter: brightness(0.97);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 30px;
+}
+
+@media (max-width: 900px) {
+  .topRow {
+    flex-direction: column;
+  }
+
+  .actions {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 20px 16px;
+  }
+
+  .identity {
+    gap: 12px;
+  }
+
+  .bookIcon {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    font-size: 22px;
+  }
+
+  .titleBlock h1 {
+    font-size: 23px;
+  }
+
+  .eyebrow {
+    font-size: var(--font-size-2xs);
+  }
+
+  .actions {
+    width: 100%;
+    align-self: stretch;
+  }
+
+  .actions button {
+    flex: 1;
+    min-height: 44px;
+    padding: 0 9px;
+    font-size: var(--font-size-2xs);
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 20px;
+  }
+}

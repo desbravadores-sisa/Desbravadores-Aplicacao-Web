@@ -5,4 +5,12 @@ const api = axios.create({
     withCredentials: true
 })
 
+export function getKanbanBoard() {
+    return api.get("/tarefas/kanban").then((response) => response.data);
+}
+
+export function updateTaskStatus(taskId, nextStatus) {
+    return api.patch(`/tarefas/${taskId}/status`, { status: nextStatus });
+}
+
 export default api

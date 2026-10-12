@@ -46,7 +46,7 @@ function Unidades() {
   async function createUnit(event) {
     event.preventDefault();
     const nome = form.nome.trim();
-    if (!nome) return;
+    if (!nome || !form.idadeMinima) return;
 
     try {
       await api.post("/unidades", {
@@ -99,6 +99,7 @@ function Unidades() {
             key={unit.id}
             name={unit.nome}
             leader={unit.nomeConselheiro || "A definir"}
+            minimumAge={unit.idadeMinima}
             score={unit.pontuacao || 0}
             completedTasks={unit.tarefasConcluidas || 0}
             totalTasks={unit.totalTarefas || 0}
@@ -138,14 +139,17 @@ function Unidades() {
             value={form.genero}
             onChange={(e) => setForm((c) => ({ ...c, genero: e.target.value }))}
           />
-          <label htmlFor="idadeMinima">Idade Mínima (opcional)</label>
+          <label htmlFor="idadeMinima">Idade necessária (mínima)</label>
           <input
             id="idadeMinima"
             name="idadeMinima"
             type="number"
-            min="0"
+            min="1"
+            max="100"
+            placeholder="Ex: 10"
             value={form.idadeMinima}
             onChange={(e) => setForm((c) => ({ ...c, idadeMinima: e.target.value }))}
+            required
           />
           <label htmlFor="idadeMaxima">Idade Máxima (opcional)</label>
           <input
