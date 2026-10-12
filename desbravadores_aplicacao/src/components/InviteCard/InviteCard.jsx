@@ -5,10 +5,13 @@ function InviteCard({ invitation, onRemove, expired = false }) {
     return <p className={styles.emptyState}>Nenhum convite ativo.</p>;
   }
 
-  const inviteLink = `https://tigre-da-montanha.com/cadastro/convite/${invitation.email.split("@")[0]}`;
+  // Link real de cadastro: o token vem da API (GET/POST /convites)
+  const inviteLink = invitation.token ? `${window.location.origin}/cadastro?token=${invitation.token}` : null;
+  const role = invitation.role ?? invitation.tipoConta;
+  const unit = invitation.unit ?? invitation.nomeUnidade ?? "";
 
   function copyLink() {
-    navigator.clipboard?.writeText(inviteLink);
+    if (inviteLink) navigator.clipboard?.writeText(inviteLink);
   }
 
   return (
@@ -18,9 +21,9 @@ function InviteCard({ invitation, onRemove, expired = false }) {
       </button>
       <strong><i className="bx bx-envelope" /> {invitation.email}</strong>
       <span className={styles.inviteMeta}>
-        <b>{invitation.role}</b> {invitation.unit}
+        <b>{role}</b> {unit}
       </span>
-      {!expired && (
+      {!expired && inviteLink && (
         <div className={styles.linkRow}>
           <i className="bx bx-link" />
           <span>{inviteLink}</span>

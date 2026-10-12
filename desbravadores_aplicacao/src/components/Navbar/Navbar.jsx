@@ -3,17 +3,56 @@ import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import api from "../../service/api";
 
-const notifications = [
-  { icon: "bx-check-circle", statusClass: "approved", title: "Tarefa aprovada", message: 'Sua evidência para "Treinamento de primeiros socorros" foi aprovada! +200 pontos', date: "09/04/2026", unread: true },
-  { icon: "bx-info-circle", statusClass: "available", title: "Nova tarefa disponível", message: 'A tarefa "Organizar reunião de pais" foi adicionada ao seu quadro', date: "01/04/2026", unread: true },
-  { icon: "bx-error-circle", statusClass: "rejected", title: "Evidência reprovada", message: "A evidência enviada precisa de ajustes. Verifique os comentários.", date: "28/03/2026", unread: false }
-];
+// Aparência de cada notificação conforme o tipo de referência gravado pela API
+const NOTIFICATION_STYLE = {
+  EVIDENCIA_APROVADA: { icon: "bx-check-circle", statusClass: "approved" },
+  EVIDENCIA_CORRECAO: { icon: "bx-error-circle", statusClass: "rejected" },
+};
+const DEFAULT_STYLE = { icon: "bx-info-circle", statusClass: "available" };
+
+function formatarData(iso) {
+  if (!iso) return "";
+  const [data] = String(iso).split("T");
+  const [ano, mes, dia] = data.split("-");
+  return dia && mes && ano ? `${dia}/${mes}/${ano}` : "";
+}
 
 function Navbar() {
   const [openPopover, setOpenPopover] = useState(null);
   const profileAreaRef = useRef(null);
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [usuario, setUsuario] = useState({ nome: "", tipoConta: "" });
   const unreadCount = notifications.filter((notification) => notification.unread).length;
+
+  useEffect(() => {
+    let ativo = true;
+    api.get("/usuarios/perfil")
+      .then(({ data }) => { if (ativo && data) setUsuario({ nome: data.nome || "", tipoConta: data.tipoConta || "" }); })
+      .catch(() => {});
+    api.get("/notificacoes")
+      .then(({ data, status }) => {
+        if (!ativo) return;
+        const lista = status === 204 || !Array.isArray(data) ? [] : data;
+        setNotifications(lista.map((n) => ({
+          id: n.id,
+          ...(NOTIFICATION_STYLE[n.tipoReferencia] || DEFAULT_STYLE),
+          title: n.titulo,
+          message: n.mensagem,
+          date: formatarData(n.dataCriacao),
+          unread: !n.lida,
+        })));
+      })
+      .catch(() => { if (ativo) setNotifications([]); });
+    return () => { ativo = false; };
+  }, []);
+
+  function markAllAsRead() {
+    if (unreadCount === 0) return;
+    api.patch("/notificacoes/lidas")
+      .then(() => setNotifications((atual) => atual.map((n) => ({ ...n, unread: false }))))
+      .catch(() => {});
+  }
 
   function logout() {
       api.post("/usuarios/logoff")
@@ -94,17 +133,17 @@ function Navbar() {
           aria-expanded={openPopover === "profile"}
           onClick={() => setOpenPopover((current) => current === "profile" ? null : "profile")}
         >
-          <span className={styles.avatar}>A</span>
+          <span className={styles.avatar}>{(usuario.nome || "?").charAt(0).toUpperCase()}</span>
           <span className={styles.profileInfo}>
-            <strong>Ana Santos</strong>
-            <small>Diretoria</small>
+            <strong>{usuario.nome}</strong>
+            <small>{usuario.tipoConta}</small>
           </span>
           <i className="bx bx-chevron-down" />
         </button>
 
         {openPopover === "profile" && (
           <div className={`${styles.popover} ${styles.profilePopover}`}>
-            <div className={styles.popoverIdentity}><strong>Ana Santos</strong><span>Diretoria</span></div>
+            <div className={styles.popoverIdentity}><strong>{usuario.nome}</strong><span>{usuario.tipoConta}</span></div>
             <button type="button" onClick={() => { setOpenPopover(null); navigate("/perfil"); }}><i className="bx bx-user" /> Meu Perfil</button>
             <button className={styles.logoutButton} type="button" onClick={() => {logout()}}><i className="bx bx-log-out" /> Sair</button>
           </div>
@@ -112,8 +151,9 @@ function Navbar() {
 
         {openPopover === "notifications" && (
           <div className={`${styles.popover} ${styles.notificationsPopover}`}>
-            <div className={styles.notificationsHeader}><strong>Notificações</strong><span>{unreadCount} não lidas</span></div>
-            {notifications.map((notification) => <Notification key={notification.title} icon={notification.icon} className={styles[notification.statusClass]} title={notification.title} message={notification.message} date={notification.date} />)}
+            <div className={styles.notificationsHeader}><strong>Notificações</strong><span>{unreadCount} não lidas</span>{unreadCount > 0 && <button type="button" onClick={markAllAsRead}>Marcar como lidas</button>}</div>
+            {notifications.length === 0 && <p className={styles.notificationItem}>Nenhuma notificação.</p>}
+            {notifications.map((notification) => <Notification key={notification.id} icon={notification.icon} className={styles[notification.statusClass]} title={notification.title} message={notification.message} date={notification.date} />)}
           </div>
         )}
       </div>

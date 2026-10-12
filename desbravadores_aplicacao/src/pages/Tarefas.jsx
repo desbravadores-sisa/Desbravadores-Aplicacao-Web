@@ -1,40 +1,56 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../components/Modal/Modal";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
 import TaskCard from "../components/TaskCard/TaskCard";
+import api from "../service/api";
 import styles from "./Tarefas.module.css";
 
 const emptyTask = {
-  type: "general",
-  linkedNotebook: "",
-  title: "",
-  description: "",
-  evidence: "",
-  points: "",
-  startDate: "",
-  deadline: "",
-  delivered: 0,
-  total: 4
+  titulo: "",
+  descricao: "",
+  tipoTarefa: "CLUBE",
+  pontuacao: "",
+  prazoPadrao: "",
+  fkCaderno: "",
 };
 
-const initialTasks = [
-  { id: 1, type: "general", title: "Organizar reunião de pais", description: "Preparar e conduzir reunião com os pais dos desbravadores", evidence: "Enviar lista de presença assinada e fotos do evento", points: 150, startDate: "2026-05-20", deadline: "2026-06-01", delivered: 0, total: 4 },
-  { id: 2, type: "general", title: "Atualizar documentação da unidade", description: "Revisar e atualizar todos os documentos oficiais da unidade", evidence: "Upload dos documentos atualizados em PDF", points: 100, startDate: "2026-05-20", deadline: "2026-06-04", delivered: 0, total: 4 },
-  { id: 3, type: "general", title: "Campori Regional - Preparação", description: "Preparar equipe para participação no Campori Regional", evidence: "Lista de equipamentos, cronograma e autorizações dos pais", points: 300, startDate: "2026-05-20", deadline: "2026-06-15", delivered: 1, total: 4 },
-  { id: 4, type: "general", title: "Treinamento de primeiros socorros", description: "Conduzir treinamento básico de primeiros socorros com a unidade", evidence: "Fotos do treinamento e certificados de participação", points: 200, startDate: "2026-05-20", deadline: "2026-06-25", delivered: 1, total: 4 },
-  { id: 5, type: "notebook", linkedNotebook: "Caderno Pioneiro", title: "Caderno Pioneiro - Bloco de Sobrevivência", description: "Acompanhar os desbravadores Pioneiros (13 anos) na conclusão dos requisitos de sobrevivência e acampamento do caderno.", evidence: "", points: 60, startDate: "2026-05-20", deadline: "2026-07-15", delivered: 0, total: 4 },
-  { id: 6, type: "notebook", linkedNotebook: "Caderno Amigo", title: "Caderno Amigo - Natureza e Meio Ambiente", description: "Orientar os desbravadores de 10 anos nos requisitos de natureza, fauna e flora do caderno Amigo.", evidence: "", points: 45, startDate: "2026-05-20", deadline: "2026-07-07", delivered: 0, total: 4 }
-];
-
-const formatDate = (value) => value ? new Date(`${value}T00:00:00`).toLocaleDateString("pt-BR") : "";
+const formatDate = (value) => (value ? new Date(`${value}T00:00:00`).toLocaleDateString("pt-BR") : "");
 
 function Tarefas() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(null);
   const [modal, setModal] = useState(null);
   const [draft, setDraft] = useState(emptyTask);
 
-  const generalTasks = tasks.filter((task) => task.type === "general");
-  const notebookTasks = tasks.filter((task) => task.type === "notebook");
+  useEffect(() => {
+    carregarTarefas();
+  }, []);
+
+  async function carregarTarefas() {
+    try {
+      setCarregando(true);
+      const { data, status } = await api.get("/tarefas");
+      if (status === 204 || !data) {
+        setTasks([]);
+      } else {
+        setTasks(data);
+      }
+      setErro(null);
+    } catch (err) {
+      const status = err.response?.status;
+      if (status === 403) {
+        setErro("Acesso restrito.");
+      } else {
+        setErro("Não foi possível carregar as tarefas. Verifique se a API está no ar.");
+      }
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  const generalTasks = tasks.filter((t) => !t.fkCaderno || t.tipoTarefa === "CLUBE");
+  const notebookTasks = tasks.filter((t) => t.fkCaderno || t.tipoTarefa === "CADERNO");
 
   function openNewTask() {
     setDraft({ ...emptyTask });
@@ -42,7 +58,15 @@ function Tarefas() {
   }
 
   function openEditTask(task) {
-    setDraft({ ...task });
+    setDraft({
+      id: task.id,
+      titulo: task.titulo || "",
+      descricao: task.descricao || "",
+      tipoTarefa: task.tipoTarefa || "CLUBE",
+      pontuacao: task.pontuacao || "",
+      prazoPadrao: task.prazoPadrao || "",
+      fkCaderno: task.fkCaderno || "",
+    });
     setModal("form");
   }
 
@@ -55,40 +79,80 @@ function Tarefas() {
     setDraft({ ...draft, [event.target.name]: event.target.value });
   }
 
-  function handleTypeChange(type) {
-    setDraft({ ...draft, type, linkedNotebook: type === "general" ? "" : draft.linkedNotebook });
-  }
-
-  function saveTask(event) {
+  async function saveTask(event) {
     event.preventDefault();
-    const task = { ...draft, points: Number(draft.points) || 0, deadline: formatDate(draft.deadline), startDate: formatDate(draft.startDate) };
-    if (draft.id) {
-      setTasks((current) => current.map((item) => item.id === draft.id ? task : item));
-    } else {
-      setTasks((current) => [...current, { ...task, id: Date.now() }]);
+
+    const payload = {
+      titulo: draft.titulo,
+      descricao: draft.descricao,
+      tipoTarefa: draft.fkCaderno ? "CADERNO" : "CLUBE",
+      pontuacao: Number(draft.pontuacao) || 0,
+      prazoPadrao: draft.prazoPadrao || null,
+      fkCaderno: draft.fkCaderno || null,
+    };
+
+    try {
+      if (draft.id) {
+        await api.put(`/tarefas/${draft.id}`, payload);
+      } else {
+        await api.post("/tarefas", payload);
+      }
+      setModal(null);
+      await carregarTarefas();
+    } catch (err) {
+      setErro("Não foi possível salvar a tarefa.");
     }
-    setModal(null);
   }
 
-  function deleteTask() {
-    setTasks((current) => current.filter((task) => task.id !== draft.id));
-    setModal(null);
+  async function deleteTask() {
+    try {
+      await api.delete(`/tarefas/${draft.id}`);
+      setModal(null);
+      await carregarTarefas();
+    } catch (err) {
+      setErro("Não foi possível excluir a tarefa.");
+    }
   }
 
   return (
     <main className={styles.page}>
       <SectionHeader
         title="Gerenciar Tarefas"
-        subtitle={<>10 tarefas · <b>{generalTasks.length} gerais</b> · <strong>{notebookTasks.length} cadernos</strong></>}
+        subtitle={<>{tasks.length} tarefas · <b>{generalTasks.length} gerais</b> · <strong>{notebookTasks.length} cadernos</strong></>}
         buttonIcon={<i className="bx bx-plus" />}
         buttonText="Nova Tarefa"
         onButtonClick={openNewTask}
       />
 
-      <div className={styles.taskColumns}>
-        <section><div className={styles.columnHeader}><h2><i className="bx bx-notepad" /> Atividades Gerais</h2><span>{generalTasks.length + 4}</span></div><div className={styles.taskList}>{generalTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onDelete={openDeleteTask} />)}</div></section>
-        <section><div className={`${styles.columnHeader} ${styles.notebookHeader}`}><h2><i className="bx bx-book-open" /> Requisitos de Caderno</h2><span>{notebookTasks.length}</span></div><div className={styles.taskList}>{notebookTasks.map((task) => <TaskCard key={task.id} task={task} onEdit={openEditTask} onDelete={openDeleteTask} />)}</div></section>
-      </div>
+      {carregando && <p>Carregando tarefas...</p>}
+      {erro && <p role="alert">{erro}</p>}
+
+      {!carregando && !erro && (
+        <div className={styles.taskColumns}>
+          <section>
+            <div className={styles.columnHeader}>
+              <h2><i className="bx bx-notepad" /> Atividades Gerais</h2>
+              <span>{generalTasks.length}</span>
+            </div>
+            <div className={styles.taskList}>
+              {generalTasks.map((task) => (
+                <TaskCard key={task.id} task={task} onEdit={openEditTask} onDelete={openDeleteTask} />
+              ))}
+            </div>
+          </section>
+          <section>
+            <div className={`${styles.columnHeader} ${styles.notebookHeader}`}>
+              <h2><i className="bx bx-book-open" /> Requisitos de Caderno</h2>
+              <span>{notebookTasks.length}</span>
+            </div>
+            <div className={styles.taskList}>
+              {notebookTasks.map((task) => (
+                <TaskCard key={task.id} task={task} onEdit={openEditTask} onDelete={openDeleteTask} />
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
 
       {modal === "form" && (
         <Modal
@@ -98,22 +162,27 @@ function Tarefas() {
           headerClassName={styles.modalHeader}
           bodyClassName={styles.modalBody}
           footerClassName={styles.modalFooter}
-          footer={<><button type="button" onClick={() => setModal(null)}>Cancelar</button><button className={draft.type === "notebook" ? styles.saveNotebook : styles.saveButton} type="submit">Salvar {draft.id ? "Alterações" : "Tarefa"}</button></>}
+          footer={<><button type="button" onClick={() => setModal(null)}>Cancelar</button><button className={draft.fkCaderno ? styles.saveNotebook : styles.saveButton} type="submit">Salvar {draft.id ? "Alterações" : "Tarefa"}</button></>}
           onClose={() => setModal(null)}
           onSubmit={saveTask}
         >
-          <label>Tipo de atividade</label>
-          <div className={styles.activityTypes}>
-            <button type="button" className={draft.type === "general" ? styles.typeSelected : ""} onClick={() => handleTypeChange("general")}><i className="bx bx-notepad" /><span><strong>Geral</strong><small>Entra no Kanban, requer evidência</small></span></button>
-            <button type="button" className={draft.type === "notebook" ? styles.typeNotebookSelected : ""} onClick={() => handleTypeChange("notebook")}><i className="bx bx-book-open" /><span><strong>Caderno</strong><small>Acompanhamento individual</small></span></button>
-          </div>
-          {draft.type === "notebook" && <><label htmlFor="linkedNotebook">Caderno vinculado <b>*</b></label><select id="linkedNotebook" name="linkedNotebook" value={draft.linkedNotebook} onChange={handleChange} required><option value="">Selecione o caderno</option><option>Amigo</option><option>Companheiro</option><option>Pesquisador</option><option>Pioneiro</option><option>Excursionista</option><option>Guia</option></select><div className={styles.formHint}><i className="bx bx-book-open" /> Somente desbravadores vinculados ao caderno selecionado poderão receber check-in.</div></>}
-          <label htmlFor="title">Título</label><input id="title" name="title" value={draft.title} onChange={handleChange} required />
-          <label htmlFor="description">Descrição</label><textarea id="description" name="description" value={draft.description} onChange={handleChange} required />
-          <label htmlFor="evidence">{draft.type === "general" ? "Instruções de Evidência" : "Orientações ao conselheiro"}</label><textarea id="evidence" name="evidence" value={draft.evidence} onChange={handleChange} required />
-          <div className={styles.formRow}><div><label htmlFor="points">Pontuação</label><input id="points" name="points" type="number" min="0" value={draft.points} onChange={handleChange} required /></div><div><label htmlFor="startDate">Data de Início</label><input id="startDate" name="startDate" type="date" value={draft.startDate} onChange={handleChange} required /></div><div><label htmlFor="deadline">Data Limite</label><input id="deadline" name="deadline" type="date" value={draft.deadline} onChange={handleChange} required /></div></div>
+          <label htmlFor="titulo">Título</label>
+          <input id="titulo" name="titulo" value={draft.titulo} onChange={handleChange} required />
+
+          <label htmlFor="descricao">Descrição</label>
+          <textarea id="descricao" name="descricao" value={draft.descricao} onChange={handleChange} required />
+
+          <label htmlFor="pontuacao">Pontuação</label>
+          <input id="pontuacao" name="pontuacao" type="number" min="0" value={draft.pontuacao} onChange={handleChange} required />
+
+          <label htmlFor="prazoPadrao">Prazo Padrão</label>
+          <input id="prazoPadrao" name="prazoPadrao" type="date" value={draft.prazoPadrao} onChange={handleChange} />
+
+          <label htmlFor="fkCaderno">ID do Caderno (deixe vazio para tarefa geral)</label>
+          <input id="fkCaderno" name="fkCaderno" type="number" min="0" value={draft.fkCaderno} onChange={handleChange} placeholder="Ex: 1, 2, 3..." />
         </Modal>
       )}
+
       {modal === "delete" && (
         <Modal
           className={styles.deleteModal}
@@ -124,7 +193,7 @@ function Tarefas() {
           footer={<><button type="button" onClick={() => setModal(null)}>Cancelar</button><button className={styles.deleteConfirm} type="button" onClick={deleteTask}>Excluir</button></>}
           onClose={() => setModal(null)}
         >
-          <p>Tem certeza que deseja excluir “{draft.title}”? Esta ação não pode ser desfeita.</p>
+          <p>Tem certeza que deseja excluir "{draft.titulo}"? Esta ação não pode ser desfeita.</p>
         </Modal>
       )}
     </main>
