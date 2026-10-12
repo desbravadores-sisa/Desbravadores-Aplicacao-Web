@@ -24,7 +24,7 @@ A branch **`consolidacao/sprint-final`** reúne o trabalho de todas as branches 
 |---|---|---|
 | Login / Cadastro por convite | Login com cookie de sessão; cadastro pelo link `/cadastro?token=` | Recuperação de senha |
 | Unidades | Listar (pontuação, conselheiro, progresso, idade mínima), criar, excluir; **"Ver Detalhes" → dashboard** (`/unidades/:id`): cards, ganhos × descontos por semana, curva do saldo, atividades abertas e edição (`GET /unidades/{id}/dashboard`, `PUT /unidades`) | — |
-| Tarefas | Listar, criar (distribuída a todas as unidades), editar, excluir | — |
+| Tarefas | Listar com "X/N unidades entregaram" e caderno; filtro por caderno; criar (Geral ou Caderno, com seletor de caderno; distribuída a todas as unidades), editar, excluir com aviso quando já há entregas | "Instruções de evidência" e "Data de início" do protótipo (sem colunas no banco) |
 | Evidências | Listar, abrir o arquivo enviado (miniatura para imagens), identificar pendência de check-in, aprovar com ajuste de pontos, pedir correção, reconhecer caderno, excluir com confirmação | — |
 | Cadernos | Resumo por grupo (ciclo, vinculados, requisitos, cores por caderno); **"Novo ciclo"** encerra o ciclo atual e aplica o período a todos os cadernos (`POST /ciclos`) | — |
 | Cadernos → Membros | Listar, cadastrar com data de aniversário (idade calculada), editar, excluir com confirmação; caderno atual pelo vínculo e **cadernos concluídos** (histórico) | — |
