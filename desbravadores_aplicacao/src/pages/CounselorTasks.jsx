@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { closestCorners, DndContext, DragOverlay, PointerSensor, useDroppable, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useNavigate } from "react-router-dom";
-import { getKanbanBoard, updateTaskStatus } from "../service/api";
+import Modal from "../components/Modal/Modal";
+import modalStyles from "../components/Modal/Modal.module.css";
+import { enviarEvidencia, getCheckin, getKanbanBoard, marcarCheckin, updateTaskStatus } from "../service/api";
 import styles from "./CounselorTasks.module.css";
 
 // Tela original de Nathan (feature/nathan, a2dbf60), ligada ao contrato real da API:
@@ -16,6 +18,9 @@ const COLUMNS = [
 ];
 // "Concluído" só acontece quando a Diretoria aprova a evidência; o back também bloqueia.
 const LOCKED = "CONCLUIDA";
+// "Em revisão" só por envio de evidência (clube) ou check-in completo (caderno); não se arrasta.
+const REVIEW = "EM REVISAO";
+const isLockedColumn = (key) => key === LOCKED || key === REVIEW;
 
 const emptyBoard = () => COLUMNS.reduce((board, column) => ({ ...board, [column.key]: [] }), {});
 const normalizeBoard = (data) =>
@@ -27,7 +32,7 @@ const formatDate = (value) => {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("pt-BR");
 };
 
-function TaskCard({ task, overlay = false, locked = false }) {
+function TaskCard({ task, overlay = false, locked = false, onOpen }) {
   const sortable = useSortable({ id: taskId(task), data: { type: "card", task }, disabled: locked });
   const cardStyle = overlay ? undefined : { transform: CSS.Transform.toString(sortable.transform), transition: sortable.transition };
   const isNotebook = task.tipoTarefa === "CADERNO";
@@ -38,6 +43,10 @@ function TaskCard({ task, overlay = false, locked = false }) {
       className={`${styles.card} ${sortable.isDragging && !overlay ? styles.dragging : ""} ${overlay ? styles.overlay : ""} ${locked ? styles.locked : ""}`}
       {...(overlay || locked ? {} : sortable.attributes)}
       {...(overlay || locked ? {} : sortable.listeners)}
+      onClick={overlay ? undefined : () => onOpen?.(task)}
+      onKeyDown={overlay ? undefined : (event) => { if (event.key === "Enter") onOpen?.(task); }}
+      role={overlay ? undefined : "button"}
+      tabIndex={overlay ? undefined : 0}
     >
       <div className={styles.cardTopline}>
         <h3>{task.titulo || "Tarefa sem título"}</h3>
@@ -57,9 +66,9 @@ function TaskCard({ task, overlay = false, locked = false }) {
   );
 }
 
-function KanbanColumn({ column, tasks, blocked }) {
+function KanbanColumn({ column, tasks, blocked, onOpen }) {
   const { isOver, setNodeRef } = useDroppable({ id: column.key, data: { type: "column" } });
-  const locked = column.key === LOCKED;
+  const locked = isLockedColumn(column.key);
   return (
     <section
       ref={setNodeRef}
@@ -67,10 +76,11 @@ function KanbanColumn({ column, tasks, blocked }) {
       className={`${styles.column} ${column.className} ${isOver ? (blocked ? styles.columnOverBlocked : styles.columnOver) : ""}`}
     >
       <header className={styles.columnHeader}><h2>{column.label}</h2><span>{tasks.length}</span></header>
-      {locked && <p className={styles.lockedHint}>Concluída quando a Diretoria aprova a evidência</p>}
+      {column.key === LOCKED && <p className={styles.lockedHint}>Concluída quando a Diretoria aprova a evidência</p>}
+      {column.key === REVIEW && <p className={styles.lockedHint}>Aguardando a Diretoria · envie evidência ou faça o check-in</p>}
       <SortableContext items={tasks.map(taskId)} strategy={verticalListSortingStrategy}>
         <div className={styles.columnContent}>
-          {tasks.map((task) => <TaskCard key={taskId(task)} task={task} locked={locked} />)}
+          {tasks.map((task) => <TaskCard key={taskId(task)} task={task} locked={locked} onOpen={onOpen} />)}
         </div>
       </SortableContext>
     </section>
@@ -84,8 +94,16 @@ function CounselorTasks() {
   const [overColumn, setOverColumn] = useState(null);
   const [state, setState] = useState("loading");
   const [error, setError] = useState("");
+  const [openTask, setOpenTask] = useState(null);
+  // Depois de arrastar, o navegador ainda dispara um clique: não abre o modal nesse caso.
+  const ultimoArraste = useRef(0);
+  const abrirTarefa = (task) => {
+    if (Date.now() - ultimoArraste.current > 300) setOpenTask(task);
+  };
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
   const allTasks = useMemo(() => Object.values(board).flat(), [board]);
+
+  const recarregar = () => getKanbanBoard().then((data) => setBoard(normalizeBoard(data))).catch(() => {});
 
   useEffect(() => {
     let cancelled = false;
@@ -121,6 +139,7 @@ function CounselorTasks() {
   }
 
   async function handleDragEnd({ active, over }) {
+    ultimoArraste.current = Date.now();
     setActiveTask(null);
     setOverColumn(null);
     if (!over) return;
@@ -145,6 +164,10 @@ function CounselorTasks() {
 
     if (destination === LOCKED || source === LOCKED) {
       setError("Só a Diretoria conclui tarefas, ao aprovar a evidência enviada.");
+      return;
+    }
+    if (destination === REVIEW) {
+      setError("Para mandar à revisão, clique no card: envie a evidência (tarefa de clube) ou faça o check-in (tarefa de caderno).");
       return;
     }
 
@@ -174,7 +197,7 @@ function CounselorTasks() {
 
   const completed = board[LOCKED].length;
   const points = board[LOCKED].reduce((total, task) => total + (task.pontuacao || 0), 0);
-  const blocked = activeTask && overColumn === LOCKED;
+  const blocked = activeTask && isLockedColumn(overColumn);
 
   return (
     <main className={styles.page}>
@@ -185,7 +208,7 @@ function CounselorTasks() {
           <span><i className="bx bx-check-circle" /> {completed} tarefas concluídas</span>
         </div>
       </header>
-      <p className={styles.hint}>Arraste os cards para atualizar o andamento. Leve para “Em revisão” quando a evidência estiver pronta para a Diretoria.</p>
+      <p className={styles.hint}>Arraste os cards entre “A fazer” e “Em andamento”. Clique num card para enviar a evidência ou fazer o check-in das crianças: aí ele vai para “Em revisão”.</p>
       {error && <p className={styles.warning} role="alert">{error}</p>}
       <DndContext
         sensors={sensors}
@@ -197,12 +220,153 @@ function CounselorTasks() {
       >
         <div className={styles.board}>
           {COLUMNS.map((column) => (
-            <KanbanColumn key={column.key} column={column} tasks={board[column.key]} blocked={blocked} />
+            <KanbanColumn key={column.key} column={column} tasks={board[column.key]} blocked={blocked} onOpen={abrirTarefa} />
           ))}
         </div>
         <DragOverlay>{activeTask ? <TaskCard task={activeTask} overlay /> : null}</DragOverlay>
       </DndContext>
+      {openTask && (
+        <TaskActionModal
+          task={openTask}
+          onClose={() => setOpenTask(null)}
+          onChanged={recarregar}
+        />
+      )}
     </main>
+  );
+}
+
+/** Ações do card: envio de evidência (tarefa de clube) ou check-in das crianças (tarefa de caderno). */
+function TaskActionModal({ task, onClose, onChanged }) {
+  const isNotebook = task.tipoTarefa === "CADERNO";
+  const status = task.statusKanban;
+  const [checkin, setCheckin] = useState(null);
+  const [arquivo, setArquivo] = useState(null);
+  const [comentario, setComentario] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    if (!isNotebook) return;
+    getCheckin(task.id)
+      .then(setCheckin)
+      .catch((err) => setErro(err.response?.data?.message || "Não foi possível carregar o check-in."));
+  }, [isNotebook, task.id]);
+
+  async function alternar(item) {
+    try {
+      setErro("");
+      const atualizado = await marcarCheckin(task.id, item.idDesbravador, !item.concluiu);
+      setCheckin(atualizado);
+      onChanged();
+    } catch (err) {
+      setErro(err.response?.data?.message || "Não foi possível salvar o check-in.");
+    }
+  }
+
+  async function enviar(event) {
+    event.preventDefault();
+    if (!arquivo) {
+      setErro("Escolha a foto ou o PDF da evidência.");
+      return;
+    }
+    if (arquivo.size > 5 * 1024 * 1024) {
+      setErro("O arquivo precisa ter até 5 MB.");
+      return;
+    }
+    try {
+      setEnviando(true);
+      setErro("");
+      await enviarEvidencia(task.id, arquivo, comentario.trim());
+      onChanged();
+      onClose();
+    } catch (err) {
+      setErro(err.response?.data?.message || "Não foi possível enviar a evidência.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  const concluida = status === LOCKED;
+  const emRevisao = status === REVIEW;
+  const podeEnviar = !isNotebook && !concluida && !emRevisao;
+
+  return (
+    <Modal
+      className={modalStyles.formModal}
+      title={task.titulo}
+      subtitle={isNotebook ? "Check-in das crianças vinculadas ao caderno" : "Evidência da tarefa"}
+      labelledBy="task-action-title"
+      headerClassName={modalStyles.formHeader}
+      bodyClassName={modalStyles.formBody}
+      footerClassName={modalStyles.formFooter}
+      footer={podeEnviar ? (
+        <>
+          <button type="button" onClick={onClose}>Cancelar</button>
+          <button className={modalStyles.primaryAction} type="submit" disabled={enviando}>
+            {enviando ? "Enviando..." : "Enviar evidência"}
+          </button>
+        </>
+      ) : (
+        <button type="button" onClick={onClose}>Fechar</button>
+      )}
+      onClose={onClose}
+      onSubmit={podeEnviar ? enviar : undefined}
+    >
+      {isNotebook ? (
+        checkin ? (
+          <>
+            <p className={styles.checkinSummary}>
+              {checkin.marcados} de {checkin.total} crianças cumpriram · caderno {checkin.nomeCaderno}
+            </p>
+            {checkin.total === 0 && <p className={styles.hint}>Nenhuma criança da sua unidade está vinculada a este caderno.</p>}
+            <ul className={styles.checkinList}>
+              {checkin.desbravadores.map((item) => (
+                <li key={item.idDesbravador}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={item.concluiu}
+                      disabled={concluida}
+                      onChange={() => alternar(item)}
+                    />
+                    <span>{item.nome}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <p className={styles.hint}>
+              {concluida
+                ? "Tarefa reconhecida pela Diretoria."
+                : "Quando todas forem marcadas, a tarefa vai para “Em revisão” e a Diretoria reconhece o caderno."}
+            </p>
+          </>
+        ) : !erro && <p className={styles.hint}>Carregando check-in...</p>
+      ) : concluida ? (
+        <p className={styles.hint}>Tarefa concluída e aprovada pela Diretoria.</p>
+      ) : emRevisao ? (
+        <p className={styles.hint}>Evidência enviada. Aguardando a Diretoria aprovar ou pedir correção.</p>
+      ) : (
+        <>
+          <label htmlFor="evidencia-arquivo">Foto ou PDF (até 5 MB)</label>
+          <input
+            id="evidencia-arquivo"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            onChange={(event) => setArquivo(event.target.files?.[0] ?? null)}
+          />
+          <label htmlFor="evidencia-comentario">Comentário (opcional)</label>
+          <textarea
+            id="evidencia-comentario"
+            rows={3}
+            maxLength={500}
+            value={comentario}
+            onChange={(event) => setComentario(event.target.value)}
+          />
+        </>
+      )}
+      {erro && <p className={styles.warning} role="alert">{erro}</p>}
+    </Modal>
   );
 }
 

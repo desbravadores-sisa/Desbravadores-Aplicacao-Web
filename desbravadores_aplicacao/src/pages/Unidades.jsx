@@ -13,6 +13,7 @@ function Unidades() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState(null);
   const [form, setForm] = useState({ nome: "", genero: "", idadeMinima: "", idadeMaxima: "" });
 
   useEffect(() => {
@@ -69,10 +70,12 @@ function Unidades() {
     }
   }
 
-  async function deleteUnit(id) {
-    if (!window.confirm("Tem certeza que deseja excluir esta unidade?")) return;
+  async function deleteUnit() {
+    const unit = unitToDelete;
+    if (!unit) return;
+    setUnitToDelete(null);
     try {
-      await api.delete(`/unidades/${id}`);
+      await api.delete(`/unidades/${unit.id}`);
       await carregarUnidades();
     } catch (err) {
       setErro("Não foi possível excluir a unidade.");
@@ -106,7 +109,7 @@ function Unidades() {
             completedTasks={unit.tarefasConcluidas || 0}
             totalTasks={unit.totalTarefas || 0}
             completionRate={unit.totalTarefas > 0 ? Math.round((unit.tarefasConcluidas / unit.totalTarefas) * 100) : 0}
-            onDelete={() => deleteUnit(unit.id)}
+            onDelete={() => setUnitToDelete(unit)}
             onDetails={() => navigate(`/unidades/${unit.id}`)}
           />
         ))}
@@ -163,6 +166,19 @@ function Unidades() {
             value={form.idadeMaxima}
             onChange={(e) => setForm((c) => ({ ...c, idadeMaxima: e.target.value }))}
           />
+        </Modal>
+      )}
+      {unitToDelete && (
+        <Modal
+          className={modalStyles.confirmModal}
+          title="Excluir Unidade"
+          labelledBy="delete-unit-title"
+          headerClassName={modalStyles.confirmHeader}
+          footerClassName={modalStyles.confirmActions}
+          footer={<><button type="button" onClick={() => setUnitToDelete(null)}>Cancelar</button><button className={modalStyles.confirmDanger} type="button" onClick={deleteUnit}>Excluir</button></>}
+          onClose={() => setUnitToDelete(null)}
+        >
+          <p>Tem certeza que deseja excluir “{unitToDelete.nome}”? Esta ação não pode ser desfeita.</p>
         </Modal>
       )}
     </main>

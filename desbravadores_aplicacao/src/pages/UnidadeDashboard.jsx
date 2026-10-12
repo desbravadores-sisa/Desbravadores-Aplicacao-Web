@@ -107,6 +107,10 @@ function UnidadeDashboard() {
   const [form, setForm] = useState({ nome: "", idadeMinima: "", idadeMaxima: "" });
   const [erroForm, setErroForm] = useState(null);
   const [salvando, setSalvando] = useState(false);
+  const [descontoAberto, setDescontoAberto] = useState(false);
+  const [desconto, setDesconto] = useState({ pontos: "", motivo: "" });
+  const [erroDesconto, setErroDesconto] = useState(null);
+  const [descontoParaExcluir, setDescontoParaExcluir] = useState(null);
 
   const carregar = useCallback(async () => {
     try {
@@ -182,6 +186,38 @@ function UnidadeDashboard() {
     }
   }
 
+  async function lancarDesconto(event) {
+    event.preventDefault();
+    const pontos = Number(desconto.pontos);
+    const motivo = desconto.motivo.trim();
+    if (!pontos || pontos < 1 || !motivo) {
+      setErroDesconto("Informe os pontos (maior que zero) e o motivo.");
+      return;
+    }
+    try {
+      setSalvando(true);
+      await api.post(`/unidades/${unidadeId}/penalidades`, { pontos, motivo });
+      setDescontoAberto(false);
+      setDesconto({ pontos: "", motivo: "" });
+      await carregar();
+    } catch (error) {
+      setErroDesconto(error.response?.data?.message || "Não foi possível lançar o desconto.");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  async function excluirDesconto() {
+    try {
+      await api.delete(`/penalidades/${descontoParaExcluir.id}`);
+      setDescontoParaExcluir(null);
+      await carregar();
+    } catch {
+      setDescontoParaExcluir(null);
+      setErro("Não foi possível excluir o desconto.");
+    }
+  }
+
   if (carregando && !dados) {
     return <main className={styles.page}><p>Carregando painel da unidade...</p></main>;
   }
@@ -253,8 +289,19 @@ function UnidadeDashboard() {
 
       <section className={styles.charts}>
         <div className={styles.panel}>
-          <h2>Ganhos e descontos por semana</h2>
-          <p className={styles.panelText}>Compare o que a unidade ganhou e perdeu em cada semana.</p>
+          <div className={styles.panelHead}>
+            <div>
+              <h2>Ganhos e descontos por semana</h2>
+              <p className={styles.panelText}>Compare o que a unidade ganhou e perdeu em cada semana.</p>
+            </div>
+            <button
+              type="button"
+              className={styles.discountButton}
+              onClick={() => { setErroDesconto(null); setDescontoAberto(true); }}
+            >
+              <i className="bx bx-minus-circle" /> Lançar desconto
+            </button>
+          </div>
           <div className={styles.legend}>
             <Legenda cor="#22c55e" texto="Ganhos" />
             <Legenda cor="#f87171" texto="Descontos" />
@@ -270,6 +317,44 @@ function UnidadeDashboard() {
             <Legenda cor="#f97316" texto="Pontos ganhos" />
           </div>
           <CurvaSaldo historico={historico} />
+        </div>
+      </section>
+
+      <section className={`${styles.panel} ${styles.activities}`}>
+        <div className={styles.activitiesHead}>
+          <div>
+            <h2>Descontos lançados</h2>
+            <p className={styles.panelText}>Penalidades da Diretoria no ciclo atual; já descontadas da pontuação.</p>
+          </div>
+          <span className={styles.discountBadge}>
+            −{(dados.penalidades ?? []).reduce((total, p) => total + p.pontos, 0)} pts
+          </span>
+        </div>
+        <div className={styles.activityList}>
+          {(dados.penalidades ?? []).map((p) => (
+            <div key={p.id} className={styles.activity}>
+              <div>
+                <p className={styles.activityTitle}>{p.motivo}</p>
+                <p className={styles.activityDue}>
+                  {new Date(p.dataRegistro).toLocaleDateString("pt-BR")}{p.autor ? ` · lançado por ${p.autor}` : ""}
+                </p>
+              </div>
+              <div className={styles.activityMeta}>
+                <span className={styles.penaltyPoints}>−{p.pontos} pts</span>
+                <button
+                  type="button"
+                  className={styles.iconButton}
+                  aria-label={`Excluir desconto: ${p.motivo}`}
+                  onClick={() => setDescontoParaExcluir(p)}
+                >
+                  <i className="bx bx-trash" />
+                </button>
+              </div>
+            </div>
+          ))}
+          {(dados.penalidades ?? []).length === 0 && (
+            <p className={styles.empty}>Nenhum desconto lançado neste ciclo.</p>
+          )}
         </div>
       </section>
 
@@ -320,6 +405,74 @@ function UnidadeDashboard() {
           )}
         </div>
       </section>
+
+      {descontoAberto && (
+        <Modal
+          className={modalStyles.formModal}
+          title="Lançar desconto"
+          subtitle={`Os pontos saem da pontuação de ${unidade.nome} no ciclo atual e o conselheiro é notificado.`}
+          labelledBy="discount-title"
+          headerClassName={modalStyles.formHeader}
+          bodyClassName={modalStyles.formBody}
+          footerClassName={modalStyles.formFooter}
+          footer={
+            <>
+              <button type="button" onClick={() => setDescontoAberto(false)}>Cancelar</button>
+              <button className={modalStyles.primaryAction} type="submit" disabled={salvando}>
+                {salvando ? "Salvando..." : "Lançar desconto"}
+              </button>
+            </>
+          }
+          onClose={() => setDescontoAberto(false)}
+          onSubmit={lancarDesconto}
+        >
+          <label htmlFor="desconto-pontos">Pontos a descontar</label>
+          <input
+            id="desconto-pontos"
+            type="number"
+            min="1"
+            max="10000"
+            value={desconto.pontos}
+            onChange={(e) => setDesconto((d) => ({ ...d, pontos: e.target.value }))}
+            required
+            autoFocus
+          />
+          <label htmlFor="desconto-motivo">Motivo</label>
+          <textarea
+            id="desconto-motivo"
+            maxLength={255}
+            rows={3}
+            placeholder="Ex.: atraso na entrega, falta de uniforme..."
+            value={desconto.motivo}
+            onChange={(e) => setDesconto((d) => ({ ...d, motivo: e.target.value }))}
+            required
+          />
+          {erroDesconto && <p className={styles.formError}>{erroDesconto}</p>}
+        </Modal>
+      )}
+
+      {descontoParaExcluir && (
+        <Modal
+          className={modalStyles.formModal}
+          title="Excluir desconto"
+          labelledBy="discount-delete-title"
+          headerClassName={modalStyles.formHeader}
+          bodyClassName={modalStyles.formBody}
+          footerClassName={modalStyles.formFooter}
+          footer={
+            <>
+              <button type="button" onClick={() => setDescontoParaExcluir(null)}>Cancelar</button>
+              <button className={modalStyles.primaryAction} type="button" onClick={excluirDesconto}>Excluir</button>
+            </>
+          }
+          onClose={() => setDescontoParaExcluir(null)}
+        >
+          <p>
+            Tem certeza que deseja excluir o desconto de <strong>{descontoParaExcluir.pontos} pts</strong> (“{descontoParaExcluir.motivo}”)?
+            Os pontos voltam para a unidade.
+          </p>
+        </Modal>
+      )}
 
       {editando && (
         <Modal

@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage";
 import Unidades from "./pages/Unidades";
 import UnidadeDashboard from "./pages/UnidadeDashboard";
 import CounselorTasks from "./pages/CounselorTasks";
+import CounselorDesbravadores from "./pages/CounselorDesbravadores";
 import Convites from "./pages/Convites";
 import Evidencias from "./pages/Evidencias";
 import Tarefas from "./pages/Tarefas";
@@ -33,6 +34,15 @@ function App() {
             <>
               <Navbar />
               <CounselorTasks />
+            </>
+          }
+        />
+        <Route
+          path="/desbravadores"
+          element={
+            <>
+              <Navbar />
+              <CounselorDesbravadores />
             </>
           }
         />

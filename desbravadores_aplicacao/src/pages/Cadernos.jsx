@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import NotebookCard from "../components/NotebookCard/NotebookCard";
 import Modal from "../components/Modal/Modal";
+import modalStyles from "../components/Modal/Modal.module.css";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
 import api from "../service/api";
 import {
@@ -35,6 +36,11 @@ function mensagemDeErro(err, padrao) {
   return padrao;
 }
 
+// "Excursionista" -> "excursionista" (chave de notebookVisuals), ignorando acentos.
+function chaveDoCaderno(nome) {
+  return String(nome ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+}
+
 function Cadernos() {
   const [grupos, setGrupos] = useState([]);
   const [carregando, setCarregando] = useState(true);
@@ -48,6 +54,7 @@ function Cadernos() {
   const [members, setMembers] = useState([]);
   const [memberModal, setMemberModal] = useState(null);
   const [memberForm, setMemberForm] = useState(emptyMember);
+  const [memberToDelete, setMemberToDelete] = useState(null);
   const memberBirthDate = parseDateInput(memberForm.birthDate);
   const memberAge = memberBirthDate ? getAgeFromBirthDate(memberBirthDate) : null;
   const memberAgeOutOfRange = memberAge !== null && (memberAge < 10 || memberAge > 15);
@@ -71,8 +78,11 @@ function Cadernos() {
       genero: desbravador.genero,
       ativo: desbravador.ativo,
       joinedAt: desbravador.dataAdmissao ? formatDate(String(desbravador.dataAdmissao).split("T")[0]) : "—",
-      // Ainda não há endpoint com o histórico de cadernos concluídos por desbravador
-      completedNotebooks: []
+      // Histórico vindo do vínculo explícito (Desbravador_Caderno): concluídos = dataConclusao preenchida.
+      linkedNotebooks: desbravador.cadernos ?? [],
+      completedNotebooks: (desbravador.cadernos ?? [])
+        .filter((caderno) => caderno.dataConclusao)
+        .map((caderno) => chaveDoCaderno(caderno.nome))
     })));
   }, []);
 
@@ -128,17 +138,16 @@ function Cadernos() {
     }
 
     try {
+      // O back encerra o ciclo ativo e aplica o novo período a todos os cadernos do clube.
+      // A pontuação do ranking (por ciclo) recomeça do zero; as tarefas são atribuídas de novo no ciclo novo.
       await api.post("/ciclos", {
         nome: `Ciclo ${formatDate(startDate)} a ${formatDate(endDate)}`,
-        idClube,
         dataInicio: startDate,
         dataFim: endDate,
         ativo: true
       });
       setErro(null);
-      // A API ainda não associa o ciclo novo aos cadernos (Caderno.id_ciclo); por isso os cards são recarregados
-      // do servidor em vez de receberem as datas localmente.
-      setAviso("Ciclo criado. A aplicação do período a todos os cadernos ainda depende de um endpoint no backend.");
+      setAviso("Novo ciclo iniciado e aplicado a todos os cadernos. A pontuação das unidades recomeça neste ciclo.");
       await carregarCadernos();
     } catch (err) {
       setErro(mensagemDeErro(err, "Não foi possível criar o ciclo. Tente novamente."));
@@ -198,7 +207,10 @@ function Cadernos() {
     }
   }
 
-  async function deleteMember(member) {
+  async function deleteMember() {
+    const member = memberToDelete;
+    if (!member) return;
+    setMemberToDelete(null);
     try {
       await api.delete(`/desbravadores/${member.id}`);
       setErro(null);
@@ -292,7 +304,11 @@ function Cadernos() {
                     <tr><td colSpan={7}>Nenhum desbravador cadastrado.</td></tr>
                   )}
                   {members.map((member) => {
-                    const notebook = member.age !== null ? getNotebookForAge(member.age) : null;
+                    // Caderno atual = vínculo em andamento; sem vínculo, sugere o da idade.
+                    const linked = member.linkedNotebooks.find((caderno) => !caderno.dataConclusao);
+                    const notebook = linked
+                      ? { name: linked.nome }
+                      : member.age !== null ? getNotebookForAge(member.age) : null;
                     const completedNotebooks = member.completedNotebooks
                       .map((notebookId) => notebookVisuals[notebookId])
                       .filter(Boolean);
@@ -301,7 +317,10 @@ function Cadernos() {
                         <td data-label="Desbravador"><span className={styles.memberAvatar}>{getInitials(member.name)}</span><strong>{member.name}</strong></td>
                         <td data-label="Idade">{member.age !== null ? `${member.age} anos` : "—"}</td>
                         <td data-label="Unidade">{member.unit}</td>
-                        <td data-label="Caderno atual"><strong>{notebook ? notebook.name : "—"}</strong></td>
+                        <td data-label="Caderno atual">
+                          <strong>{notebook ? notebook.name : "—"}</strong>
+                          {notebook && !linked && <small className={styles.notLinked}> (não vinculado)</small>}
+                        </td>
                         <td data-label="Cadernos concluídos">
                           {completedNotebooks.length === 0 ? (
                             <span className={styles.noCompletedNotebooks}>Nenhum</span>
@@ -330,7 +349,7 @@ function Cadernos() {
                         <td data-label="Ações">
                           <div className={styles.memberActions}>
                             <button type="button" aria-label={`Editar ${member.name}`} onClick={() => openMember(member)}><i className="bx bx-pencil" /></button>
-                            <button type="button" aria-label={`Excluir ${member.name}`} onClick={() => deleteMember(member)}><i className="bx bx-trash" /></button>
+                            <button type="button" aria-label={`Excluir ${member.name}`} onClick={() => setMemberToDelete(member)}><i className="bx bx-trash" /></button>
                           </div>
                         </td>
                       </tr>
@@ -418,7 +437,10 @@ function Cadernos() {
           onClose={() => setCycleModalOpen(false)}
           onSubmit={createCycle}
         >
-          <p className={styles.cycleNotice}>O período será criado para todos os cadernos do clube.</p>
+          <p className={styles.cycleNotice}>
+            O período será aplicado a todos os cadernos do clube. O ciclo atual será encerrado e a pontuação
+            das unidades recomeça do zero no novo ciclo (o histórico continua salvo).
+          </p>
           <div className={styles.cycleFields}>
             <div>
               <label htmlFor="cycle-start-date">Data inicial</label>
@@ -449,6 +471,19 @@ function Cadernos() {
               />
             </div>
           </div>
+        </Modal>
+      )}
+      {memberToDelete && (
+        <Modal
+          className={modalStyles.confirmModal}
+          title="Excluir Desbravador"
+          labelledBy="delete-member-title"
+          headerClassName={modalStyles.confirmHeader}
+          footerClassName={modalStyles.confirmActions}
+          footer={<><button type="button" onClick={() => setMemberToDelete(null)}>Cancelar</button><button className={modalStyles.confirmDanger} type="button" onClick={deleteMember}>Excluir</button></>}
+          onClose={() => setMemberToDelete(null)}
+        >
+          <p>Tem certeza que deseja excluir “{memberToDelete.name}”? Esta ação não pode ser desfeita.</p>
         </Modal>
       )}
     </main>

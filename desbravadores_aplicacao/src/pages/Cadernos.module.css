@@ -605,3 +605,9 @@
     grid-column: span 2;
   }
 }
+
+.notLinked {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 500;
+}

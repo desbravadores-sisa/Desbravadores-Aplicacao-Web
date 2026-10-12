@@ -70,7 +70,8 @@
 }
 
 .formBody input,
-.formBody select {
+.formBody select,
+.formBody textarea {
   width: 100%;
   padding: var(--spacing-sm-plus) var(--spacing-sm-plus);
   border: 1px solid #e1e7ed;
@@ -84,9 +85,14 @@
 }
 
 .formBody input:focus,
-.formBody select:focus {
+.formBody select:focus,
+.formBody textarea:focus {
   border-color: #ff761e;
   box-shadow: 0 0 0 2px rgba(255, 118, 30, 0.12);
+}
+
+.formBody textarea {
+  resize: vertical;
 }
 
 .formFooter {
@@ -107,5 +113,50 @@
 
 .formFooter .primaryAction {
   background: #ff6508;
+  color: #fff;
+}
+
+/* Modal de confirmação de exclusão (padrão: "Excluir Tarefa") */
+.confirmModal {
+  width: min(360px, 100%);
+  padding: 20px;
+  border-radius: 13px;
+}
+
+.confirmModal h2 {
+  margin: 0 0 12px;
+  color: #273449;
+  font-size: 16px;
+}
+
+.confirmModal .confirmHeader button {
+  display: none;
+}
+
+.confirmModal p {
+  margin: 0 0 16px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirmActions button {
+  flex: 1;
+  padding: 11px;
+  border: 0;
+  border-radius: 11px;
+  background: #f1f3f5;
+  color: #475569;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.confirmActions .confirmDanger {
+  background: #ef000b;
   color: #fff;
 }

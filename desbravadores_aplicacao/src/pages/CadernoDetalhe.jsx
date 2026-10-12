@@ -15,11 +15,6 @@ import {
 } from "../service/cadernos";
 import styles from "./CadernoDetalhe.module.css";
 
-// Leituras auxiliares (progresso individual): se falharem, a tela continua sem o progresso.
-function listaOpcional(promessa) {
-  return promessa.then(listaDaResposta).catch(() => []);
-}
-
 function CadernoDetalhe() {
   const navigate = useNavigate();
   const { cadernoId } = useParams();
@@ -27,8 +22,8 @@ function CadernoDetalhe() {
   const [erro, setErro] = useState(null);
   const [members, setMembers] = useState([]);
   const [requirements, setRequirements] = useState([]);
-  const [progressByMember, setProgressByMember] = useState({});
-  const [unlinkedIds, setUnlinkedIds] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [eligiblePioneers, setEligiblePioneers] = useState([]);
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [isRequirementsModalOpen, setIsRequirementsModalOpen] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
@@ -51,14 +46,26 @@ function CadernoDetalhe() {
     return lista;
   }, []);
 
+  const carregarVinculados = useCallback(async (idCaderno, unidades) => {
+    const nomePorUnidade = Object.fromEntries((unidades ?? []).map((unidade) => [unidade.id, unidade.nome]));
+    const vinculados = listaDaResposta(await api.get(`/cadernos/${idCaderno}/desbravadores`));
+    setMembers(vinculados.map((v) => ({
+      id: v.idDesbravador,
+      name: v.nome,
+      unit: v.nomeUnidade ?? nomePorUnidade[v.idUnidade] ?? "—",
+      joinedAt: formatDate(v.dataVinculo),
+      concluded: Boolean(v.dataConclusao),
+      completedRequirementIds: v.requisitosConcluidos ?? []
+    })));
+  }, []);
+
   useEffect(() => {
     let isCurrent = true;
     const idCaderno = Number(cadernoId);
 
     async function carregar() {
       try {
-        const [perfil, resumo, unidades] = await Promise.all([
-          api.get("/usuarios/perfil"),
+        const [resumo, unidades] = await Promise.all([
           api.get("/cadernos/resumo"),
           api.get("/unidades/diretor").then(listaDaResposta).catch(() => [])
         ]);
@@ -67,45 +74,15 @@ function CadernoDetalhe() {
           .find((item) => item.id === idCaderno) ?? null;
 
         if (!isCurrent) return;
+        setUnits(unidades);
         if (!notebook) {
           setDetail({ cadernoId, notebook: null });
           return;
         }
 
-        const [lista, desbravadores, execucoes, checklists] = await Promise.all([
-          carregarRequisitos(idCaderno),
-          api.get("/desbravadores", { params: { idClube: perfil.data?.idClube } }).then(listaDaResposta),
-          listaOpcional(api.get("/execucoes-caderno")),
-          listaOpcional(api.get("/checklists-caderno"))
-        ]);
+        // Vínculo explícito (Desbravador_Caderno) definido pela Diretoria; progresso vem do check-in.
+        await Promise.all([carregarRequisitos(idCaderno), carregarVinculados(idCaderno, unidades)]);
         if (!isCurrent) return;
-
-        // Vínculo calculado por idade, como na view vw_resumo_cadernos (desbravadores ativos com a idade do caderno)
-        const nomePorUnidade = Object.fromEntries(unidades.map((unidade) => [unidade.id, unidade.nome]));
-        setMembers(desbravadores
-          .filter((d) => d.ativo !== false && d.dataNascimento && getAgeFromBirthDate(d.dataNascimento) === notebook.age)
-          .map((d) => ({
-            id: d.id,
-            name: d.nome,
-            unit: nomePorUnidade[d.idUnidade] ?? "—",
-            joinedAt: formatDate(d.dataAdmissao)
-          })));
-
-        // Progresso individual: checklist (desbravador concluiu a tarefa) → execução → tarefa (requisito)
-        const idsRequisitos = new Set(lista.map((requisito) => requisito.id));
-        const tarefaPorExecucao = Object.fromEntries(
-          execucoes.filter((e) => idsRequisitos.has(e.idTarefa)).map((e) => [e.id, e.idTarefa])
-        );
-        const progresso = {};
-        checklists.forEach((item) => {
-          const idTarefa = tarefaPorExecucao[item.idExecucaoCaderno];
-          if (!idTarefa || !item.concluiuTarefa) return;
-          progresso[item.idDesbravador] = progresso[item.idDesbravador] || new Set();
-          progresso[item.idDesbravador].add(idTarefa);
-        });
-        setProgressByMember(Object.fromEntries(
-          Object.entries(progresso).map(([id, ids]) => [id, [...ids]])
-        ));
         setDetail({ cadernoId, notebook });
       } catch (err) {
         if (!isCurrent) return;
@@ -119,15 +96,15 @@ function CadernoDetalhe() {
     return () => {
       isCurrent = false;
     };
-  }, [cadernoId, carregarRequisitos]);
+  }, [cadernoId, carregarRequisitos, carregarVinculados]);
 
   const loading = !detail || detail.cadernoId !== cadernoId;
   const notebook = loading ? null : detail.notebook;
   const requirementCount = notebook ? requirements.length : 0;
   const pioneers = notebook
-    ? members.filter((member) => !unlinkedIds.includes(member.id)).map((member) => {
+    ? members.map((member) => {
       const totalRequirements = requirementCount;
-      const completedRequirementIds = (progressByMember[member.id] || [])
+      const completedRequirementIds = member.completedRequirementIds
         .filter((id) => requirements.some((item) => item.id === id));
       const completedRequirements = Math.min(completedRequirementIds.length, totalRequirements);
 
@@ -143,7 +120,7 @@ function CadernoDetalhe() {
           : 0,
         completedRequirements,
         totalRequirements,
-        status: totalRequirements > 0 && completedRequirements === totalRequirements
+        status: member.concluded
           ? "Concluído antecipadamente"
           : notebook.status === "Encerrado"
             ? "Encerrado"
@@ -153,11 +130,24 @@ function CadernoDetalhe() {
     })
     : [];
   const selectedPioneer = pioneers.find((pioneer) => pioneer.id === selectedPioneerId);
-  // O vínculo é calculado pela idade: quem tem a idade do caderno já aparece vinculado.
-  // Só voltam a ser elegíveis os desvinculados nesta tela (vínculo explícito ainda não existe na API).
-  const eligiblePioneers = notebook
-    ? members.filter((member) => unlinkedIds.includes(member.id))
-    : [];
+
+  async function abrirVinculo() {
+    try {
+      const nomePorUnidade = Object.fromEntries(units.map((unidade) => [unidade.id, unidade.nome]));
+      const lista = listaDaResposta(await api.get(`/cadernos/${cadernoId}/desbravadores/elegiveis`))
+        .map((d) => {
+          const age = d.dataNascimento ? getAgeFromBirthDate(d.dataNascimento) : null;
+          const unidade = nomePorUnidade[d.idUnidade] ?? "—";
+          return { id: d.id, name: d.nome, unit: age != null ? `${unidade} · ${age} anos` : unidade, sameAge: age === notebook?.age };
+        })
+        // Quem tem a idade do caderno aparece primeiro.
+        .sort((x, y) => Number(y.sameAge) - Number(x.sameAge) || x.name.localeCompare(y.name, "pt-BR"));
+      setEligiblePioneers(lista);
+      setIsLinkModalOpen(true);
+    } catch {
+      setErro("Não foi possível carregar os desbravadores disponíveis.");
+    }
+  }
 
   async function saveRequirements(nextRequirements) {
     const idCaderno = Number(cadernoId);
@@ -203,17 +193,29 @@ function CadernoDetalhe() {
     setIsRequirementsModalOpen(false);
   }
 
-  function linkPioneer(pioneer) {
-    setUnlinkedIds((current) => current.filter((id) => id !== pioneer.id));
+  async function linkPioneer(pioneer) {
+    try {
+      await api.post(`/cadernos/${cadernoId}/desbravadores`, { idDesbravador: pioneer.id });
+      setErro(null);
+    } catch (err) {
+      setErro(err.response?.data?.message || "Não foi possível vincular o desbravador.");
+    }
+    await carregarVinculados(Number(cadernoId), units).catch(() => {});
   }
 
-  function confirmAction() {
+  async function confirmAction() {
     if (!confirmation) {
       return;
     }
 
     if (confirmation.type === "unlink") {
-      setUnlinkedIds((current) => [...current, confirmation.pioneer.id]);
+      try {
+        await api.delete(`/cadernos/${cadernoId}/desbravadores/${confirmation.pioneer.id}`);
+        setErro(null);
+      } catch (err) {
+        setErro(err.response?.data?.message || "Não foi possível desvincular o desbravador.");
+      }
+      await carregarVinculados(Number(cadernoId), units).catch(() => {});
     } else if (confirmation.type === "requirement") {
       confirmation.onConfirm();
     }
@@ -258,7 +260,7 @@ function CadernoDetalhe() {
                 linkedCount={pioneers.length}
                 requirementCount={requirementCount}
                 onOpenRequirements={() => setIsRequirementsModalOpen(true)}
-                onLinkPioneer={() => setIsLinkModalOpen(true)}
+                onLinkPioneer={abrirVinculo}
               />
               <LinkedPioneersTable
                 pioneers={pioneers}

@@ -11,11 +11,9 @@ import styles from "./Convites.module.css";
 function Convites() {
   const [users, setUsers] = useState([]);
   const [activeInvites, setActiveInvites] = useState([]);
-  const [expiredInvites, setExpiredInvites] = useState([]);
   const [unidades, setUnidades] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
-  const [activeTab, setActiveTab] = useState("active");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [inviteResult, setInviteResult] = useState(null);
@@ -39,11 +37,10 @@ function Convites() {
       const convites = convitesRes.data || [];
       const unis = unidadesRes.data || [];
 
+      // Convites expirados/usados não são listados (protótipo sem aba "Expirados")
       const ativos = convites.filter((c) => c.statusConvite === "PENDENTE");
-      const expirados = convites.filter((c) => c.statusConvite !== "PENDENTE");
 
       setActiveInvites(ativos);
-      setExpiredInvites(expirados);
       setUnidades(unis);
 
       const usuariosAtivos = unis.flatMap((u) =>
@@ -80,7 +77,6 @@ function Convites() {
         role: form.tipoConta,
         unit: unidades.find((u) => u.id === Number(form.idUnidade))?.nome || "Diretoria",
         link: data?.token ? `${window.location.origin}/cadastro?token=${data.token}` : null,
-        expiresInDays: 7,
       });
 
       setIsModalOpen(false);
@@ -123,8 +119,8 @@ function Convites() {
     closeDeactivateUserModal();
   }
 
-  function openDeleteInviteModal(invite, tab) {
-    setInviteToDelete({ invite, tab });
+  function openDeleteInviteModal(invite) {
+    setInviteToDelete({ invite });
   }
 
   function closeDeleteInviteModal() {
@@ -178,17 +174,11 @@ function Convites() {
         <section className={styles.invitesSection}>
           <div className={styles.invitesHeader}>
             <h2><i className="bx bx-envelope" /> Convites</h2>
-            <div className={styles.tabs}>
-              <button className={activeTab === "active" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("active")}>Ativos ({activeInvites.length})</button>
-              <button className={activeTab === "expired" ? styles.tabActive : ""} type="button" onClick={() => setActiveTab("expired")}>Expirados ({expiredInvites.length})</button>
-            </div>
+            <span className={styles.count}>{activeInvites.length}</span>
           </div>
-          {activeTab === "active" && (activeInvites.length > 0 ? activeInvites.map((item) => (
-            <InviteCard key={item.id} invitation={item} onRemove={() => openDeleteInviteModal(item, "active")} />
-          )) : <p className={styles.emptyState}>Nenhum convite ativo.</p>)}
-          {activeTab === "expired" && (expiredInvites.length > 0 ? expiredInvites.map((item) => (
-            <InviteCard key={item.id} invitation={item} onRemove={() => openDeleteInviteModal(item, "expired")} expired />
-          )) : <p className={styles.emptyState}>Nenhum convite expirado.</p>)}
+          {activeInvites.length > 0 ? activeInvites.map((item) => (
+            <InviteCard key={item.id} invitation={item} onRemove={() => openDeleteInviteModal(item)} />
+          )) : <p className={styles.emptyState}>Nenhum convite ativo.</p>}
         </section>
       </div>
       )}
@@ -288,11 +278,6 @@ function Convites() {
                 <i className="bx bx-copy" /> Copiar
               </button>
             </div>
-          </div>
-
-          <div className={styles.helperCard}>
-            <i className="bx bx-time-five" />
-            <span>Este link expira em {inviteResult.expiresInDays} dias. O backend pode retornar a URL definitiva quando a geração estiver disponível.</span>
           </div>
         </Modal>
       )}

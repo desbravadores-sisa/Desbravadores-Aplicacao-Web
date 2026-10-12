@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../service/api";
+import api, { urlArquivo } from "../service/api";
 import styles from "./Perfil.module.css";
 
 function Perfil() {
@@ -10,7 +10,8 @@ function Perfil() {
   const [emailOriginal, setEmailOriginal] = useState("");
   const [tipoConta, setTipoConta] = useState("");
   const [password, setPassword] = useState({ current: "", next: "", confirmation: "" });
-  const [photoName, setPhotoName] = useState("");
+  const [fotoUrl, setFotoUrl] = useState(null);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [message, setMessage] = useState("");
   const [carregando, setCarregando] = useState(true);
 
@@ -30,6 +31,7 @@ function Perfil() {
         });
         setEmailOriginal(data.email || "");
         setTipoConta(data.tipoConta || "");
+        setFotoUrl(data.fotoUrl || null);
       }
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
@@ -68,6 +70,42 @@ function Perfil() {
     }
   }
 
+  async function trocarFoto(event) {
+    const arquivo = event.target.files?.[0];
+    event.target.value = "";
+    if (!arquivo) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(arquivo.type)) {
+      setMessage("Escolha uma imagem JPG, PNG ou WEBP.");
+      return;
+    }
+    if (arquivo.size > 5 * 1024 * 1024) {
+      setMessage("A foto precisa ter até 5 MB.");
+      return;
+    }
+    try {
+      setEnviandoFoto(true);
+      const form = new FormData();
+      form.append("arquivo", arquivo);
+      const { data } = await api.put("/usuarios/perfil/foto", form);
+      setFotoUrl(data?.fotoUrl || null);
+      setMessage("Foto atualizada.");
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Não foi possível enviar a foto.");
+    } finally {
+      setEnviandoFoto(false);
+    }
+  }
+
+  async function removerFoto() {
+    try {
+      await api.delete("/usuarios/perfil/foto");
+      setFotoUrl(null);
+      setMessage("Foto removida.");
+    } catch {
+      setMessage("Não foi possível remover a foto.");
+    }
+  }
+
   async function savePassword(event) {
     event.preventDefault();
     if (password.next !== password.confirmation) {
@@ -92,13 +130,23 @@ function Perfil() {
       <section className={styles.profileCard}>
         <header className={styles.profileHeader}>
           <div className={styles.photoArea}>
-            <div className={styles.photo}>{photoName ? <span>{photoName.slice(0, 1).toUpperCase()}</span> : <i className="bx bx-user" />}</div>
+            <div className={styles.photo}>
+              {fotoUrl ? <img className={styles.photoImage} src={urlArquivo(fotoUrl)} alt={`Foto de ${profile.nome}`} /> : <i className="bx bx-user" />}
+            </div>
             <label className={styles.cameraButton} title="Alterar foto">
-              <i className="bx bx-camera" />
-              <input type="file" accept="image/*" onChange={(event) => setPhotoName(event.target.files?.[0]?.name || "")} />
+              <i className={`bx ${enviandoFoto ? "bx-loader-alt bx-spin" : "bx-camera"}`} />
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={trocarFoto} disabled={enviandoFoto} />
             </label>
           </div>
-          <div><h1>{profile.nome || "Usuário"}</h1><span>{tipoConta || "—"}</span><p>{photoName ? `Foto selecionada: ${photoName}` : "Clique no ícone da câmera para alterar a foto"}</p></div>
+          <div>
+            <h1>{profile.nome || "Usuário"}</h1><span>{tipoConta || "—"}</span>
+            <p>
+              {enviandoFoto ? "Enviando foto..." : "Clique no ícone da câmera para alterar a foto (JPG, PNG ou WEBP até 5 MB)"}
+              {fotoUrl && !enviandoFoto && (
+                <> · <button type="button" className={styles.removePhoto} onClick={removerFoto}>Remover foto</button></>
+              )}
+            </p>
+          </div>
         </header>
 
         <div className={styles.tabs} role="tablist" aria-label="Opções do perfil">

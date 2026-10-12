@@ -25,17 +25,24 @@ A branch **`consolidacao/sprint-final`** reúne o trabalho de todas as branches 
 | Login / Cadastro por convite | Login com cookie de sessão; cadastro pelo link `/cadastro?token=` | Recuperação de senha |
 | Unidades | Listar (pontuação, conselheiro, progresso, idade mínima), criar, excluir; **"Ver Detalhes" → dashboard** (`/unidades/:id`): cards, ganhos × descontos por semana, curva do saldo, atividades abertas e edição (`GET /unidades/{id}/dashboard`, `PUT /unidades`) | — |
 | Tarefas | Listar, criar (distribuída a todas as unidades), editar, excluir | — |
-| Evidências | Listar, aprovar com ajuste de pontos, pedir correção, reconhecer caderno, excluir | — (o envio da evidência é feito pelo conselheiro) |
-| Cadernos | Resumo por grupo (ciclo, vinculados, requisitos, cores por caderno); **"Novo ciclo"** cria o ciclo (`POST /ciclos`) | Aplicar o ciclo novo a todos os cadernos (falta endpoint no back) |
-| Cadernos → Membros | Listar, cadastrar com data de aniversário (idade calculada), editar, excluir (`/desbravadores`) | Cadernos concluídos por desbravador (sem endpoint); confirmação antes de excluir |
-| Cadernos → Ver Caderno | Cabeçalho do ciclo; requisitos (tarefas `CADERNO`) com adicionar, editar e excluir com confirmação; vinculados calculados por idade; progresso individual via checklists | Vincular/desvincular de forma explícita (hoje só na tela, não persiste: **decisão do time**) |
-| Convites | Criar (Conselheiro ou Diretoria), copiar o link real, listar, excluir | Alinhar ao protótipo: remover a aba "Expirados" e os textos de validade |
-| Perfil | Ver e editar nome, e-mail e telefone; trocar senha | Upload da foto (hoje é só visual) |
+| Evidências | Listar, abrir o arquivo enviado (miniatura para imagens), identificar pendência de check-in, aprovar com ajuste de pontos, pedir correção, reconhecer caderno, excluir com confirmação | — |
+| Cadernos | Resumo por grupo (ciclo, vinculados, requisitos, cores por caderno); **"Novo ciclo"** encerra o ciclo atual e aplica o período a todos os cadernos (`POST /ciclos`) | — |
+| Cadernos → Membros | Listar, cadastrar com data de aniversário (idade calculada), editar, excluir com confirmação; caderno atual pelo vínculo e **cadernos concluídos** (histórico) | — |
+| Cadernos → Ver Caderno | Cabeçalho do ciclo; requisitos com adicionar, editar e excluir com confirmação; **vincular/desvincular persistido** (`/cadernos/{id}/desbravadores`); progresso individual pelo check-in do conselheiro | — |
+| Convites | Criar (Conselheiro ou Diretoria), copiar o link real, excluir com confirmação; lista só os convites pendentes (sem aba "Expirados" nem textos de validade/reenvio, por decisão do time) | — |
+| Perfil | Ver e editar nome, e-mail e telefone; trocar senha; **foto de perfil** (enviar/remover, aparece também no menu) | — |
 | Navbar | Menu responsivo; usuário logado, notificações reais e "marcar como lidas" | — |
 
 ### Conselheiro
 
-O login leva a **`/minhas-tarefas`**, o Kanban da unidade, que veio da `feature/nathan` e está ligado a `GET /tarefas/kanban` e `PATCH /tarefas/{id}/status`. Os cards se movem entre A fazer, Em andamento e Em revisão; a coluna Concluído é só leitura, porque quem conclui é a Diretoria ao aprovar a evidência. Ainda faltam o check-in das crianças nas tarefas de caderno, o envio de evidências e a tela "Desbravadores" do Nathan, que hoje é só mock.
+O login leva a **`/minhas-tarefas`**, o Kanban da unidade (da `feature/nathan`, ligado a `GET /tarefas/kanban` e `PATCH /tarefas/{id}/status`). Os cards se arrastam entre A fazer e Em andamento. **Clicar num card** abre:
+
+- tarefa de clube → **enviar evidência** (foto ou PDF até 5 MB, comentário opcional); a tarefa vai para Em revisão;
+- tarefa de caderno → **check-in** das crianças vinculadas; com todas marcadas, vai para Em revisão.
+
+Em revisão e Concluído não aceitam arraste: quem decide é a Diretoria. A tela **`/desbravadores`** (layout do Nathan, agora com dados reais) mostra as crianças da unidade, o progresso por caderno e os requisitos individuais, com "Marcar cumprido" usando o mesmo check-in.
+
+Na Diretoria, o dashboard da unidade ganhou **"Lançar desconto"** (pontos + motivo) e a lista de descontos do ciclo com exclusão confirmada.
 
 ---
 
@@ -66,12 +73,9 @@ desbravadores_aplicacao/src/
 ## Próximos passos (frontend)
 
 1. **Merge** de `consolidacao/sprint-final` na `main`, depois que os PRs do banco e do backend forem aprovados.
-2. **Cadernos (depende do back):** endpoint que aplica o ciclo novo a todos os cadernos (e desativa o anterior); histórico de cadernos concluídos por desbravador; vínculo explícito desbravador ↔ caderno, se o time decidir por ele. `POST /desbravadores` e `POST /ciclos` ainda exigem `idClube` no corpo (o front envia o do usuário logado).
-3. ~~**Unidades:** dashboard da unidade~~ ✅ feito em 12/10.
-4. **Conselheiro:** ~~login e Kanban~~ ✅. Faltam o check-in e o envio de evidência.
-5. **Convites:** ajustar ao protótipo (sem aba "Expirados", sem texto de validade).
-6. **Confirmação antes de excluir** em todas as telas (o protótipo exige; hoje existe só em Convites, Tarefas e Unidades).
-7. Qualidade: testes de componentes e tratar os avisos do `oxlint` (`catch (err)` sem uso).
+2. ~~Ciclo global, histórico e vínculo de cadernos, dashboard, conselheiro (Kanban, check-in, evidência, Desbravadores), Convites, confirmações de exclusão, foto de perfil, descontos~~ ✅ 12/10.
+3. Recuperação de senha (não existe endpoint).
+4. Qualidade: testes de componentes e tratar os avisos do `oxlint` (`catch (err)` sem uso).
 
 O plano completo, com as decisões tomadas e os riscos, está em `PLANO_CONSOLIDACAO.md`, na pasta raiz do projeto.
 

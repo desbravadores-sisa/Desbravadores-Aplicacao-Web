@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import EvidenceNotebookCard from "../components/EvidenceNotebookCard/EvidenceNotebookCard";
 import Modal from "../components/Modal/Modal";
+import modalStyles from "../components/Modal/Modal.module.css";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
-import api from "../service/api";
+import api, { urlArquivo } from "../service/api";
 import styles from "./Evidencias.module.css";
 
 function Evidencias() {
@@ -15,6 +16,7 @@ function Evidencias() {
   const [comment, setComment] = useState("");
   const [recognition, setRecognition] = useState(null);
   const [recognitionPoints, setRecognitionPoints] = useState(0);
+  const [evidenceToDismiss, setEvidenceToDismiss] = useState(null);
 
   useEffect(() => {
     carregarEvidencias();
@@ -100,9 +102,16 @@ function Evidencias() {
     }
   }
 
-  async function dismissNotebook(id) {
+  function requestDismissNotebook(id) {
+    setEvidenceToDismiss(evidences.find((e) => e.id === id) || { id });
+  }
+
+  async function dismissNotebook() {
+    const evidence = evidenceToDismiss;
+    if (!evidence) return;
+    setEvidenceToDismiss(null);
     try {
-      await api.delete(`/evidencias/${id}`);
+      await api.delete(`/evidencias/${evidence.id}`);
       await carregarEvidencias();
     } catch (err) {
       setErro("Não foi possível dispensar a evidência.");
@@ -161,15 +170,23 @@ function Evidencias() {
                   </div>
 
                   <p className={styles.description}>{evidence.comentarioFeedback || evidence.descricao || "Sem descrição disponível."}</p>
-                  {evidence.urlS3 && (
+                  {evidence.urlS3 === "checkin:caderno" ? (
+                    <>
+                      <div className={styles.fileDivider} />
+                      <h3>Check-in do conselheiro</h3>
+                      <p className={styles.description}>Todas as crianças vinculadas cumpriram este requisito do caderno.</p>
+                    </>
+                  ) : evidence.urlS3 && (
                     <>
                       <div className={styles.fileDivider} />
                       <h3>Arquivo enviado</h3>
                       <div className={styles.files}>
-                        <div className={styles.file}>
-                          <i className="bx bx-file-blank" />
+                        <a className={styles.file} href={urlArquivo(evidence.urlS3)} target="_blank" rel="noreferrer">
+                          {/\.(jpe?g|png|webp)$/i.test(evidence.urlS3)
+                            ? <img className={styles.fileThumb} src={urlArquivo(evidence.urlS3)} alt="" />
+                            : <i className="bx bx-file-blank" />}
                           <div><strong>{evidence.urlS3.split("/").pop() || "Arquivo"}</strong><span>Clique para visualizar</span></div>
-                        </div>
+                        </a>
                       </div>
                     </>
                   )}
@@ -185,7 +202,7 @@ function Evidencias() {
                   key={notebook.id}
                   notebook={notebook}
                   onRecognize={openRecognition}
-                  onDismiss={dismissNotebook}
+                  onDismiss={requestDismissNotebook}
                 />
               ))
             ) : (
@@ -234,6 +251,19 @@ function Evidencias() {
           <div className={styles.notebookInfoBox}><i className="bx bx-book-open" /><span>Reconhecer este caderno adiciona os pontos à pontuação da unidade. Esta ação é opcional, sem penalidade se não reconhecido.</span></div>
           <label htmlFor="notebook-points">Pontos a reconhecer</label>
           <div className={styles.notebookPointsInput}><input id="notebook-points" type="number" min="0" value={recognitionPoints} onChange={(event) => setRecognitionPoints(event.target.value)} /><span>pts</span></div>
+        </Modal>
+      )}
+      {evidenceToDismiss && (
+        <Modal
+          className={modalStyles.confirmModal}
+          title="Não reconhecer caderno"
+          labelledBy="dismiss-evidence-title"
+          headerClassName={modalStyles.confirmHeader}
+          footerClassName={modalStyles.confirmActions}
+          footer={<><button type="button" onClick={() => setEvidenceToDismiss(null)}>Cancelar</button><button className={modalStyles.confirmDanger} type="button" onClick={dismissNotebook}>Excluir</button></>}
+          onClose={() => setEvidenceToDismiss(null)}
+        >
+          <p>Tem certeza que deseja excluir “{evidenceToDismiss.titulo || `Caderno #${evidenceToDismiss.id}`}”? Esta ação não pode ser desfeita.</p>
         </Modal>
       )}
     </main>

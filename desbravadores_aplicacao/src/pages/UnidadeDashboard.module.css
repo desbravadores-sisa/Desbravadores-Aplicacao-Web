@@ -438,6 +438,60 @@
   font-size: 0.85rem;
 }
 
+.panelHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.discountButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.discountButton:hover {
+  background: #fee2e2;
+}
+
+.discountBadge,
+.penaltyPoints {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
 @media (max-width: 1100px) {
   .cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));

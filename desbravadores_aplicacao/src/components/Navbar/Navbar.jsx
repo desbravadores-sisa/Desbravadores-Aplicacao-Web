@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import api from "../../service/api";
+import api, { urlArquivo } from "../../service/api";
 
 // Aparência de cada notificação conforme o tipo de referência gravado pela API
 const NOTIFICATION_STYLE = {
@@ -26,7 +26,7 @@ function Navbar() {
   const drawerCloseRef = useRef(null);
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
-  const [usuario, setUsuario] = useState({ nome: "", tipoConta: "" });
+  const [usuario, setUsuario] = useState({ nome: "", tipoConta: "", fotoUrl: null });
   const unreadCount = notifications.filter((notification) => notification.unread).length;
   const isConselheiro = usuario.tipoConta.toLowerCase() === "conselheiro";
 
@@ -65,7 +65,7 @@ function Navbar() {
   useEffect(() => {
     let ativo = true;
     api.get("/usuarios/perfil")
-      .then(({ data }) => { if (ativo && data) setUsuario({ nome: data.nome || "", tipoConta: data.tipoConta || "" }); })
+      .then(({ data }) => { if (ativo && data) setUsuario({ nome: data.nome || "", tipoConta: data.tipoConta || "", fotoUrl: data.fotoUrl || null }); })
       .catch(() => {});
     api.get("/notificacoes")
       .then(({ data, status }) => {
@@ -173,9 +173,14 @@ function Navbar() {
         </div>
         <nav className={styles.menu} aria-label="Navegação principal">
           {isConselheiro ? (
-            <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/minhas-tarefas" onClick={() => setMobileMenuOpen(false)}>
-              <i className='bx bx-check-square'></i> Minhas Tarefas
-            </NavLink>
+            <>
+              <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/minhas-tarefas" onClick={() => setMobileMenuOpen(false)}>
+                <i className='bx bx-check-square'></i> Minhas Tarefas
+              </NavLink>
+              <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/desbravadores" onClick={() => setMobileMenuOpen(false)}>
+                <i className='bx bx-group'></i> Desbravadores
+              </NavLink>
+            </>
           ) : (
             <>
             <NavLink className={({ isActive }) => isActive ? styles.active : ""} to="/unidades" onClick={() => setMobileMenuOpen(false)}>
@@ -220,7 +225,11 @@ function Navbar() {
           aria-expanded={openPopover === "profile"}
           onClick={() => setOpenPopover((current) => current === "profile" ? null : "profile")}
         >
-          <span className={styles.avatar}>{(usuario.nome || "?").charAt(0).toUpperCase()}</span>
+          <span className={styles.avatar}>
+            {usuario.fotoUrl
+              ? <img className={styles.avatarImage} src={urlArquivo(usuario.fotoUrl)} alt="" />
+              : (usuario.nome || "?").charAt(0).toUpperCase()}
+          </span>
           <span className={styles.profileInfo}>
             <strong>{usuario.nome}</strong>
             <small>{usuario.tipoConta}</small>
