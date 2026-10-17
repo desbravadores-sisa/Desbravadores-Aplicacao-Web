@@ -24,7 +24,7 @@ function mapApiUsers(responseData) {
       id: usuario.id,
       name,
       email: usuario.email ?? "",
-      role: usuario.nomePerfil ?? "",
+      role: usuario.tipoConta ?? "",
       unit: usuario.nomeUnidade ?? "",
       initial: name.charAt(0).toUpperCase(),
       active: true
@@ -95,7 +95,7 @@ function Convites() {
 
       const [usersResult, currentUserResult, invitesResult, unitsResult] = await Promise.allSettled([
         api.get("/usuarios"),
-        api.get("/usuarios/buscarUsuario"),
+        api.get("/usuarios/perfil"),
         api.get("/convites"),
         api.get("/unidades/diretor")
       ]);
@@ -192,6 +192,7 @@ function Convites() {
     };
 
     try {
+      console.log(requestBody)
       const response = await api.post("/convites", requestBody);
       const createdInvite = response.data?.convite ?? response.data ?? {};
       const invitation = {

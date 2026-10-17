@@ -64,9 +64,11 @@ function Navbar() {
 
   useEffect(() => {
     let ativo = true;
-    api.get("/usuarios/buscarUsuario")
+    api.get("/usuarios/perfil")
       .then(({ data }) => { if (ativo && data) setUsuario({ nome: data.nome || "", tipoConta: data.tipoConta || "", fotoUrl: data.fotoUrl || null }); })
       .catch(() => {});
+      console.log("Oii")
+      console.log(usuario)
     api.get("/notificacoes")
       .then(({ data, status }) => {
         if (!ativo) return;
