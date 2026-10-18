@@ -8,8 +8,6 @@ import evidenceStyles from "./Evidencias.module.css";
 import styles from "./Convites.module.css";
 import api from "../service/api";
 
-const profileIds = { Diretoria: 1, Conselheiro: 2 };
-
 function getResponseItems(responseData, collectionName) {
   if (Array.isArray(responseData)) return responseData;
   if (Array.isArray(responseData?.[collectionName])) return responseData[collectionName];
@@ -52,6 +50,9 @@ function Convites() {
   const [users, setUsers] = useState([]);
   const [invites, setInvites] = useState([]);
   const [units, setUnits] = useState([]);
+  const [profiles, setProfiles] = useState([]);
+  const [profilesError, setProfilesError] = useState("");
+  const [isProfilesLoading, setIsProfilesLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -71,10 +72,12 @@ function Convites() {
   const [inviteToDelete, setInviteToDelete] = useState(null);
   const [isDeletingInvite, setIsDeletingInvite] = useState(false);
   const [inviteDeleteError, setInviteDeleteError] = useState("");
-  const [form, setForm] = useState({ email: "", role: "Conselheiro", unit: "" });
+  const [form, setForm] = useState({ email: "", profileId: "", unit: "" });
   const submitLock = useRef(false);
   const userDeleteLock = useRef(false);
   const inviteDeleteLock = useRef(false);
+  const selectedProfile = profiles.find((profile) => String(profile.id) === form.profileId);
+  const requiresUnit = selectedProfile?.nome === "Conselheiro";
 
   useEffect(() => {
     function updateCurrentTime() {
@@ -93,11 +96,12 @@ function Convites() {
       setIsLoading(true);
       setUsersError("");
 
-      const [usersResult, currentUserResult, invitesResult, unitsResult] = await Promise.allSettled([
+      const [usersResult, currentUserResult, invitesResult, unitsResult, profilesResult] = await Promise.allSettled([
         api.get("/usuarios"),
         api.get("/usuarios/perfil"),
         api.get("/convites"),
-        api.get("/unidades/diretor")
+        api.get("/unidades/diretor"),
+        api.get("/perfis")
       ]);
 
       if (!isMounted) return;
@@ -133,9 +137,21 @@ function Convites() {
         console.error("Erro ao buscar unidades:", unitsResult.reason);
       }
 
+      if (profilesResult.status === "fulfilled") {
+        const profileList = getResponseItems(profilesResult.value.data, "perfis")
+          .filter((profile) => profile.id != null && profile.nome);
+        const defaultProfile = profileList.find((profile) => profile.nome === "Conselheiro") ?? profileList[0];
+        setProfiles(profileList);
+        setForm((current) => ({ ...current, profileId: defaultProfile ? String(defaultProfile.id) : "" }));
+      } else {
+        setProfilesError("Não foi possível carregar os perfis.");
+        console.error("Erro ao buscar perfis:", profilesResult.reason);
+      }
+
       setIsLoading(false);
       setIsInvitesLoading(false);
       setIsUnitsLoading(false);
+      setIsProfilesLoading(false);
     }
 
     loadUsers();
@@ -176,7 +192,7 @@ function Convites() {
     if (submitLock.current) return;
 
     const selectedUnit = units.find((unit) => String(unit.id) === form.unit);
-    if (!form.email || !profileIds[form.role] || (form.role === "Conselheiro" && !selectedUnit)) {
+    if (!form.email.trim() || isProfilesLoading || !selectedProfile || (requiresUnit && !selectedUnit)) {
       setSubmitError("Preencha os dados do convite antes de continuar.");
       return;
     }
@@ -187,8 +203,8 @@ function Convites() {
 
     const requestBody = {
       email: form.email.trim(),
-      idPerfil: profileIds[form.role],
-      idUnidade: form.role === "Diretoria" ? null : Number(selectedUnit.id)
+      idPerfil: Number(selectedProfile.id),
+      idUnidade: requiresUnit ? Number(selectedUnit.id) : null
     };
 
     try {
@@ -198,8 +214,8 @@ function Convites() {
       const invitation = {
         id: createdInvite.id ?? `pending-${Date.now()}`,
         email: createdInvite.email ?? requestBody.email,
-        role: createdInvite.tipoConta ?? form.role,
-        unit: form.role === "Diretoria" ? "" : selectedUnit?.name ?? "",
+        role: createdInvite.tipoConta ?? selectedProfile.nome,
+        unit: requiresUnit ? selectedUnit.name : "",
         status: createdInvite.statusConvite ?? "PENDENTE",
         expiresAt: createdInvite.dataExpiracao ?? ""
       };
@@ -214,7 +230,8 @@ function Convites() {
       });
       setActiveTab("active");
       setIsModalOpen(false);
-      setForm({ email: "", role: "Conselheiro", unit: "" });
+      const defaultProfile = profiles.find((profile) => profile.nome === "Conselheiro") ?? profiles[0];
+      setForm({ email: "", profileId: String(defaultProfile.id), unit: "" });
 
       const [invitesRefresh, usersRefresh] = await Promise.allSettled([
         api.get("/convites"),
@@ -482,7 +499,7 @@ function Convites() {
           headerClassName={modalStyles.formHeader}
           bodyClassName={modalStyles.formBody}
           footerClassName={modalStyles.formFooter}
-          footer={<><button type="button" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>Cancelar</button><button className={modalStyles.primaryAction} type="submit" disabled={isSubmitting || (form.role === "Conselheiro" && (isUnitsLoading || units.length === 0))}>{isSubmitting ? "Enviando..." : "Gerar Convite"}</button></>}
+          footer={<><button type="button" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>Cancelar</button><button className={modalStyles.primaryAction} type="submit" disabled={isSubmitting || isProfilesLoading || !selectedProfile || (requiresUnit && (isUnitsLoading || units.length === 0))}>{isSubmitting ? "Enviando..." : "Gerar Convite"}</button></>}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
         >
@@ -490,9 +507,12 @@ function Convites() {
           <input id="email" name="email" type="email" placeholder="usuario@email.com" value={form.email} onChange={handleChange} required />
           <label>Função</label>
           <div className={styles.roleOptions}>
-            {[["Conselheiro", "Gerencia uma unidade no Kanban"], ["Diretoria", "Acesso completo ao sistema"]].map(([role, description]) => <button key={role} type="button" className={form.role === role ? styles.roleSelected : ""} onClick={() => setForm({ ...form, role })}><strong>{role}</strong><small>{description}</small></button>)}
+            {profiles.map((profile) => <button key={profile.id} type="button" className={form.profileId === String(profile.id) ? styles.roleSelected : ""} aria-pressed={form.profileId === String(profile.id)} disabled={isSubmitting} onClick={() => setForm({ ...form, profileId: String(profile.id) })}><strong>{profile.nome}</strong><small>{profile.descricao}</small></button>)}
           </div>
-          {form.role === "Conselheiro" && <><label htmlFor="unit">Unidade vinculada</label><select id="unit" name="unit" value={form.unit} onChange={handleChange} required disabled={isUnitsLoading || units.length === 0}><option value="">{isUnitsLoading ? "Carregando unidades..." : "Selecione uma unidade"}</option>{units.map((unit) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}</select>{unitsError && <p className={styles.formError} role="alert">{unitsError}</p>}</>}
+          {isProfilesLoading && <p role="status">Carregando perfis...</p>}
+          {profilesError && <p className={styles.formError} role="alert">{profilesError}</p>}
+          {!isProfilesLoading && !profilesError && profiles.length === 0 && <p className={styles.formError} role="alert">Nenhum perfil disponível.</p>}
+          {requiresUnit && <><label htmlFor="unit">Unidade vinculada</label><select id="unit" name="unit" value={form.unit} onChange={handleChange} required disabled={isUnitsLoading || units.length === 0}><option value="">{isUnitsLoading ? "Carregando unidades..." : "Selecione uma unidade"}</option>{units.map((unit) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}</select>{unitsError && <p className={styles.formError} role="alert">{unitsError}</p>}</>}
           {submitError && <p className={styles.formError} role="alert">{submitError}</p>}
           <div className={styles.howItWorks}><i className="bx bx-link" /><div><strong>Como funciona</strong><span>• Um link único de cadastro será gerado<br />• Compartilhe o link com a pessoa convidada<br />• Cada link pode ser usado apenas uma vez<br />• Você pode excluir um convite a qualquer momento</span></div></div>
         </Modal>
