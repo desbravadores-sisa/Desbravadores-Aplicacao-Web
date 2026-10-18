@@ -39,7 +39,11 @@ export function enviarEvidencia(taskId, arquivo, comentario) {
 /** URL absoluta de um arquivo servido pela API ("/arquivos/..."). */
 export function urlArquivo(caminho) {
     if (!caminho) return null;
-    return /^https?:\/\//.test(caminho) ? caminho : `${import.meta.env.VITE_API_URL ?? ""}${caminho}`;
+    if (/^https?:\/\//.test(caminho)) return caminho;
+
+    const baseUrl = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
+    const filePath = caminho.startsWith("/") ? caminho : `/${caminho}`;
+    return `${baseUrl}${filePath}`;
 }
 
 export default api

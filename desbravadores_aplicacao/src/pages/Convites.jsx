@@ -6,7 +6,7 @@ import SectionHeader from "../components/SectionHeader/SectionHeader";
 import UserCard from "../components/UserCard/UserCard";
 import evidenceStyles from "./Evidencias.module.css";
 import styles from "./Convites.module.css";
-import api from "../service/api";
+import api, { urlArquivo } from "../service/api";
 
 function getResponseItems(responseData, collectionName) {
   if (Array.isArray(responseData)) return responseData;
@@ -25,6 +25,7 @@ function mapApiUsers(responseData) {
       role: usuario.tipoConta ?? "",
       unit: usuario.nomeUnidade ?? "",
       initial: name.charAt(0).toUpperCase(),
+      fotoUrl: urlArquivo(usuario.fotoUrl),
       active: true
     };
   });
@@ -66,6 +67,7 @@ function Convites() {
   const [activeTab, setActiveTab] = useState("active");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserPhotoFailed, setSelectedUserPhotoFailed] = useState(false);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
   const [userDeleteError, setUserDeleteError] = useState("");
   const [inviteResult, setInviteResult] = useState(null);
@@ -267,6 +269,7 @@ function Convites() {
 
   function openDeactivateUserModal(user) {
     setUserDeleteError("");
+    setSelectedUserPhotoFailed(false);
     setSelectedUser(user);
   }
 
@@ -397,7 +400,17 @@ function Convites() {
         >
           <div className={styles.userSummaryCard}>
             <div className={styles.userSummaryHeader}>
-              <span className={styles.avatarSmall}>{selectedUser.initial}</span>
+              <span className={`${styles.avatarSmall} ${selectedUser.fotoUrl && !selectedUserPhotoFailed ? styles.avatarWithPhoto : ""}`}>
+                {selectedUser.fotoUrl && !selectedUserPhotoFailed
+                  ? <img
+                      className={styles.avatarImage}
+                      src={selectedUser.fotoUrl}
+                      alt={`Foto de ${selectedUser.name}`}
+                      crossOrigin="use-credentials"
+                      onError={() => setSelectedUserPhotoFailed(true)}
+                    />
+                  : selectedUser.initial}
+              </span>
               <div>
                 <strong>{selectedUser.name}</strong>
                 <span>{selectedUser.email}</span>
