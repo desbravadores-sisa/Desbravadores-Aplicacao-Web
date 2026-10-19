@@ -7,7 +7,7 @@ const initialProfile = {
   email: ""
 };
 
-function Perfil() {
+function Perfil({ onProfileUpdated }) {
 
   const [activeTab, setActiveTab] = useState("details");
   const [profile, setProfile] = useState(initialProfile);
@@ -84,6 +84,7 @@ function Perfil() {
       }
       setPhotoUrl(data.fotoUrl);
       setPhotoFeedback("Foto de perfil atualizada.");
+      onProfileUpdated?.();
     } catch {
       setPhotoFeedback("Não foi possível enviar a foto. Tente novamente.");
       setIsPhotoError(true);
@@ -105,6 +106,7 @@ function Perfil() {
       await api.put("/usuarios/perfil", { nome: name , email: email});
       setSavedName(name);
       setMessage("Alterações salvas.");
+      onProfileUpdated?.();
     } catch {
       setMessage("Não foi possível salvar as alterações. Tente novamente.");
     } finally {

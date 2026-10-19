@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Cadernos from "./pages/Cadernos";
@@ -102,16 +103,26 @@ function App() {
         />
         <Route
           path="/perfil"
-          element={
-            <>
-              <Navbar />
-              <Perfil />
-            </>
-          }
+          element={<PerfilPage />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+  );
+}
+
+function PerfilPage() {
+  const [profileVersion, setProfileVersion] = useState(0);
+
+  function handleProfileUpdated() {
+    setProfileVersion((current) => current + 1);
+  }
+
+  return (
+    <>
+      <Navbar profileVersion={profileVersion} />
+      <Perfil onProfileUpdated={handleProfileUpdated} />
+    </>
   );
 }
 

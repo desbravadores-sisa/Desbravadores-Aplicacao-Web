@@ -17,7 +17,7 @@ function formatarData(iso) {
   return dia && mes && ano ? `${dia}/${mes}/${ano}` : "";
 }
 
-function Navbar() {
+function Navbar({ profileVersion = 0 }) {
   const [openPopover, setOpenPopover] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const profileAreaRef = useRef(null);
@@ -67,6 +67,11 @@ function Navbar() {
     api.get("/usuarios/perfil")
       .then(({ data }) => { if (ativo && data) setUsuario({ nome: data.nome || "", tipoConta: data.tipoConta || "", fotoUrl: data.fotoUrl || null }); })
       .catch(() => {});
+    return () => { ativo = false; };
+  }, [profileVersion]);
+
+  useEffect(() => {
+    let ativo = true;
     api.get("/notificacoes")
       .then(({ data, status }) => {
         if (!ativo) return;
