@@ -33,7 +33,7 @@ function LinkPioneerModal({ age, pioneers, onLinkPioneer, onClose }) {
       onClose={onClose}
     >
       <p className={styles.description}>
-        Somente desbravadores com <strong>{age} anos</strong> e ainda não vinculados a este ciclo são exibidos.
+        Desbravadores do clube ainda não vinculados a este caderno. Os que têm <strong>{age} anos</strong> aparecem primeiro.
       </p>
       <div className={styles.search}>
         <i className="bx bx-search" aria-hidden="true" />

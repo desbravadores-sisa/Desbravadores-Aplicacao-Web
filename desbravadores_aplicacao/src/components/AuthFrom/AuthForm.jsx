@@ -33,10 +33,13 @@ function AuthForm({ type }) {
       api.post("/usuarios/login", { email: email, senha: senha })
         .then((resposta) => {
           const res = resposta.data;
-          if (res.tipoConta === "Conselheiro") {
-            setErrors({ form: "O acesso de conselheiro ainda não está disponível." });
-          } else if (res.tipoConta === "Diretoria") {
+          const perfil = String(res.tipoConta || "").toLowerCase();
+          if (perfil === "conselheiro") {
+            navigate("/minhas-tarefas");
+          } else if (perfil === "diretoria") {
             navigate("/unidades");
+          } else {
+            setErrors({ form: "Tipo de usuário sem acesso configurado." });
           }
         })
         .catch((erro) => {
