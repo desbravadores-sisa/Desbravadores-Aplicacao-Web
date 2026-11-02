@@ -6,13 +6,17 @@ const initialProfile = {
   name: "",
   email: ""
 };
+const initialPassword = { current: "", next: "", confirmation: "" };
 
 function Perfil({ onProfileUpdated }) {
 
   const [activeTab, setActiveTab] = useState("details");
   const [profile, setProfile] = useState(initialProfile);
   const [savedName, setSavedName] = useState("");
-  const [password, setPassword] = useState({ current: "", next: "", confirmation: "" });
+  const [profileErrors, setProfileErrors] = useState({});
+  const [password, setPassword] = useState(initialPassword);
+  const [passwordErrors, setPasswordErrors] = useState({});
+  const [passwordFormError, setPasswordFormError] = useState("");
   const [photoUrl, setPhotoUrl] = useState(null);
   const [photoFeedback, setPhotoFeedback] = useState("");
   const [isPhotoError, setIsPhotoError] = useState(false);
@@ -52,6 +56,20 @@ function Perfil({ onProfileUpdated }) {
 
   function updateProfile(event) {
     setProfile((current) => ({ ...current, [event.target.name]: event.target.value }));
+  }
+
+  function changeTab(tab) {
+    if (tab === activeTab) return;
+
+    setActiveTab(tab);
+    setProfileErrors({});
+    setPassword(initialPassword);
+    setPasswordErrors({});
+    setPasswordFormError("");
+    setMessage("");
+    if (tab === "details") {
+      setProfile((current) => ({ ...current, name: savedName }));
+    }
   }
 
   async function uploadPhoto(event) {
@@ -97,13 +115,21 @@ function Perfil({ onProfileUpdated }) {
     event.preventDefault();
     if (isLoading || isSaving) return;
 
-    const name = profile.name;
+    const name = profile.name.trim();
+    if (!name) {
+      setProfileErrors({ name: "Preencha o campo Nome Completo." });
+      setMessage("");
+      return;
+    }
+
+    setProfileErrors({});
     const email = profile.email;
     setIsSaving(true);
     setMessage("");
 
     try {
-      await api.put("/usuarios/perfil", { nome: name , email: email});
+      await api.put("/usuarios/perfil", { nome: name, email });
+      setProfile((current) => ({ ...current, name }));
       setSavedName(name);
       setMessage("Alterações salvas.");
       onProfileUpdated?.();
@@ -118,23 +144,62 @@ function Perfil({ onProfileUpdated }) {
     event.preventDefault();
     if (isChangingPassword) return;
 
-    if (password.next !== password.confirmation) {
-      setMessage("As senhas não coincidem.");
-      return;
+    const errors = {};
+    if (!password.current) {
+      errors.current = "Informe a senha atual.";
+    }
+    if (!password.next) {
+      errors.next = "Informe a nova senha.";
+    } else if (password.next.length < 6) {
+      errors.next = "A nova senha deve ter ao menos 6 caracteres.";
+    } else if (password.current && password.next === password.current) {
+      errors.next = "A nova senha deve ser diferente da senha atual.";
+    }
+    if (!password.confirmation) {
+      errors.confirmation = "Confirme a nova senha.";
+    } else if (password.next && password.next !== password.confirmation) {
+      errors.confirmation = "A confirmação deve ser igual à nova senha.";
     }
 
-    setIsChangingPassword(true);
+    setPasswordErrors(errors);
+    setPasswordFormError("");
     setMessage("");
+    if (Object.keys(errors).length > 0) return;
+
+    setIsChangingPassword(true);
 
     try {
       await api.put("/usuarios/senha", {
         senhaAtual: password.current,
-        novaSenha: password.next
+        novaSenha: password.next,
+        confirmacaoNovaSenha: password.confirmation
       });
       setMessage("Senha alterada com sucesso.");
-      setPassword({ current: "", next: "", confirmation: "" });
-    } catch {
-      setMessage("Não foi possível alterar a senha. Tente novamente.");
+      setPassword(initialPassword);
+    } catch (error) {
+      const status = error.response?.status;
+      const response = error.response?.data;
+      const serverErrors = response?.campos ?? {};
+      const mappedErrors = Object.fromEntries(Object.entries(serverErrors).map(([field, text]) => [
+        field === "senhaAtual" ? "current" :
+          field === "novaSenha" ? "next" :
+            field === "confirmacaoNovaSenha" || field === "confirmacaoNovaSenhaValida" ? "confirmation" : field,
+        text
+      ]));
+
+      if (status === 401) {
+        mappedErrors.current = response?.message || "A senha atual está incorreta.";
+      } else if (response?.message === "A nova senha deve ser diferente da senha atual.") {
+        mappedErrors.next = response.message;
+      } else if (response?.message === "A confirmação da nova senha não corresponde.") {
+        mappedErrors.confirmation = response.message;
+      }
+
+      if (Object.keys(mappedErrors).length > 0) {
+        setPasswordErrors(mappedErrors);
+      } else {
+        setPasswordFormError("Não foi possível alterar a senha. Tente novamente.");
+      }
     } finally {
       setIsChangingPassword(false);
     }
@@ -165,24 +230,25 @@ function Perfil({ onProfileUpdated }) {
         </header>
 
         <div className={styles.tabs} role="tablist" aria-label="Opções do perfil">
-          <button className={activeTab === "details" ? styles.tabActive : ""} type="button" role="tab" aria-selected={activeTab === "details"} onClick={() => setActiveTab("details")}>Dados Pessoais</button>
-          <button className={activeTab === "password" ? styles.tabActive : ""} type="button" role="tab" aria-selected={activeTab === "password"} onClick={() => setActiveTab("password")}>Alterar Senha</button>
+          <button className={activeTab === "details" ? styles.tabActive : ""} type="button" role="tab" aria-selected={activeTab === "details"} onClick={() => changeTab("details")}>Dados Pessoais</button>
+          <button className={activeTab === "password" ? styles.tabActive : ""} type="button" role="tab" aria-selected={activeTab === "password"} onClick={() => changeTab("password")}>Alterar Senha</button>
         </div>
 
         {activeTab === "details" ? (
-          <form className={styles.form} onSubmit={saveProfile} aria-busy={isLoading || isSaving}>
+          <form className={styles.form} onSubmit={saveProfile} aria-busy={isLoading || isSaving} noValidate>
             <h2>Informações Pessoais</h2>
-            <ProfileField icon="bx-user" label="Nome Completo" id="name" name="name" placeholder="Digite seu nome completo" value={profile.name} onChange={updateProfile} disabled={isLoading || isSaving} />
+            <ProfileField icon="bx-user" label="Nome Completo" id="name" name="name" placeholder="Digite seu nome completo" value={profile.name} onChange={updateProfile} disabled={isLoading || isSaving} error={profileErrors.name} />
             <ProfileField icon="bx-envelope" label="E-mail" id="email" name="email" type="email" placeholder="Digite seu e-mail" value={profile.email} disabled />
             <button className={styles.saveButton} type="submit" disabled={isLoading || isSaving}>{isSaving ? "Salvando..." : "Salvar Alterações"}</button>
           </form>
         ) : (
-          <form className={styles.form} onSubmit={savePassword} aria-busy={isChangingPassword}>
+          <form className={styles.form} onSubmit={savePassword} aria-busy={isChangingPassword} noValidate>
             <h2>Alterar Senha</h2>
-            <ProfileField icon="bx-lock-alt" label="Senha Atual" id="current" name="current" type="password" placeholder="Digite sua senha atual" value={password.current} onChange={(event) => setPassword((current) => ({ ...current, current: event.target.value }))} disabled={isChangingPassword} />
-            <ProfileField icon="bx-lock-alt" label="Nova Senha" id="next" name="next" type="password" placeholder="Digite sua nova senha" value={password.next} onChange={(event) => setPassword((current) => ({ ...current, next: event.target.value }))} disabled={isChangingPassword} />
-            <ProfileField icon="bx-lock-alt" label="Confirmar Nova Senha" id="confirmation" name="confirmation" type="password" placeholder="Digite sua nova senha novamente" value={password.confirmation} onChange={(event) => setPassword((current) => ({ ...current, confirmation: event.target.value }))} disabled={isChangingPassword} />
+            <ProfileField icon="bx-lock-alt" label="Senha Atual" id="current" name="current" type="password" placeholder="Digite sua senha atual" value={password.current} onChange={(event) => setPassword((current) => ({ ...current, current: event.target.value }))} disabled={isChangingPassword} error={passwordErrors.current} />
+            <ProfileField icon="bx-lock-alt" label="Nova Senha" id="next" name="next" type="password" placeholder="Digite sua nova senha" value={password.next} onChange={(event) => setPassword((current) => ({ ...current, next: event.target.value }))} disabled={isChangingPassword} error={passwordErrors.next} />
+            <ProfileField icon="bx-lock-alt" label="Confirmar Nova Senha" id="confirmation" name="confirmation" type="password" placeholder="Digite sua nova senha novamente" value={password.confirmation} onChange={(event) => setPassword((current) => ({ ...current, confirmation: event.target.value }))} disabled={isChangingPassword} error={passwordErrors.confirmation} />
             <button className={styles.saveButton} type="submit" disabled={isChangingPassword}>{isChangingPassword ? "Alterando..." : "Alterar Senha"}</button>
+            {passwordFormError && <p className={styles.fieldError} role="alert">{passwordFormError}</p>}
           </form>
         )}
         {(isLoading || message) && <p className={styles.feedback} role="status">{isLoading ? "Carregando perfil..." : message}</p>}
@@ -191,12 +257,24 @@ function Perfil({ onProfileUpdated }) {
   );
 }
 
-function ProfileField({ icon, label, id, ...inputProps }) {
+function ProfileField({ icon, label, id, error, ...inputProps }) {
+  const errorId = `${id}-error`;
+
   return (
-    <label className={styles.field} htmlFor={id}>
-      <span>{label}</span>
-      <div><i className={`bx ${icon}`} /><input id={id} {...inputProps} required /></div>
-    </label>
+    <div className={styles.field}>
+      <label htmlFor={id}>{label}</label>
+      <div className={`${styles.fieldControl} ${error ? styles.fieldControlError : ""}`}>
+        <i className={`bx ${icon}`} />
+        <input
+          id={id}
+          {...inputProps}
+          required
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+        />
+      </div>
+      {error && <span id={errorId} className={styles.fieldError} role="alert">{error}</span>}
+    </div>
   );
 }
 

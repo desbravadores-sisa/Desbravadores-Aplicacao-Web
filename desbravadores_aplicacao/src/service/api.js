@@ -5,6 +5,24 @@ const api = axios.create({
     withCredentials: true
 })
 
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const status = error.response?.status;
+        const requestUrl = (error.config?.url ?? "").split("?")[0].replace(/\/+$/, "");
+        const responseMessage = String(error.response?.data?.message ?? error.response?.data?.detail ?? "");
+        const isLoginRequest = requestUrl.endsWith("/usuarios/login");
+        const isIncorrectCurrentPassword = requestUrl.endsWith("/usuarios/senha")
+            && responseMessage.toLowerCase().includes("senha atual incorreta");
+
+        if (status === 401 && !isLoginRequest && !isIncorrectCurrentPassword) {
+            window.dispatchEvent(new Event("auth:session-expired"));
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 export function getKanbanBoard() {
     return api.get("/tarefas/kanban").then((response) => response.data);
 }

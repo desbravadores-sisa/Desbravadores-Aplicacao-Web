@@ -91,6 +91,28 @@
   box-shadow: 0 0 0 2px rgba(255, 118, 30, 0.12);
 }
 
+.formBody input[aria-invalid="true"],
+.formBody select[aria-invalid="true"] {
+  border-color: #c62828;
+}
+
+.formBody input[aria-invalid="true"]:focus,
+.formBody select[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.12);
+}
+
+.fieldError {
+  margin: calc(-1 * var(--spacing-xs)) 0 0;
+  color: #b42318;
+  font-size: var(--font-size-xs);
+}
+
+.formError {
+  margin: 0;
+  color: #b42318;
+  font-size: var(--font-size-xs);
+}
+
 .formBody textarea {
   resize: vertical;
 }

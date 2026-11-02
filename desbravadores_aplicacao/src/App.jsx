@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
+import Modal from "./components/Modal/Modal";
+import modalStyles from "./components/Modal/Modal.module.css";
 import Cadernos from "./pages/Cadernos";
 import CadernoDetalhe from "./pages/CadernoDetalhe";
 import LoginPage from "./pages/LoginPage";
@@ -17,6 +19,31 @@ import Tarefas from "./pages/Tarefas";
 function App() {
   return (
     <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}
+
+function AppRoutes() {
+  const navigate = useNavigate();
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  useEffect(() => {
+    function handleSessionExpired() {
+      setSessionExpired(true);
+    }
+
+    window.addEventListener("auth:session-expired", handleSessionExpired);
+    return () => window.removeEventListener("auth:session-expired", handleSessionExpired);
+  }, []);
+
+  function returnToLogin() {
+    setSessionExpired(false);
+    navigate("/", { replace: true });
+  }
+
+  return (
+    <>
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/cadastro" element={<RegisterPage />} />
@@ -107,7 +134,25 @@ function App() {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+      {sessionExpired && (
+        <Modal
+          className={modalStyles.formModal}
+          title="Sessão encerrada"
+          labelledBy="session-expired-title"
+          headerClassName={modalStyles.formHeader}
+          bodyClassName={modalStyles.formBody}
+          footerClassName={modalStyles.formFooter}
+          footer={(
+            <button className={modalStyles.primaryAction} type="button" onClick={returnToLogin}>
+              Fazer Login novamente
+            </button>
+          )}
+          onClose={returnToLogin}
+        >
+          <p>Sua sessão foi encerrada por inatividade. Faça login novamente para continuar.</p>
+        </Modal>
+      )}
+    </>
   );
 }
 

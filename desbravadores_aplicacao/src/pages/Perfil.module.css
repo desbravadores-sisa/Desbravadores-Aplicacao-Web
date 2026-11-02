@@ -144,7 +144,11 @@
   font-weight: 600;
 }
 
-.field div {
+.field > label {
+  color: #172033;
+}
+
+.fieldControl {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -154,9 +158,15 @@
   background: #f8fafc;
 }
 
-.field div:focus-within {
+.fieldControl:focus-within {
   border-color: #f55b00;
   box-shadow: 0 0 0 2px rgba(245, 91, 0, 0.12);
+}
+
+.fieldControlError,
+.fieldControlError:focus-within {
+  border-color: #b42318;
+  box-shadow: 0 0 0 2px rgba(180, 35, 24, 0.12);
 }
 
 .field i {
@@ -173,6 +183,13 @@
   color: #334155;
   font: inherit;
   font-size: 13px;
+}
+
+.fieldError {
+  margin: 0;
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .saveButton {

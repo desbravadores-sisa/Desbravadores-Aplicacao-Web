@@ -16,7 +16,8 @@ function Modal({
   footer,
   footerClassName = "",
   onClose,
-  onSubmit
+  onSubmit,
+  noValidate = false
 }) {
   const dialogRef = useRef(null);
   const Container = onSubmit ? "form" : "div";
@@ -45,6 +46,7 @@ function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
+        noValidate={noValidate}
         onSubmit={onSubmit}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
