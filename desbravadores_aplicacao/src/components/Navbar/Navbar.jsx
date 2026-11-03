@@ -26,6 +26,9 @@ function Navbar({ profileVersion = 0 }) {
   const drawerCloseRef = useRef(null);
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
+  const seen = useRef(null);
+  const [toast, setToast] = useState(null);
+  useEffect(() => { if(!toast) return; const timer=setTimeout(() => setToast(null),10000); return () => clearTimeout(timer); },[toast]);
   const [usuario, setUsuario] = useState({ nome: "", tipoConta: "", fotoUrl: null });
   const unreadCount = notifications.filter((notification) => notification.unread).length;
   const isConselheiro = usuario.tipoConta.toLowerCase() === "conselheiro";
@@ -72,10 +75,13 @@ function Navbar({ profileVersion = 0 }) {
 
   useEffect(() => {
     let ativo = true;
-    api.get("/notificacoes")
+    function refresh() { api.get("/notificacoes")
       .then(({ data, status }) => {
         if (!ativo) return;
         const lista = status === 204 || !Array.isArray(data) ? [] : data;
+        const fresh=seen.current===null ? [] : lista.filter(n => !n.lida && !seen.current.has(n.id));
+        if(fresh.length) setToast(fresh[0]);
+        seen.current=new Set(lista.map(n=>n.id));
         setNotifications(lista.map((n) => ({
           id: n.id,
           ...(NOTIFICATION_STYLE[n.tipoReferencia] || DEFAULT_STYLE),
@@ -86,7 +92,10 @@ function Navbar({ profileVersion = 0 }) {
         })));
       })
       .catch(() => { if (ativo) setNotifications([]); });
-    return () => { ativo = false; };
+    }
+    refresh();
+    const timer=setInterval(refresh,30000);
+    return () => { ativo = false; clearInterval(timer); };
   }, []);
 
   function markAllAsRead() {
@@ -259,6 +268,7 @@ function Navbar({ profileVersion = 0 }) {
         )}
       </div>
 
+      {toast && <div className={styles.toastRegion} role="status" aria-live="polite"><div className={styles.toast}><strong>{toast.titulo}</strong><p>{toast.mensagem}</p><div className={styles.toastActions}><button type="button" onClick={() => {navigate(toast.tipoReferencia === "NOVA_TAREFA" ? "/tarefas" : "/evidencias");setToast(null);}}>Ver detalhes</button><button type="button" onClick={() => setToast(null)}>Fechar</button></div></div></div>}
       {mobileMenuOpen && (
         <button
           className={styles.backdrop}

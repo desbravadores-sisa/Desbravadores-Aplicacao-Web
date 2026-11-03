@@ -34,6 +34,7 @@ function mapApiUsers(responseData) {
 function mapApiInvites(responseData) {
   return getResponseItems(responseData, "convites").map((invite) => ({
     id: invite.id,
+    token: invite.token,
     email: invite.email,
     role: invite.tipoConta,
     unit: invite.tipoConta === "Diretoria" ? "" : invite.nomeUnidade ?? "",
@@ -227,8 +228,8 @@ function Convites() {
         email: invitation.email,
         role: invitation.role,
         unit: invitation.unit,
-        link: createdInvite.link ?? createdInvite.url ?? "",
-        expiresInDays: createdInvite.expiresInDays ?? 7
+        link: createdInvite.token ? window.location.origin + "/cadastro?token=" + encodeURIComponent(createdInvite.token) : createdInvite.link ?? createdInvite.url ?? "",
+        expiresInDays: createdInvite.expiresInDays ?? 14
       });
       setActiveTab("active");
       setIsModalOpen(false);
@@ -499,7 +500,7 @@ function Convites() {
 
           <div className={styles.helperCard}>
             <i className="bx bx-time-five" />
-            <span>Este link expira em {inviteResult.expiresInDays} dias. O backend pode retornar a URL definitiva quando a geração estiver disponível.</span>
+            <span>Este link expira em {inviteResult.expiresInDays} dias. O convite foi encaminhado ao serviço de e-mail configurado.</span>
           </div>
         </Modal>
       )}
@@ -527,7 +528,7 @@ function Convites() {
           {!isProfilesLoading && !profilesError && profiles.length === 0 && <p className={styles.formError} role="alert">Nenhum perfil disponível.</p>}
           {requiresUnit && <><label htmlFor="unit">Unidade vinculada</label><select id="unit" name="unit" value={form.unit} onChange={handleChange} required disabled={isUnitsLoading || units.length === 0}><option value="">{isUnitsLoading ? "Carregando unidades..." : "Selecione uma unidade"}</option>{units.map((unit) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}</select>{unitsError && <p className={styles.formError} role="alert">{unitsError}</p>}</>}
           {submitError && <p className={styles.formError} role="alert">{submitError}</p>}
-          <div className={styles.howItWorks}><i className="bx bx-link" /><div><strong>Como funciona</strong><span>• Um link único de cadastro será gerado<br />• Compartilhe o link com a pessoa convidada<br />• Cada link pode ser usado apenas uma vez<br />• Você pode excluir um convite a qualquer momento</span></div></div>
+          <div className={styles.howItWorks}><i className="bx bx-link" /><div><strong>Como funciona</strong><span>• Um link único de cadastro será gerado<br />• O convite será enviado por e-mail<br />• Cada link pode ser usado apenas uma vez<br />• Você pode excluir um convite a qualquer momento</span></div></div>
         </Modal>
       )}
     </main>

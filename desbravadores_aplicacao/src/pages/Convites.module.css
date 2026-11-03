@@ -910,3 +910,6 @@
 		white-space: nowrap;
 	}
 }
+.inviteSuccessBody, .linkFieldWrap, .linkField, .linkField span {min-width:0;}
+.copyButton {flex-shrink:0;}
+.helperCard {min-width:0;overflow-wrap:anywhere;}

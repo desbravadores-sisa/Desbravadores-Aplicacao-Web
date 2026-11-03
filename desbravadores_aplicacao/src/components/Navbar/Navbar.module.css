@@ -443,3 +443,12 @@
   border-radius: 50%;
   object-fit: cover;
 }
+
+.toastRegion { position:fixed; right:24px; bottom:24px; width:min(390px,calc(100vw - 32px)); z-index:30; }
+.toast { padding:20px; background:#fff; border:1px solid #e2e8f0; border-left:4px solid #ec5800; border-radius:14px; box-shadow:0 12px 35px #0f172a26; }
+.toast strong { display:block; font-size:15px; color:#172033; }
+.toast p { margin:8px 0; font-size:13px; color:#475569; line-height:1.6; }
+.toast small { color:#64748b; }
+.toastActions { display:flex; gap:12px; margin-top:14px; }
+.toastActions button { border:0; border-radius:8px; padding:9px 12px; background:#fff7ed; color:#9a3412; font:600 12px Arial,sans-serif; cursor:pointer; }
+.toastActions button:focus-visible { outline:2px solid #2563eb; outline-offset:3px; }
