@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import NotebookCard from "../components/NotebookCard/NotebookCard";
 import Modal from "../components/Modal/Modal";
+import modalStyles from "../components/Modal/Modal.module.css";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
+import api from "../service/api";
 import {
-  getMembersForNotebook,
-  getNotebookForAge,
-  initialCadernos,
-  initialMembers
-} from "../data/cadernos";
+  formatDate,
+  formatDateInput,
+  getAgeFromBirthDate,
+  listaDaResposta,
+  mapearGruposCadernos,
+  parseDateInput
+} from "../service/cadernos";
 import styles from "./Cadernos.module.css";
 
 const notebookVisuals = {
@@ -20,74 +24,111 @@ const notebookVisuals = {
 };
 
 const emptyMember = { name: "", birthDate: "", unit: "" };
-const units = ["Tigresas", "Leões", "Onças", "Panteras"];
-
-function formatDate(date) {
-  const [year, month, day] = date.split("-");
-  return `${day}/${month}/${year}`;
-}
-
-function formatDateInput(value) {
-  const digits = value.replace(/\D/g, "").slice(0, 8);
-  const day = digits.slice(0, 2);
-  const month = digits.slice(2, 4);
-  const year = digits.slice(4, 8);
-
-  return [day, month, year].filter(Boolean).join("/");
-}
-
-function parseDateInput(value) {
-  const match = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!match) {
-    return "";
-  }
-
-  const [, day, month, year] = match;
-  const date = new Date(Number(year), Number(month) - 1, Number(day));
-  const isValidDate = date.getFullYear() === Number(year)
-    && date.getMonth() === Number(month) - 1
-    && date.getDate() === Number(day);
-
-  return isValidDate ? `${year}-${month}-${day}` : "";
-}
-
-function getAgeFromBirthDate(birthDate) {
-  const [year, month, day] = birthDate.split("-").map(Number);
-  const today = new Date();
-  let age = today.getFullYear() - year;
-
-  if (
-    today.getMonth() + 1 < month
-    || (today.getMonth() + 1 === month && today.getDate() < day)
-  ) {
-    age -= 1;
-  }
-
-  return age;
-}
 
 function getInitials(name) {
   return name.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase();
 }
 
+function mensagemDeErro(err, padrao) {
+  const status = err.response?.status;
+  if (status === 403) return "Acesso restrito à diretoria.";
+  if (status === 401) return "Sua sessão expirou. Faça login novamente.";
+  return padrao;
+}
+
+// "Excursionista" -> "excursionista" (chave de notebookVisuals), ignorando acentos.
+function chaveDoCaderno(nome) {
+  return String(nome ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+}
+
 function Cadernos() {
-  const [cadernos, setCadernos] = useState(initialCadernos);
+  const [grupos, setGrupos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(null);
+  const [aviso, setAviso] = useState(null);
+  const [idClube, setIdClube] = useState(null);
+  const [units, setUnits] = useState([]);
   const [cycleModalOpen, setCycleModalOpen] = useState(false);
   const [cycleDates, setCycleDates] = useState({ startDate: "", endDate: "" });
   const [activeTab, setActiveTab] = useState("notebooks");
-  const [members, setMembers] = useState(initialMembers);
+  const [members, setMembers] = useState([]);
   const [memberModal, setMemberModal] = useState(null);
   const [memberForm, setMemberForm] = useState(emptyMember);
+  const [memberToDelete, setMemberToDelete] = useState(null);
   const memberBirthDate = parseDateInput(memberForm.birthDate);
   const memberAge = memberBirthDate ? getAgeFromBirthDate(memberBirthDate) : null;
   const memberAgeOutOfRange = memberAge !== null && (memberAge < 10 || memberAge > 15);
+  const cadernos = grupos.flatMap((grupo) => grupo.items);
+
+  const carregarCadernos = useCallback(async () => {
+    const resposta = await api.get("/cadernos/resumo");
+    setGrupos(mapearGruposCadernos(listaDaResposta(resposta)));
+  }, []);
+
+  const carregarMembros = useCallback(async (clube, listaUnidades) => {
+    const resposta = await api.get("/desbravadores", { params: { idClube: clube } });
+    const nomePorUnidade = Object.fromEntries(listaUnidades.map((unidade) => [unidade.id, unidade.nome]));
+    setMembers(listaDaResposta(resposta).map((desbravador) => ({
+      id: desbravador.id,
+      name: desbravador.nome,
+      birthDate: desbravador.dataNascimento,
+      age: desbravador.dataNascimento ? getAgeFromBirthDate(desbravador.dataNascimento) : null,
+      unitId: desbravador.idUnidade,
+      unit: nomePorUnidade[desbravador.idUnidade] ?? "—",
+      genero: desbravador.genero,
+      ativo: desbravador.ativo,
+      joinedAt: desbravador.dataAdmissao ? formatDate(String(desbravador.dataAdmissao).split("T")[0]) : "—",
+      // Histórico vindo do vínculo explícito (Desbravador_Caderno): concluídos = dataConclusao preenchida.
+      linkedNotebooks: desbravador.cadernos ?? [],
+      completedNotebooks: (desbravador.cadernos ?? [])
+        .filter((caderno) => caderno.dataConclusao)
+        .map((caderno) => chaveDoCaderno(caderno.nome))
+    })));
+  }, []);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarTudo() {
+      try {
+        const [perfil, respostaUnidades] = await Promise.all([
+          api.get("/usuarios/perfil"),
+          api.get("/unidades/diretor").catch((err) => {
+            if (err.response?.status === 404) return { status: 204, data: [] };
+            throw err;
+          })
+        ]);
+        if (!ativo) return;
+        const listaUnidades = listaDaResposta(respostaUnidades);
+        const clube = perfil.data?.idClube ?? null;
+        setIdClube(clube);
+        setUnits(listaUnidades);
+        await Promise.all([carregarCadernos(), carregarMembros(clube, listaUnidades)]);
+      } catch (err) {
+        if (ativo) {
+          setErro(mensagemDeErro(err, "Não foi possível carregar os cadernos. Verifique se a API está no ar."));
+        }
+      } finally {
+        if (ativo) setCarregando(false);
+      }
+    }
+
+    carregarTudo();
+    return () => {
+      ativo = false;
+    };
+  }, [carregarCadernos, carregarMembros]);
+
+  function getNotebookForAge(age) {
+    return cadernos.find((caderno) => caderno.age === Number(age)) || null;
+  }
 
   function handleCycleChange(event) {
     const { name, value } = event.target;
     setCycleDates((current) => ({ ...current, [name]: formatDateInput(value) }));
   }
 
-  function createCycle(event) {
+  async function createCycle(event) {
     event.preventDefault();
     const startDate = parseDateInput(cycleDates.startDate);
     const endDate = parseDateInput(cycleDates.endDate);
@@ -96,12 +137,21 @@ function Cadernos() {
       return;
     }
 
-    setCadernos((current) => current.map((caderno) => ({
-      ...caderno,
-      startDate: formatDate(startDate),
-      endDate: formatDate(endDate),
-      status: "Ativo"
-    })));
+    try {
+      // O back encerra o ciclo ativo e aplica o novo período a todos os cadernos do clube.
+      // A pontuação do ranking (por ciclo) recomeça do zero; as tarefas são atribuídas de novo no ciclo novo.
+      await api.post("/ciclos", {
+        nome: `Ciclo ${formatDate(startDate)} a ${formatDate(endDate)}`,
+        dataInicio: startDate,
+        dataFim: endDate,
+        ativo: true
+      });
+      setErro(null);
+      setAviso("Novo ciclo iniciado e aplicado a todos os cadernos. A pontuação das unidades recomeça neste ciclo.");
+      await carregarCadernos();
+    } catch (err) {
+      setErro(mensagemDeErro(err, "Não foi possível criar o ciclo. Tente novamente."));
+    }
     setCycleDates({ startDate: "", endDate: "" });
     setCycleModalOpen(false);
   }
@@ -115,12 +165,12 @@ function Cadernos() {
     setMemberForm({
       name: member.name,
       birthDate: member.birthDate ? formatDate(member.birthDate) : "",
-      unit: member.unit
+      unit: member.unitId ? String(member.unitId) : ""
     });
     setMemberModal({ type: "edit", member });
   }
 
-  function saveMember(event) {
+  async function saveMember(event) {
     event.preventDefault();
     const isNewMember = memberModal.type === "new";
     const age = memberAge ?? (isNewMember ? null : memberModal.member.age);
@@ -134,46 +184,43 @@ function Cadernos() {
       || memberAgeOutOfRange
     ) return;
 
-    const notebook = getNotebookForAge(age, cadernos);
-    const memberData = {
-      name: memberForm.name.trim(),
-      age,
-      unit: memberForm.unit,
-      notebook: notebook.name,
-      cadernoId: notebook.id,
-      ...(memberBirthDate ? { birthDate: memberBirthDate } : {})
+    const payload = {
+      nome: memberForm.name.trim(),
+      idClube,
+      idUnidade: Number(memberForm.unit),
+      dataNascimento: memberBirthDate || memberModal.member?.birthDate || null,
+      genero: isNewMember ? null : memberModal.member.genero ?? null,
+      ativo: isNewMember ? true : memberModal.member.ativo ?? true
     };
 
-    if (memberModal.type === "new") {
-      setMembers((current) => [...current, {
-        id: Date.now(),
-        ...memberData,
-        joinedAt: notebook.startDate,
-        completedNotebooks: []
-      }]);
-    } else {
-      setMembers((current) => current.map((member) => (
-        member.id === memberModal.member.id ? { ...member, ...memberData } : member
-      )));
+    try {
+      if (isNewMember) {
+        await api.post("/desbravadores", payload);
+      } else {
+        await api.put(`/desbravadores/${memberModal.member.id}`, payload);
+      }
+      setErro(null);
+      setMemberModal(null);
+      await Promise.all([carregarMembros(idClube, units), carregarCadernos()]);
+    } catch (err) {
+      setErro(mensagemDeErro(err, "Não foi possível salvar o desbravador. Verifique os dados e tente novamente."));
     }
-
-    setMemberModal(null);
   }
 
-  const grupos = [
-    {
-      name: "Leões e Tigresas",
-      subtitle: "Cadernos para 10 a 12 anos",
-      items: cadernos.filter((caderno) => caderno.category === "LEÕES E TIGRESAS"),
-      color: "orange"
-    },
-    {
-      name: "Onças e Panteras",
-      subtitle: "Cadernos para 13 a 15 anos",
-      items: cadernos.filter((caderno) => caderno.category === "ONÇAS E PANTERAS"),
-      color: "blue"
+  async function deleteMember() {
+    const member = memberToDelete;
+    if (!member) return;
+    setMemberToDelete(null);
+    try {
+      await api.delete(`/desbravadores/${member.id}`);
+      setErro(null);
+      await Promise.all([carregarMembros(idClube, units), carregarCadernos()]);
+    } catch (err) {
+      setErro(mensagemDeErro(err, "Não foi possível excluir o desbravador."));
     }
-  ];
+  }
+
+  const memberNotebook = memberBirthDate && !memberAgeOutOfRange ? getNotebookForAge(memberAge) : null;
 
   return (
     <main className={styles.page}>
@@ -195,7 +242,15 @@ function Cadernos() {
           </button>
         </div>
 
-        {activeTab === "notebooks" ? grupos.map((grupo) => (
+        {carregando && <p>Carregando cadernos...</p>}
+        {erro && <p role="alert">{erro}</p>}
+        {aviso && <p role="status">{aviso}</p>}
+
+        {!carregando && activeTab === "notebooks" && grupos.length === 0 && !erro && (
+          <p>Nenhum caderno cadastrado para o clube.</p>
+        )}
+
+        {!carregando && (activeTab === "notebooks" ? grupos.map((grupo) => (
           <section className={styles.section} key={grupo.name}>
             <div className={`${styles.sectionHeader} ${styles[grupo.color]}`}>
               <div>
@@ -206,11 +261,7 @@ function Cadernos() {
             </div>
             <div className={styles.grid}>
               {grupo.items.map((caderno) => (
-                <NotebookCard
-                  key={caderno.name}
-                  {...caderno}
-                  linkedMembers={getMembersForNotebook(caderno, members).length}
-                />
+                <NotebookCard key={caderno.id} {...caderno} />
               ))}
             </div>
           </section>
@@ -249,17 +300,27 @@ function Cadernos() {
                   </tr>
                 </thead>
                 <tbody>
+                  {members.length === 0 && (
+                    <tr><td colSpan={7}>Nenhum desbravador cadastrado.</td></tr>
+                  )}
                   {members.map((member) => {
-                    const notebook = getNotebookForAge(member.age, cadernos);
+                    // Caderno atual = vínculo em andamento; sem vínculo, sugere o da idade.
+                    const linked = member.linkedNotebooks.find((caderno) => !caderno.dataConclusao);
+                    const notebook = linked
+                      ? { name: linked.nome }
+                      : member.age !== null ? getNotebookForAge(member.age) : null;
                     const completedNotebooks = member.completedNotebooks
                       .map((notebookId) => notebookVisuals[notebookId])
                       .filter(Boolean);
                     return (
                       <tr key={member.id}>
                         <td data-label="Desbravador"><span className={styles.memberAvatar}>{getInitials(member.name)}</span><strong>{member.name}</strong></td>
-                        <td data-label="Idade">{member.age} anos</td>
+                        <td data-label="Idade">{member.age !== null ? `${member.age} anos` : "—"}</td>
                         <td data-label="Unidade">{member.unit}</td>
-                        <td data-label="Caderno atual"><strong>{notebook.name}</strong></td>
+                        <td data-label="Caderno atual">
+                          <strong>{notebook ? notebook.name : "—"}</strong>
+                          {notebook && !linked && <small className={styles.notLinked}> (não vinculado)</small>}
+                        </td>
                         <td data-label="Cadernos concluídos">
                           {completedNotebooks.length === 0 ? (
                             <span className={styles.noCompletedNotebooks}>Nenhum</span>
@@ -288,7 +349,7 @@ function Cadernos() {
                         <td data-label="Ações">
                           <div className={styles.memberActions}>
                             <button type="button" aria-label={`Editar ${member.name}`} onClick={() => openMember(member)}><i className="bx bx-pencil" /></button>
-                            <button type="button" aria-label={`Excluir ${member.name}`} onClick={() => setMembers((current) => current.filter((item) => item.id !== member.id))}><i className="bx bx-trash" /></button>
+                            <button type="button" aria-label={`Excluir ${member.name}`} onClick={() => setMemberToDelete(member)}><i className="bx bx-trash" /></button>
                           </div>
                         </td>
                       </tr>
@@ -298,7 +359,7 @@ function Cadernos() {
               </table>
             </div>
           </section>
-        )}
+        ))}
       </div>
 
       {memberModal && (
@@ -337,7 +398,7 @@ function Cadernos() {
               <label htmlFor="member-unit">Unidade</label>
               <select id="member-unit" value={memberForm.unit} onChange={(event) => setMemberForm((current) => ({ ...current, unit: event.target.value }))} required>
                 <option value="">Selecione</option>
-                {units.map((unit) => <option key={unit} value={unit}>{unit}</option>)}
+                {units.map((unit) => <option key={unit.id} value={unit.id}>{unit.nome}</option>)}
               </select>
             </div>
           </div>
@@ -350,7 +411,11 @@ function Cadernos() {
           {memberBirthDate && !memberAgeOutOfRange && (
             <div className={styles.autoNotebookNotice}>
               <strong><i className="bx bx-info-circle" /> Caderno automático</strong>
-              <span>Com {memberAge} anos, este desbravador pertence ao caderno {getNotebookForAge(memberAge, cadernos).name}. Após o cadastro, o vínculo será criado automaticamente.</span>
+              <span>
+                {memberNotebook
+                  ? `Com ${memberAge} anos, este desbravador pertence ao caderno ${memberNotebook.name}. Após o cadastro, o vínculo será criado automaticamente.`
+                  : `Com ${memberAge} anos, ainda não há caderno cadastrado para esta idade.`}
+              </span>
             </div>
           )}
         </Modal>
@@ -372,7 +437,10 @@ function Cadernos() {
           onClose={() => setCycleModalOpen(false)}
           onSubmit={createCycle}
         >
-          <p className={styles.cycleNotice}>O período será criado para todos os cadernos do clube.</p>
+          <p className={styles.cycleNotice}>
+            O período será aplicado a todos os cadernos do clube. O ciclo atual será encerrado e a pontuação
+            das unidades recomeça do zero no novo ciclo (o histórico continua salvo).
+          </p>
           <div className={styles.cycleFields}>
             <div>
               <label htmlFor="cycle-start-date">Data inicial</label>
@@ -403,6 +471,19 @@ function Cadernos() {
               />
             </div>
           </div>
+        </Modal>
+      )}
+      {memberToDelete && (
+        <Modal
+          className={modalStyles.confirmModal}
+          title="Excluir Desbravador"
+          labelledBy="delete-member-title"
+          headerClassName={modalStyles.confirmHeader}
+          footerClassName={modalStyles.confirmActions}
+          footer={<><button type="button" onClick={() => setMemberToDelete(null)}>Cancelar</button><button className={modalStyles.confirmDanger} type="button" onClick={deleteMember}>Excluir</button></>}
+          onClose={() => setMemberToDelete(null)}
+        >
+          <p>Tem certeza que deseja excluir “{memberToDelete.name}”? Esta ação não pode ser desfeita.</p>
         </Modal>
       )}
     </main>

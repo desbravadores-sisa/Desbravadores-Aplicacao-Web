@@ -24,6 +24,7 @@
 .avatar {
   display: grid;
   place-items: center;
+  overflow: hidden;
   width: 32px;
   height: 32px;
   flex: 0 0 auto;
@@ -33,6 +34,18 @@
   color: #fff;
   font-size: 14px;
   font-weight: 700;
+}
+
+.avatarWithPhoto {
+  background: transparent;
+}
+
+.avatarImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
 }
 
 .userInfo {

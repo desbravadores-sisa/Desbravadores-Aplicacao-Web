@@ -503,3 +503,86 @@
     gap: 8px;
   }
 }
+
+.formRowTwo {
+  grid-template-columns: 1fr 1fr;
+}
+
+.lockedHint {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 10px;
+}
+
+.formError {
+  margin: 6px 0 0;
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.feedback {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.feedbackError {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+.emptyColumn {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 40px 12px;
+  border: 2px dashed #e2e8f0;
+  border-radius: 14px;
+  color: #94a3b8;
+  font-size: 12px;
+  text-align: center;
+}
+
+.emptyColumn i {
+  font-size: 26px;
+}
+
+.emptyColumn p {
+  margin: 0;
+}
+
+.notebookFilter {
+  margin-left: auto;
+  padding: 4px 8px;
+  border: 1px solid #eadbfa;
+  border-radius: 8px;
+  background: #fbf3ff;
+  color: #6b21a8;
+  font: inherit;
+  font-size: 11px;
+}
+
+.notebookHeader {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.deleteWarning {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px !important;
+  padding: 10px;
+  border-radius: 10px;
+  background: #fff7ed;
+  color: #c2410c !important;
+  font-size: 11px !important;
+}
+
+.activityTypes button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}

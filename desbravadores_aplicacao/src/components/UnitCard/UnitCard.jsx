@@ -8,7 +8,8 @@ function UnitCard({
   score,
   completedTasks,
   totalTasks,
-  completionRate
+  completionRate,
+  onDetails
 }) {
 
   return (
@@ -29,7 +30,7 @@ function UnitCard({
         <i className="bx bx-user" /> {leader}
       </div>
 
-      {minimumAge && (
+      {minimumAge != null && (
         <div className={styles.minimumAge}>
           <i className="bx bx-user-check" /> Idade mínima: {minimumAge} anos
         </div>
@@ -79,7 +80,7 @@ function UnitCard({
       </div>
 
 
-      <button className={styles.button}>
+      <button type="button" className={styles.button} onClick={onDetails}>
         Ver Detalhes
       </button>
 
