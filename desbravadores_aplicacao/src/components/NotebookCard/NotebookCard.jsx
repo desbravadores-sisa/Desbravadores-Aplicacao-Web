@@ -40,7 +40,7 @@ function NotebookCard({
         </div>
 
         <div className={styles.icon}>
-          📖
+          <i className="bx bx-book-open" aria-hidden="true" />
         </div>
 
       </div>

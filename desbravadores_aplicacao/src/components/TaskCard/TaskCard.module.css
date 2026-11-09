@@ -11,20 +11,39 @@
 
 .taskHeading {
   display: flex;
+  min-width: 0;
   justify-content: space-between;
   gap: 12px;
 }
 
+.taskMain {
+  min-width: 0;
+  flex: 1;
+}
+
 .taskTitleLine {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
 
+.notebookBadge {
+  padding: 3px 7px;
+  border-radius: 8px;
+  background: #fbf3ff;
+  color: #9130bd;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .taskTitleLine h3 {
+  min-width: 0;
   margin: 0;
   color: #172033;
   font-size: var(--font-size-14px);
+  overflow-wrap: anywhere;
 }
 
 .deliveryCount {
@@ -37,6 +56,10 @@
 }
 
 .taskDescription {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   margin: 9px 0 10px;
   color: #64748b;
   font-size: 11px;

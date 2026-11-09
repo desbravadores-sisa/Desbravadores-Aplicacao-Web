@@ -1,4 +1,16 @@
-# React + Vite
+# Desbravadores — Frontend (React + Vite)
+
+> Visão geral do projeto, status das telas e próximos passos: veja o [README principal](../README.md).
+> Protótipo de referência: [Figma Make — prototipo_versãofinal](https://www.figma.com/make/zdjDwsWCbkBmPXUXtR9QxT/prototipo_vers%C3%A3ofinal?t=SkffTCtZwgP5uuL2-1)
+
+## Rodando localmente
+
+```bash
+npm install
+cp .env.example .env   # VITE_API_URL=http://localhost:8080
+npm run dev            # http://localhost:5173
+npm run build          # build de produção em dist/
+```
 
 ## Fluxo de trabalho com Git
 
@@ -9,8 +21,11 @@
 | Gabrielly | `feature/gabrielly` |
 | Nathan | `feature/nathan` |
 | Marcela | `feature/marcela` |
+| Consolidação (todas as features + integração com a API) | `consolidacao/sprint-final` |
 
 As branches já existem no repositório. Não crie uma branch nova e não use `-b`.
+
+> **Atenção:** até o PR de `consolidacao/sprint-final` → `main` ser aprovado, a versão integrada com o backend está **somente** em `consolidacao/sprint-final`. Depois do merge, atualize sua branch com a `main` (passo 3) antes de continuar.
 
 ### 1. Começar a trabalhar (só na primeira vez)
 
@@ -35,7 +50,7 @@ git push
 
 ### 3. Atualizar sua branch com a main
 
-Faça antes de abrir um Pull Request e depois que qualquer PR for aprovado.
+Faça isso antes de abrir um Pull Request e depois que qualquer PR for aprovado.
 Deixe tudo commitado antes (`git status` limpo).
 
 ```bash
@@ -76,18 +91,11 @@ git push
 - Mudanças entram na `main` apenas via Pull Request.
 - Commits claros: `feat:` para novidade, `fix:` para correção.
 - Avise o time no grupo antes de mexer em arquivos compartilhados.
+- Nunca versione o `.env` (ele já está no `.gitignore`); use o `.env.example` como modelo.
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Convenções de integração com a API
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- Todas as chamadas passam por `src/service/api.js` (axios com `withCredentials: true`). Não use `fetch` direto.
+- A sessão usa o cookie httpOnly `authToken`; o front **não** guarda token em `localStorage`.
+- Os perfis vêm do banco com os nomes `Diretoria` e `Conselheiro`; use exatamente esses valores ao comparar `tipoConta`.
+- O clube do usuário é definido pelo backend a partir da sessão. Não envie `idClube` nas requisições.

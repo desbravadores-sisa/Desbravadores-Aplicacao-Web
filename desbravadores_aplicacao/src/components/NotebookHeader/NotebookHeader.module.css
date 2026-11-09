@@ -54,6 +54,7 @@
   font-size: 20px;
   font-weight: 800;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .titleBlock p {
@@ -133,7 +134,7 @@
   }
 
   .titleBlock h1 {
-    font-size: 23px;
+    font-size: var(--font-size-section-title);
   }
 
   .eyebrow {
@@ -150,6 +151,8 @@
     min-height: 44px;
     padding: 0 9px;
     font-size: var(--font-size-2xs);
+    white-space: normal;
+    text-align: center;
   }
 
   .stats {

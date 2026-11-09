@@ -2,6 +2,7 @@
   display: flex;
   width: min(510px, 100%);
   max-height: min(640px, calc(100vh - 40px));
+  max-height: min(640px, calc(100dvh - 40px));
   flex-direction: column;
   overflow: hidden;
   border-radius: 20px;

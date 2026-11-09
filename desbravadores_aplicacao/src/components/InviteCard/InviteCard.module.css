@@ -1,5 +1,7 @@
 .inviteCard {
   position: relative;
+  width: 100%;
+  min-width: 0;
   min-height: 92px;
   padding: 15px 14px;
   border: 1px solid #edf0f3;
@@ -8,13 +10,10 @@
   box-sizing: border-box;
 }
 
-.expiredCard {
-  border-color: #f8d7d7;
-  background: #fff9f9;
-}
-
 .inviteCard > strong {
   display: block;
+  padding-right: 24px;
+  overflow-wrap: anywhere;
   color: #273449;
   font-size: 12px;
 }
@@ -24,7 +23,9 @@
 }
 
 .inviteMeta {
-  display: inline-flex;
+  display: flex;
+  max-width: 100%;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 4px 0 10px 8px;
   color: #64748b;
@@ -51,6 +52,9 @@
 
 .linkRow {
   display: flex;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   align-items: center;
   gap: 6px;
   padding: 7px 9px;
@@ -61,6 +65,8 @@
 }
 
 .linkRow span {
+  min-width: 0;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -77,17 +83,6 @@
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-}
-
-.expiredBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 8px;
-  background: #fff0f1;
-  color: #c3274b;
-  font-size: 10px;
-  font-weight: 700;
 }
 
 .emptyState {
