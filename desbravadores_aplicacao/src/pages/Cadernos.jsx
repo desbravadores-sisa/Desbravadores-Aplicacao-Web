@@ -24,6 +24,7 @@ const notebookVisuals = {
 };
 
 const emptyMember = { name: "", birthDate: "", unit: "" };
+const MEMBERS_PER_PAGE = 8;
 
 function getInitials(name) {
   return name.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase();
@@ -52,6 +53,7 @@ function Cadernos() {
   const [cycleDates, setCycleDates] = useState({ startDate: "", endDate: "" });
   const [activeTab, setActiveTab] = useState("notebooks");
   const [members, setMembers] = useState([]);
+  const [membersPage, setMembersPage] = useState(1);
   const [memberModal, setMemberModal] = useState(null);
   const [memberForm, setMemberForm] = useState(emptyMember);
   const [memberToDelete, setMemberToDelete] = useState(null);
@@ -59,6 +61,12 @@ function Cadernos() {
   const memberAge = memberBirthDate ? getAgeFromBirthDate(memberBirthDate) : null;
   const memberAgeOutOfRange = memberAge !== null && (memberAge < 10 || memberAge > 15);
   const cadernos = grupos.flatMap((grupo) => grupo.items);
+  const membersPageCount = Math.max(1, Math.ceil(members.length / MEMBERS_PER_PAGE));
+  const currentMembersPage = Math.min(membersPage, membersPageCount);
+  const paginatedMembers = members.slice(
+    (currentMembersPage - 1) * MEMBERS_PER_PAGE,
+    currentMembersPage * MEMBERS_PER_PAGE
+  );
 
   const carregarCadernos = useCallback(async () => {
     const resposta = await api.get("/cadernos/resumo");
@@ -303,7 +311,7 @@ function Cadernos() {
                   {members.length === 0 && (
                     <tr><td colSpan={7}>Nenhum desbravador cadastrado.</td></tr>
                   )}
-                  {members.map((member) => {
+                  {paginatedMembers.map((member) => {
                     // Caderno atual = vínculo em andamento; sem vínculo, sugere o da idade.
                     const linked = member.linkedNotebooks.find((caderno) => !caderno.dataConclusao);
                     const notebook = linked
@@ -358,6 +366,32 @@ function Cadernos() {
                 </tbody>
               </table>
             </div>
+            {members.length > MEMBERS_PER_PAGE && (
+              <nav className={styles.memberPagination} aria-label="Paginação dos membros">
+                <span>
+                  Exibindo {(currentMembersPage - 1) * MEMBERS_PER_PAGE + 1} a {Math.min(currentMembersPage * MEMBERS_PER_PAGE, members.length)} de {members.length}
+                </span>
+                <div className={styles.memberPaginationControls}>
+                  <button
+                    type="button"
+                    onClick={() => setMembersPage(currentMembersPage - 1)}
+                    disabled={currentMembersPage === 1}
+                    aria-label="Página anterior"
+                  >
+                    <i className="bx bx-chevron-left" aria-hidden="true" /> Anterior
+                  </button>
+                  <span aria-current="page">Página {currentMembersPage} de {membersPageCount}</span>
+                  <button
+                    type="button"
+                    onClick={() => setMembersPage(currentMembersPage + 1)}
+                    disabled={currentMembersPage === membersPageCount}
+                    aria-label="Próxima página"
+                  >
+                    Próxima <i className="bx bx-chevron-right" aria-hidden="true" />
+                  </button>
+                </div>
+              </nav>
+            )}
           </section>
         ))}
       </div>

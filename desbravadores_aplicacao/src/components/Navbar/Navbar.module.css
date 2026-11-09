@@ -25,18 +25,13 @@
 }
 
 .logo {
-  width: 34px;
-  height: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  display: block;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: #f8fafc;
-  border: 1px solid #d9e0e8;
-  font-size: 20px;
-  color: var(--color-primary);
+  background: #fff;
+  object-fit: contain;
 }
 
 .title {
@@ -315,11 +310,14 @@
   }
 
   .menu {
-    padding: 0 8px;
+    gap: 3px;
+    padding: 0 4px;
   }
 
   .menu a {
-    padding-inline: 8px;
+    gap: 4px;
+    padding-inline: 6px;
+    font-size: 12px;
   }
 
   .profileInfo,

@@ -47,7 +47,7 @@
 .message h1 {
   margin-bottom: 8px;
   color: #172033;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-page-title);
 }
 
 .message p {

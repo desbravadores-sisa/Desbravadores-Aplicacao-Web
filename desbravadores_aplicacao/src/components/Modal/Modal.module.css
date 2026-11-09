@@ -15,6 +15,7 @@
 .dialog {
   max-width: 100%;
   max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
   box-sizing: border-box;
   border-radius: var(--radius-md);
   background: #fff;
@@ -34,7 +35,9 @@
 
 .formModal {
   width: min(380px, 100%);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .formHeader {

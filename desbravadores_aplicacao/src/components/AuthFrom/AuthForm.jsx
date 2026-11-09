@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./AuthForm.module.css";
+import logo from "../../assets/logo_tigredamontanha.png";
 import Input from "../Input/Input";
 import api from "../../service/api";
 
@@ -72,7 +73,10 @@ function AuthForm({ type }) {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Tigre da Montanha</h1>
+      <div className={styles.brand}>
+        <img className={styles.brandLogo} src={logo} alt="" />
+        <h1 className={styles.title}>Tigre da Montanha</h1>
+      </div>
       <p className={styles.subtitle}>Sistema de Gerenciamento das Tarefas</p>
 
       <form onSubmit={handleSubmit} className={styles.form}>

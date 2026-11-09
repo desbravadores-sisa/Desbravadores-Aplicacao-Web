@@ -26,7 +26,7 @@
 .pageHeader h1 {
 	margin: 0 0 5px;
 	color: #111827;
-	font-size: 27px;
+	font-size: var(--font-size-page-title);
 	font-weight: 800;
 }
 
@@ -100,6 +100,7 @@
 
 .inviteList {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	gap: 11px;
 }
 
@@ -899,6 +900,27 @@
 		flex-direction: column;
 	}
 
+	.invitesHeader {
+		align-items: stretch;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.tabs {
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.tabs button {
+		min-width: 0;
+		flex: 1 1 0;
+		padding-inline: 8px;
+	}
+
+	.pageHeader h1 {
+		font-size: var(--font-size-page-title-mobile);
+	}
+
 	.userRole {
 		width: auto;
 	}
@@ -913,3 +935,14 @@
 .inviteSuccessBody, .linkFieldWrap, .linkField, .linkField span {min-width:0;}
 .copyButton {flex-shrink:0;}
 .helperCard {min-width:0;overflow-wrap:anywhere;}
+
+.modal,
+.deleteInviteModal,
+.deactivationModal,
+.inviteSuccessModal {
+	max-height: min(640px, calc(100vh - 40px));
+	max-height: min(640px, calc(100dvh - 40px));
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}

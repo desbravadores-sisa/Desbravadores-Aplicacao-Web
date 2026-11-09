@@ -28,7 +28,7 @@
 .heading h1 {
   margin: 0 0 var(--spacing-xs);
   color: #111827;
-  font-size: var(--font-size-25px);
+  font-size: var(--font-size-page-title);
   line-height: 1.2;
   letter-spacing: 0;
   font-weight: 800;
@@ -82,6 +82,23 @@
 
 .section {
   margin-bottom: var(--spacing-lg);
+  animation: notebook-tab-enter 180ms ease-out both;
+}
+
+.membersSection {
+  animation: notebook-tab-enter 180ms ease-out both;
+}
+
+@keyframes notebook-tab-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .sectionHeader {
@@ -253,6 +270,47 @@
   border: 1px solid #e1e8f0;
   border-radius: var(--radius-sm-plus);
   background: #fff;
+}
+
+.memberPagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm-plus);
+  color: #64748b;
+  font-size: var(--font-size-caption);
+}
+
+.memberPaginationControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.memberPaginationControls button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-sm-plus);
+  border: 1px solid #dbe3ed;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: #334155;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.memberPaginationControls button:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.memberPaginationControls > span {
+  white-space: nowrap;
 }
 
 .memberTable {
@@ -471,12 +529,14 @@
 
 @media (max-width: 850px) {
   .header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
   }
 
   .primaryButton {
-    grid-column: 2;
-    grid-row: 2;
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
   }
 
   .grid {
@@ -541,7 +601,7 @@
     margin-bottom: var(--spacing-xs);
     color: #7890a8;
     content: attr(data-label);
-    font-size: var(--font-size-8px);
+    font-size: var(--font-size-2xs);
     font-weight: 700;
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -576,6 +636,10 @@
     gap: var(--spacing-10px);
   }
 
+  .heading h1 {
+    font-size: var(--font-size-page-title-mobile);
+  }
+
   .primaryButton {
     align-self: flex-start;
   }
@@ -587,6 +651,16 @@
   .membersHeading {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .memberPagination {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .memberPaginationControls {
+    justify-content: space-between;
   }
 
   .registerButton {

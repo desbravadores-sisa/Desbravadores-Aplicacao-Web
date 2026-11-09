@@ -16,7 +16,7 @@
 .pageHeader h1 {
   margin: 0 0 5px;
   color: #172033;
-  font-size: 27px;
+  font-size: var(--font-size-page-title);
   font-weight: 800;
 }
 
@@ -223,6 +223,7 @@
 .taskModal {
   width: min(535px, 100%);
   max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -486,6 +487,10 @@
   .pageHeader {
     flex-direction: column;
     gap: 15px;
+  }
+
+  .pageHeader h1 {
+    font-size: var(--font-size-page-title-mobile);
   }
 
   .taskTitleLine {

@@ -1,6 +1,10 @@
 .modal {
   width: min(540px, 100%);
-  overflow: hidden;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border-radius: 20px;
 }
 

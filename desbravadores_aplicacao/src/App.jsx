@@ -47,91 +47,16 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/cadastro" element={<RegisterPage />} />
-        <Route
-          path="/unidades"
-          element={
-            <>
-              <Navbar />
-              <Unidades />
-            </>
-          }
-        />
-        <Route
-          path="/minhas-tarefas"
-          element={
-            <>
-              <Navbar />
-              <CounselorTasks />
-            </>
-          }
-        />
-        <Route
-          path="/desbravadores"
-          element={
-            <>
-              <Navbar />
-              <CounselorDesbravadores />
-            </>
-          }
-        />
-        <Route
-          path="/unidades/:unidadeId"
-          element={
-            <>
-              <Navbar />
-              <UnidadeDashboard />
-            </>
-          }
-        />
-        <Route
-          path="/cadernos"
-          element={
-            <>
-              <Navbar />
-              <Cadernos />
-            </>
-          }
-        />
-        <Route
-          path="/cadernos/:cadernoId"
-          element={
-            <>
-              <Navbar />
-              <CadernoDetalhe />
-            </>
-          }
-        />
-        <Route
-          path="/convites"
-          element={
-            <>
-              <Navbar />
-              <Convites />
-            </>
-          }
-        />
-        <Route
-          path="/evidencias"
-          element={
-            <>
-              <Navbar />
-              <Evidencias />
-            </>
-          }
-        />
-        <Route
-          path="/tarefas"
-          element={
-            <>
-              <Navbar />
-              <Tarefas />
-            </>
-          }
-        />
-        <Route
-          path="/perfil"
-          element={<PerfilPage />}
-        />
+        <Route path="/unidades" element={<><Navbar /><Unidades /></>} />
+        <Route path="/minhas-tarefas" element={<><Navbar /><CounselorTasks /></>} />
+        <Route path="/desbravadores" element={<><Navbar /><CounselorDesbravadores /></>} />
+        <Route path="/unidades/:unidadeId" element={<><Navbar /><UnidadeDashboard /></>} />
+        <Route path="/cadernos" element={<><Navbar /><Cadernos /></>} />
+        <Route path="/cadernos/:cadernoId" element={<><Navbar /><CadernoDetalhe /></>} />
+        <Route path="/convites" element={<><Navbar /><Convites /></>} />
+        <Route path="/evidencias" element={<><Navbar /><Evidencias /></>} />
+        <Route path="/tarefas" element={<><Navbar /><Tarefas /></>} />
+        <Route path="/perfil" element={<PerfilPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {sessionExpired && (

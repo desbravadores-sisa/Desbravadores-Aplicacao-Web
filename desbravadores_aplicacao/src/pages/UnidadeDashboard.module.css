@@ -1,7 +1,7 @@
 .page {
   flex: 1;
   min-height: calc(100vh - 64px);
-  padding: 22px 24px 40px;
+  padding: 20px 20px 32px;
   background: #f8fafc;
   box-sizing: border-box;
   text-align: left;
@@ -11,7 +11,7 @@
 
 .page h2 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: var(--font-size-section-title);
   font-weight: 700;
   color: #111827;
 }
@@ -37,16 +37,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 26px;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .title {
   margin: 0 0 6px;
   font-family: var(--font-display);
-  font-size: 2.4rem;
+  font-size: var(--font-size-page-title);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .subtitle,
@@ -57,13 +58,16 @@
 
 .ownerCard {
   display: flex;
+  flex: 0 1 280px;
+  width: min(280px, 100%);
   align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
-  min-width: 300px;
-  padding: 16px;
+  box-sizing: border-box;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
   border: 1px solid #e5e7eb;
-  border-radius: 16px;
+  border-radius: 12px;
   background: #fff;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
@@ -74,25 +78,26 @@
 
 .ownerLabel {
   color: #6b7280;
-  font-size: 0.72rem;
+  font-size: var(--font-size-2xs);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .ownerName {
   margin-top: 4px !important;
-  font-size: 1.1rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .ownerAge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 8px !important;
+  gap: 5px;
+  margin-top: 6px !important;
   color: #4b5563;
-  font-size: 0.9rem;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -103,12 +108,13 @@
 .editButton {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 5px;
+  padding: 7px 10px;
   border: 0;
   border-radius: 8px;
   background: #fff7ed;
   color: #c2410c;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   cursor: pointer;
 }
@@ -120,13 +126,13 @@
 .cards {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 
 .card {
-  padding: 20px;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   background: #fff;
   transition: border-color 0.15s;
 }
@@ -148,13 +154,13 @@
 
 .cardTitle {
   color: #4b5563;
-  font-size: 0.9rem;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .cardValue {
-  margin-top: 12px !important;
-  font-size: 2.2rem;
+  margin-top: 8px !important;
+  font-size: 26px;
   font-weight: 700;
   line-height: 1;
 }
@@ -162,7 +168,7 @@
 .cardUnit {
   margin-left: 4px;
   color: #6b7280;
-  font-size: 1rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
 }
 
@@ -170,16 +176,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  font-size: 1.3rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 20px;
 }
 
 .cardHelper {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   color: #6b7280;
-  font-size: 0.88rem;
+  font-size: var(--font-size-caption);
 }
 
 .text_orange { color: #ea580c; }
@@ -194,22 +200,23 @@
 .charts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  margin-top: 24px;
+  gap: 18px;
+  margin-top: 18px;
 }
 
 .panel {
-  padding: 22px;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   background: #fff;
 }
 
 .legend {
   display: flex;
-  gap: 16px;
-  margin: 18px 0 14px;
-  font-size: 0.88rem;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 14px 0 10px;
+  font-size: var(--font-size-caption);
   font-weight: 600;
 }
 
@@ -231,9 +238,9 @@
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: end;
-  gap: 12px;
-  height: 260px;
-  padding-top: 20px;
+  gap: 8px;
+  height: 220px;
+  padding-top: 16px;
   border-bottom: 1px solid #e2e8f0;
 }
 
@@ -261,14 +268,14 @@
 .axisLabel {
   margin-top: 8px;
   color: #64748b;
-  font-size: 0.75rem;
+  font-size: var(--font-size-11px);
   font-weight: 600;
   text-align: center;
 }
 
 .curveBox {
   position: relative;
-  height: 260px;
+  height: 220px;
   overflow: hidden;
   padding: 12px 8px 0;
   border: 1px solid #f1f5f9;
@@ -279,7 +286,7 @@
 
 .curvePlot {
   position: relative;
-  height: 210px;
+  height: 170px;
 }
 
 .curveSvg {
@@ -305,7 +312,7 @@
   height: 20px;
   margin-top: 6px;
   color: #64748b;
-  font-size: 0.75rem;
+  font-size: var(--font-size-11px);
   font-weight: 600;
 }
 
@@ -315,7 +322,7 @@
 }
 
 .activities {
-  margin-top: 24px;
+  margin-top: 18px;
 }
 
 .activitiesHead {
@@ -323,7 +330,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .openBadge {
@@ -406,6 +413,7 @@
 
 .activityMeta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
@@ -440,6 +448,7 @@
 
 .panelHead {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
@@ -515,7 +524,24 @@
   }
 
   .ownerCard {
+    align-self: flex-start;
+    flex: 0 1 auto;
+    width: min(300px, 100%);
     min-width: 0;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .ownerName {
+    font-size: 15px;
+  }
+
+  .ownerAge {
+    font-size: 12px;
+  }
+
+  .editButton {
+    padding: 6px 8px;
   }
 
   .cards {
@@ -523,6 +549,6 @@
   }
 
   .title {
-    font-size: 2rem;
+    font-size: var(--font-size-page-title-mobile);
   }
 }

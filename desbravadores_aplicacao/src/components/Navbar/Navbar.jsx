@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
+import logo from "../../assets/logo_tigredamontanha.png";
 import api, { urlArquivo } from "../../service/api";
 
 // Aparência de cada notificação conforme o tipo de referência gravado pela API
@@ -141,9 +142,7 @@ function Navbar({ profileVersion = 0 }) {
     <nav className={`${styles.navbar} ${mobileMenuOpen ? styles.menuActive : ""}`}>
 
       <div className={styles.logoArea}>
-        <div className={styles.logo}>
-          <i className='bx bx-landscape'></i>
-        </div>
+        <img className={styles.logo} src={logo} alt="" />
         <span className={styles.title}>Tigre da Montanha</span>
       </div>
 
@@ -170,9 +169,7 @@ function Navbar({ profileVersion = 0 }) {
       >
         <div className={styles.drawerHeader}>
           <div className={styles.logoArea}>
-            <div className={styles.logo}>
-              <i className='bx bx-landscape' aria-hidden="true"></i>
-            </div>
+            <img className={styles.logo} src={logo} alt="" />
             <span className={styles.title}>Tigre da Montanha</span>
           </div>
           <button
