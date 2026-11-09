@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import styles from "./Modal.module.css";
 
 function Modal({
@@ -34,7 +35,7 @@ function Modal({
     };
   }, []);
 
-  return (
+  return createPortal((
     <div
       className={`${styles.backdrop} ${stacked ? styles.stackedBackdrop : ""}`}
       role="presentation"
@@ -69,7 +70,7 @@ function Modal({
         {footer && <footer className={`${styles.footer} ${footerClassName}`}>{footer}</footer>}
       </Container>
     </div>
-  );
+  ), document.body);
 }
 
 export default Modal;
