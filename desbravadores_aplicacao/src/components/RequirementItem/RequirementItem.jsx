@@ -1,13 +1,15 @@
 import styles from "./RequirementItem.module.css";
+import modalStyles from "../Modal/Modal.module.css";
 
 /**
  * @param {{
  *   requirement: { id: string, title: string, description: string },
+ *   titleError?: string,
  *   onChange: (id: string, field: "title" | "description", value: string) => void,
  *   onDelete: (requirement: { id: string, title: string, description: string }) => void
  * }} props
  */
-function RequirementItem({ requirement, onChange, onDelete }) {
+function RequirementItem({ requirement, titleError, onChange, onDelete }) {
   const titleId = `requirement-title-${requirement.id}`;
   const descriptionId = `requirement-description-${requirement.id}`;
 
@@ -15,13 +17,18 @@ function RequirementItem({ requirement, onChange, onDelete }) {
     <article className={styles.card} data-requirement-id={requirement.id}>
       <div className={styles.heading}>
         <label className={styles.visuallyHidden} htmlFor={titleId}>Título do requisito</label>
-        <input
-          id={titleId}
-          className={styles.title}
-          value={requirement.title}
-          onChange={(event) => onChange(requirement.id, "title", event.target.value)}
-          placeholder="Título do requisito"
-        />
+        <div className={styles.titleField}>
+          <input
+            id={titleId}
+            className={styles.title}
+            value={requirement.title}
+            onChange={(event) => onChange(requirement.id, "title", event.target.value)}
+            placeholder="Título do requisito"
+            aria-invalid={Boolean(titleError)}
+            aria-describedby={titleError ? `${titleId}-error` : undefined}
+          />
+          {titleError && <span id={`${titleId}-error`} className={modalStyles.fieldError} role="alert">{titleError}</span>}
+        </div>
         <button
           className={styles.deleteButton}
           type="button"

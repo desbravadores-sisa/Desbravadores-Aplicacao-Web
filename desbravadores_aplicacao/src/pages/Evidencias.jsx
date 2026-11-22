@@ -225,7 +225,7 @@ function Evidencias() {
       {modal?.type === "correction" && (
         <Modal className={styles.modal} title="Solicitar correção" eyebrow="DECISÃO DA DIRETORIA" labelledBy="correction-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={`${styles.submitButton} ${styles.submitButtonDanger}`} type="submit" disabled={!comment.trim()}><i className="bx bx-chevron-right" /> Enviar para correção</button></>} onClose={closeModal} onSubmit={requestCorrection}>
           <EvidenceSummary evidence={modal.evidence} />
-          <label htmlFor="comment">Motivo da solicitação de correção <b>*</b></label>
+          <label htmlFor="comment">Motivo da solicitação de correção</label>
           <p className={styles.helper}>Explique com clareza o que o conselheiro precisa complementar.</p>
           <textarea id="comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Ex.: incluir lista de presença e foto de todos os participantes." required />
           <div className={styles.warningBox}><i className="bx bx-shield-x" /><span>Se a entrega não for corrigida conforme solicitado, a Diretoria poderá aplicar penalidade à unidade.</span></div>

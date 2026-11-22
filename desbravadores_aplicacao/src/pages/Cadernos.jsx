@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import NotebookCard from "../components/NotebookCard/NotebookCard";
 import Modal from "../components/Modal/Modal";
 import modalStyles from "../components/Modal/Modal.module.css";
+import Pagination, { MEMBERS_PER_PAGE } from "../components/Pagination/Pagination";
 import SectionHeader from "../components/SectionHeader/SectionHeader";
 import api from "../service/api";
 import {
@@ -24,7 +25,6 @@ const notebookVisuals = {
 };
 
 const emptyMember = { name: "", birthDate: "", unit: "" };
-const MEMBERS_PER_PAGE = 8;
 
 function getInitials(name) {
   return name.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase();
@@ -51,15 +51,32 @@ function Cadernos() {
   const [units, setUnits] = useState([]);
   const [cycleModalOpen, setCycleModalOpen] = useState(false);
   const [cycleDates, setCycleDates] = useState({ startDate: "", endDate: "" });
+  const [cycleAttempted, setCycleAttempted] = useState(false);
   const [activeTab, setActiveTab] = useState("notebooks");
   const [members, setMembers] = useState([]);
   const [membersPage, setMembersPage] = useState(1);
   const [memberModal, setMemberModal] = useState(null);
   const [memberForm, setMemberForm] = useState(emptyMember);
+  const [memberSubmitError, setMemberSubmitError] = useState("");
   const [memberToDelete, setMemberToDelete] = useState(null);
   const memberBirthDate = parseDateInput(memberForm.birthDate);
   const memberAge = memberBirthDate ? getAgeFromBirthDate(memberBirthDate) : null;
   const memberAgeOutOfRange = memberAge !== null && (memberAge < 10 || memberAge > 15);
+  const memberDateError = memberForm.birthDate && !memberBirthDate
+    ? "Informe uma data válida no formato dd/mm/aaaa."
+    : memberAgeOutOfRange
+      ? "A idade calculada precisa estar entre 10 e 15 anos para vincular um caderno."
+      : "";
+  const cycleStart = parseDateInput(cycleDates.startDate);
+  const cycleEnd = parseDateInput(cycleDates.endDate);
+  const cycleStartError = cycleAttempted && cycleDates.startDate && !cycleStart
+    ? "Informe uma data válida no formato dd/mm/aaaa."
+    : "";
+  const cycleEndError = cycleAttempted && cycleDates.endDate && !cycleEnd
+    ? "Informe uma data válida no formato dd/mm/aaaa."
+    : cycleAttempted && cycleStart && cycleEnd && cycleEnd < cycleStart
+      ? "A data final deve ser igual ou posterior à inicial."
+      : "";
   const cadernos = grupos.flatMap((grupo) => grupo.items);
   const membersPageCount = Math.max(1, Math.ceil(members.length / MEMBERS_PER_PAGE));
   const currentMembersPage = Math.min(membersPage, membersPageCount);
@@ -140,6 +157,7 @@ function Cadernos() {
     event.preventDefault();
     const startDate = parseDateInput(cycleDates.startDate);
     const endDate = parseDateInput(cycleDates.endDate);
+    setCycleAttempted(true);
 
     if (!startDate || !endDate || endDate < startDate) {
       return;
@@ -166,10 +184,12 @@ function Cadernos() {
 
   function openNewMember() {
     setMemberForm({ ...emptyMember });
+    setMemberSubmitError("");
     setMemberModal({ type: "new" });
   }
 
   function openMember(member) {
+    setMemberSubmitError("");
     setMemberForm({
       name: member.name,
       birthDate: member.birthDate ? formatDate(member.birthDate) : "",
@@ -190,7 +210,12 @@ function Cadernos() {
       || (isNewMember && !memberBirthDate)
       || (memberForm.birthDate && !memberBirthDate)
       || memberAgeOutOfRange
-    ) return;
+    ) {
+      if (!memberBirthDate && !memberForm.birthDate && !isNewMember && !age) {
+        setMemberSubmitError("Informe a data de aniversário do desbravador.");
+      }
+      return;
+    }
 
     const payload = {
       nome: memberForm.name.trim(),
@@ -211,7 +236,7 @@ function Cadernos() {
       setMemberModal(null);
       await Promise.all([carregarMembros(idClube, units), carregarCadernos()]);
     } catch (err) {
-      setErro(mensagemDeErro(err, "Não foi possível salvar o desbravador. Verifique os dados e tente novamente."));
+      setMemberSubmitError(mensagemDeErro(err, "Não foi possível salvar o desbravador. Verifique os dados e tente novamente."));
     }
   }
 
@@ -238,7 +263,7 @@ function Cadernos() {
           subtitle="Gerencie os ciclos e os membros do clube."
           buttonIcon={activeTab === "notebooks" ? <i className="bx bx-plus" /> : null}
           buttonText={activeTab === "notebooks" ? "Novo ciclo" : null}
-          onButtonClick={() => setCycleModalOpen(true)}
+          onButtonClick={() => { setCycleAttempted(false); setCycleModalOpen(true); }}
         />
 
         <div className={styles.tabs} role="tablist" aria-label="Visualização dos cadernos">
@@ -366,32 +391,7 @@ function Cadernos() {
                 </tbody>
               </table>
             </div>
-            {members.length > MEMBERS_PER_PAGE && (
-              <nav className={styles.memberPagination} aria-label="Paginação dos membros">
-                <span>
-                  Exibindo {(currentMembersPage - 1) * MEMBERS_PER_PAGE + 1} a {Math.min(currentMembersPage * MEMBERS_PER_PAGE, members.length)} de {members.length}
-                </span>
-                <div className={styles.memberPaginationControls}>
-                  <button
-                    type="button"
-                    onClick={() => setMembersPage(currentMembersPage - 1)}
-                    disabled={currentMembersPage === 1}
-                    aria-label="Página anterior"
-                  >
-                    <i className="bx bx-chevron-left" aria-hidden="true" /> Anterior
-                  </button>
-                  <span aria-current="page">Página {currentMembersPage} de {membersPageCount}</span>
-                  <button
-                    type="button"
-                    onClick={() => setMembersPage(currentMembersPage + 1)}
-                    disabled={currentMembersPage === membersPageCount}
-                    aria-label="Próxima página"
-                  >
-                    Próxima <i className="bx bx-chevron-right" aria-hidden="true" />
-                  </button>
-                </div>
-              </nav>
-            )}
+            <Pagination total={members.length} page={currentMembersPage} onPageChange={setMembersPage} />
           </section>
         ))}
       </div>
@@ -421,12 +421,15 @@ function Cadernos() {
                 maxLength={10}
                 placeholder="dd/mm/aaaa"
                 value={memberForm.birthDate}
+                aria-invalid={Boolean(memberDateError)}
+                aria-describedby={memberDateError ? "member-date-error" : undefined}
                 onChange={(event) => setMemberForm((current) => ({
                   ...current,
                   birthDate: formatDateInput(event.target.value)
                 }))}
                 required={memberModal.type === "new" || Boolean(memberModal.member.birthDate)}
               />
+              {memberDateError && <span id="member-date-error" className={modalStyles.fieldError} role="alert">{memberDateError}</span>}
             </div>
             <div>
               <label htmlFor="member-unit">Unidade</label>
@@ -436,12 +439,7 @@ function Cadernos() {
               </select>
             </div>
           </div>
-          {memberForm.birthDate && !memberBirthDate && (
-            <span className={styles.memberFormError} role="alert">Informe uma data válida no formato dd/mm/aaaa.</span>
-          )}
-          {memberAgeOutOfRange && (
-            <span className={styles.memberFormError} role="alert">A idade calculada precisa estar entre 10 e 15 anos para vincular um caderno.</span>
-          )}
+          {memberSubmitError && <p className={modalStyles.formError} role="alert">{memberSubmitError}</p>}
           {memberBirthDate && !memberAgeOutOfRange && (
             <div className={styles.autoNotebookNotice}>
               <strong><i className="bx bx-info-circle" /> Caderno automático</strong>
@@ -477,7 +475,7 @@ function Cadernos() {
           </p>
           <div className={styles.cycleFields}>
             <div>
-              <label htmlFor="cycle-start-date">Data inicial</label>
+              <label htmlFor="cycle-start-date">Data Inicial</label>
               <input
                 id="cycle-start-date"
                 name="startDate"
@@ -487,11 +485,14 @@ function Cadernos() {
                 placeholder="dd/mm/aaaa"
                 value={cycleDates.startDate}
                 onChange={handleCycleChange}
+                aria-invalid={Boolean(cycleStartError)}
+                aria-describedby={cycleStartError ? "cycle-start-error" : undefined}
                 required
               />
+              {cycleStartError && <span id="cycle-start-error" className={modalStyles.fieldError} role="alert">{cycleStartError}</span>}
             </div>
             <div>
-              <label htmlFor="cycle-end-date">Data final</label>
+              <label htmlFor="cycle-end-date">Data Final</label>
               <input
                 id="cycle-end-date"
                 name="endDate"
@@ -501,8 +502,11 @@ function Cadernos() {
                 placeholder="dd/mm/aaaa"
                 value={cycleDates.endDate}
                 onChange={handleCycleChange}
+                aria-invalid={Boolean(cycleEndError)}
+                aria-describedby={cycleEndError ? "cycle-end-error" : undefined}
                 required
               />
+              {cycleEndError && <span id="cycle-end-error" className={modalStyles.fieldError} role="alert">{cycleEndError}</span>}
             </div>
           </div>
         </Modal>

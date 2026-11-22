@@ -14,6 +14,53 @@
   gap: 18px;
 }
 
+.ageGroup {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ageGroup legend {
+  margin-bottom: 8px;
+  padding: 0;
+  color: #526070;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.ageFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+}
+
+.ageFields > * {
+  min-width: 0;
+}
+
+.ageFields label {
+  grid-row: 1;
+  align-self: end;
+}
+
+.ageFields input {
+  grid-row: 2;
+}
+
+.ageInitial {
+  grid-column: 1;
+}
+
+.ageFinal {
+  grid-column: 2;
+}
+
+.ageFields .ageError {
+  grid-row: 3;
+  margin: 0;
+}
+
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

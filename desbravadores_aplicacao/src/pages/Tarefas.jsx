@@ -252,7 +252,7 @@ function Tarefas() {
 
           {isNotebookDraft && (
             <>
-              <label htmlFor="fkCaderno">Caderno vinculado <b>*</b></label>
+              <label htmlFor="fkCaderno">Caderno vinculado</label>
               <select id="fkCaderno" name="fkCaderno" value={draft.fkCaderno} onChange={handleChange} required disabled={Boolean(draft.id)}>
                 <option value="">Selecione o caderno</option>
                 {cadernos.map((caderno) => (
@@ -299,6 +299,7 @@ function Tarefas() {
           className={styles.deleteModal}
           title="Excluir Tarefa"
           labelledBy="delete-task-title"
+          headerClassName={styles.deleteHeader}
           bodyClassName={styles.deleteBody}
           footerClassName={styles.deleteActions}
           footer={<><button type="button" onClick={() => setModal(null)}>Cancelar</button><button className={styles.deleteConfirm} type="button" onClick={deleteTask} disabled={salvando}>Excluir</button></>}

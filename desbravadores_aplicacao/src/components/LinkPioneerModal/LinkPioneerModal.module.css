@@ -126,7 +126,7 @@
 
 .list button > i {
   color: #f04400;
-  font-size: 20px;
+  font-size: var(--icon-size-action);
 }
 
 .empty {

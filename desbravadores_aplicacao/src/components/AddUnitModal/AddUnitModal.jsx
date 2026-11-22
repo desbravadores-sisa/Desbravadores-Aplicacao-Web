@@ -15,7 +15,7 @@ function AddUnitModal({ form, onChange, onSubmit, onClose }) {
 
         <div className={styles.modalBody}>
           <label htmlFor="unit-name">
-            Nome da Unidade <span>*</span>
+            Nome da Unidade
           </label>
           <input
             id="unit-name"

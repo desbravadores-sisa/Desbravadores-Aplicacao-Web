@@ -242,6 +242,7 @@ function TaskActionModal({ task, onClose, onChanged }) {
   const status = task.statusKanban;
   const [checkin, setCheckin] = useState(null);
   const [arquivo, setArquivo] = useState(null);
+  const [erroArquivo, setErroArquivo] = useState("");
   const [comentario, setComentario] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState("");
@@ -280,11 +281,11 @@ function TaskActionModal({ task, onClose, onChanged }) {
   async function enviar(event) {
     event.preventDefault();
     if (!arquivo) {
-      setErro("Escolha a foto ou o PDF da evidência.");
+      setErroArquivo("Escolha a foto ou o PDF da evidência.");
       return;
     }
     if (arquivo.size > 5 * 1024 * 1024) {
-      setErro("O arquivo precisa ter até 5 MB.");
+      setErroArquivo("O arquivo precisa ter até 5 MB.");
       return;
     }
     try {
@@ -379,8 +380,12 @@ function TaskActionModal({ task, onClose, onChanged }) {
             id="evidencia-arquivo"
             type="file"
             accept="image/jpeg,image/png,image/webp,application/pdf"
-            onChange={(event) => setArquivo(event.target.files?.[0] ?? null)}
+            required
+            aria-invalid={Boolean(erroArquivo)}
+            aria-describedby={erroArquivo ? "evidencia-arquivo-error" : undefined}
+            onChange={(event) => { setArquivo(event.target.files?.[0] ?? null); setErroArquivo(""); }}
           />
+          {erroArquivo && <p id="evidencia-arquivo-error" className={modalStyles.fieldError} role="alert">{erroArquivo}</p>}
           <label htmlFor="evidencia-comentario">Comentário (opcional)</label>
           <textarea
             id="evidencia-comentario"

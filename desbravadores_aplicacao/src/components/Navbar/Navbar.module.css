@@ -70,6 +70,11 @@
   background: #f5f5f5;
 }
 
+.menuToggle > i,
+.drawerClose > i {
+  font-size: 24px;
+}
+
 .menuToggle:focus-visible,
 .drawerClose:focus-visible,
 .menu a:focus-visible {
@@ -146,6 +151,10 @@
   font-size: 21px;
 }
 
+.notificationButton > i {
+  font-size: 20px;
+}
+
 .notificationDot {
   position: absolute;
   top: 3px;
@@ -166,7 +175,7 @@
 }
 
 .profileButton > i {
-  font-size: 17px;
+  font-size: var(--icon-size-action);
 }
 
 .avatar {

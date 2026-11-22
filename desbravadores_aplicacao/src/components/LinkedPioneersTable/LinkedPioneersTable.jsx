@@ -1,15 +1,20 @@
 import ProgressBar from "../ProgressBar/ProgressBar";
+import Pagination, { MEMBERS_PER_PAGE } from "../Pagination/Pagination";
 import StatusBadge from "../StatusBadge/StatusBadge";
 import styles from "./LinkedPioneersTable.module.css";
 
 /**
  * @param {{
  *   pioneers: Array<{ id: string | number, name: string, unit: string, progress: number, completedRequirements: number, totalRequirements: number, status: string, linkedAt: string }>,
+ *   page: number,
+ *   onPageChange: (page: number) => void,
  *   onView?: (pioneer: object) => void,
  *   onUnlink?: (pioneer: object) => void
  * }} props
  */
-function LinkedPioneersTable({ pioneers, onView, onUnlink }) {
+function LinkedPioneersTable({ pioneers, page, onPageChange, onView, onUnlink }) {
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(pioneers.length / MEMBERS_PER_PAGE)));
+  const visiblePioneers = pioneers.slice((currentPage - 1) * MEMBERS_PER_PAGE, currentPage * MEMBERS_PER_PAGE);
   function getInitials(name) {
     return name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
   }
@@ -41,7 +46,7 @@ function LinkedPioneersTable({ pioneers, onView, onUnlink }) {
               </tr>
             </thead>
             <tbody>
-              {pioneers.map((pioneer) => (
+              {visiblePioneers.map((pioneer) => (
                 <tr key={pioneer.id}>
                   <td data-label="Desbravador">
                     <div className={styles.pioneer}>
@@ -94,6 +99,7 @@ function LinkedPioneersTable({ pioneers, onView, onUnlink }) {
           </table>
         </div>
       )}
+      <Pagination total={pioneers.length} page={currentPage} onPageChange={onPageChange} />
     </section>
   );
 }

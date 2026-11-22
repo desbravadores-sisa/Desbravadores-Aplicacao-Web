@@ -5,6 +5,7 @@ import IndividualRequirements from "../components/IndividualRequirements/Individ
 import LinkedPioneersTable from "../components/LinkedPioneersTable/LinkedPioneersTable";
 import Modal from "../components/Modal/Modal";
 import NotebookHeader from "../components/NotebookHeader/NotebookHeader";
+import { MEMBERS_PER_PAGE } from "../components/Pagination/Pagination";
 import RequirementsModal from "../components/RequirementsModal/RequirementsModal";
 import api from "../service/api";
 import {
@@ -28,6 +29,7 @@ function CadernoDetalhe() {
   const [isRequirementsModalOpen, setIsRequirementsModalOpen] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
   const [selectedPioneerId, setSelectedPioneerId] = useState(null);
+  const [pagination, setPagination] = useState({ cadernoId, page: 1 });
 
   const carregarRequisitos = useCallback(async (idCaderno) => {
     const tarefas = listaDaResposta(await api.get("/tarefas"));
@@ -49,6 +51,10 @@ function CadernoDetalhe() {
   const carregarVinculados = useCallback(async (idCaderno, unidades) => {
     const nomePorUnidade = Object.fromEntries((unidades ?? []).map((unidade) => [unidade.id, unidade.nome]));
     const vinculados = listaDaResposta(await api.get(`/cadernos/${idCaderno}/desbravadores`));
+    setPagination((current) => ({
+      ...current,
+      page: Math.min(current.page, Math.max(1, Math.ceil(vinculados.length / MEMBERS_PER_PAGE)))
+    }));
     setMembers(vinculados.map((v) => ({
       id: v.idDesbravador,
       name: v.nome,
@@ -264,6 +270,8 @@ function CadernoDetalhe() {
               />
               <LinkedPioneersTable
                 pioneers={pioneers}
+                page={pagination.cadernoId === cadernoId ? pagination.page : 1}
+                onPageChange={(page) => setPagination({ cadernoId, page })}
                 onView={(pioneer) => setSelectedPioneerId(pioneer.id)}
                 onUnlink={(pioneer) => setConfirmation({ type: "unlink", pioneer })}
               />

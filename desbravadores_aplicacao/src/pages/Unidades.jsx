@@ -18,6 +18,7 @@ function Unidades() {
   const [form, setForm] = useState({ nome: "", genero: "", idadeMinima: "", idadeMaxima: "" });
   const [errosFormulario, setErrosFormulario] = useState({});
   const [tentouEnviar, setTentouEnviar] = useState(false);
+  const rankedUnits = [...units].sort((a, b) => (b.pontuacao ?? 0) - (a.pontuacao ?? 0));
 
   useEffect(() => {
     carregarUnidades();
@@ -183,12 +184,13 @@ function Unidades() {
       )}
 
       <div className={styles.grid}>
-        {units.map((unit) => (
+        {rankedUnits.map((unit, index) => (
           <UnitCard
             key={unit.id}
             name={unit.nome}
             leader={unit.nomeConselheiro || "A definir"}
             minimumAge={unit.idadeMinima}
+            position={index < 3 ? index + 1 : null}
             score={unit.pontuacao || 0}
             completedTasks={unit.tarefasConcluidas || 0}
             totalTasks={unit.totalTarefas || 0}
@@ -242,33 +244,40 @@ function Unidades() {
             <option value="Misto">Misto</option>
           </select>
           {errosFormulario.genero && <p id="erro-genero-unidade" className={modalStyles.fieldError} role="alert">{errosFormulario.genero}</p>}
-          <label htmlFor="idadeMinima">Idade necessária (mínima)</label>
-          <input
-            id="idadeMinima"
-            name="idadeMinima"
-            type="number"
-            min="1"
-            max="100"
-            placeholder="Ex: 10"
-            value={form.idadeMinima}
-            onChange={alterarCampo}
-            required
-            aria-invalid={Boolean(errosFormulario.idadeMinima)}
-            aria-describedby={errosFormulario.idadeMinima ? "erro-idade-minima-unidade" : undefined}
-          />
-          {errosFormulario.idadeMinima && <p id="erro-idade-minima-unidade" className={modalStyles.fieldError} role="alert">{errosFormulario.idadeMinima}</p>}
-          <label htmlFor="idadeMaxima">Idade Máxima (opcional)</label>
-          <input
-            id="idadeMaxima"
-            name="idadeMaxima"
-            type="number"
-            min="0"
-            value={form.idadeMaxima}
-            onChange={alterarCampo}
-            aria-invalid={Boolean(errosFormulario.idadeMaxima)}
-            aria-describedby={errosFormulario.idadeMaxima ? "erro-idade-maxima-unidade" : undefined}
-          />
-          {errosFormulario.idadeMaxima && <p id="erro-idade-maxima-unidade" className={modalStyles.fieldError} role="alert">{errosFormulario.idadeMaxima}</p>}
+          <fieldset className={styles.ageGroup}>
+            <legend>Faixa etária</legend>
+            <div className={styles.ageFields}>
+              <label className={styles.ageInitial} htmlFor="idadeMinima">Idade inicial</label>
+              <label className={styles.ageFinal} htmlFor="idadeMaxima">Idade final (opcional)</label>
+              <input
+                className={styles.ageInitial}
+                id="idadeMinima"
+                name="idadeMinima"
+                type="number"
+                min="1"
+                max="100"
+                placeholder="Ex: 10"
+                value={form.idadeMinima}
+                onChange={alterarCampo}
+                required
+                aria-invalid={Boolean(errosFormulario.idadeMinima)}
+                aria-describedby={errosFormulario.idadeMinima ? "erro-idade-minima-unidade" : undefined}
+              />
+              <input
+                className={styles.ageFinal}
+                id="idadeMaxima"
+                name="idadeMaxima"
+                type="number"
+                min="0"
+                value={form.idadeMaxima}
+                onChange={alterarCampo}
+                aria-invalid={Boolean(errosFormulario.idadeMaxima)}
+                aria-describedby={errosFormulario.idadeMaxima ? "erro-idade-maxima-unidade" : undefined}
+              />
+              {errosFormulario.idadeMinima && <p id="erro-idade-minima-unidade" className={`${modalStyles.fieldError} ${styles.ageInitial} ${styles.ageError}`} role="alert">{errosFormulario.idadeMinima}</p>}
+              {errosFormulario.idadeMaxima && <p id="erro-idade-maxima-unidade" className={`${modalStyles.fieldError} ${styles.ageFinal} ${styles.ageError}`} role="alert">{errosFormulario.idadeMaxima}</p>}
+            </div>
+          </fieldset>
           {erroEnvio && <p className={modalStyles.formError} role="alert">{erroEnvio}</p>}
         </Modal>
       )}

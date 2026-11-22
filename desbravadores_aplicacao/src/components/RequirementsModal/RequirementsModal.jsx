@@ -20,6 +20,7 @@ function RequirementsModal({
   onClose
 }) {
   const [draftRequirements, setDraftRequirements] = useState(requirements);
+  const [attempted, setAttempted] = useState(false);
   const listRef = useRef(null);
   const previousCount = useRef(draftRequirements.length);
 
@@ -58,6 +59,8 @@ function RequirementsModal({
 
   function saveRequirements(event) {
     event.preventDefault();
+    setAttempted(true);
+    if (draftRequirements.some((requirement) => !requirement.title.trim())) return;
     onSave(draftRequirements);
   }
 
@@ -83,6 +86,7 @@ function RequirementsModal({
           <RequirementItem
             key={requirement.id}
             requirement={requirement}
+            titleError={attempted && !requirement.title.trim() ? "Informe o título do requisito." : ""}
             onChange={changeRequirement}
             onDelete={requestDelete}
           />

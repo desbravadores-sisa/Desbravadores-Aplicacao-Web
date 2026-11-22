@@ -58,8 +58,9 @@
 
 .ownerCard {
   display: flex;
-  flex: 0 1 280px;
-  width: min(280px, 100%);
+  flex: 0 1 380px;
+  width: min(380px, 100%);
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   box-sizing: border-box;
@@ -105,22 +106,47 @@
   color: var(--color-primary);
 }
 
-.editButton {
+.ownerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.editButton,
+.deleteButton {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 7px 10px;
   border: 0;
   border-radius: 8px;
-  background: #fff7ed;
-  color: #c2410c;
   font-size: var(--font-size-xs);
   font-weight: 700;
   cursor: pointer;
 }
 
+.editButton {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
 .editButton:hover {
   background: #ffedd5;
+}
+
+.deleteButton {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.deleteButton:hover {
+  background: #fee2e2;
+}
+
+.deleteFooter button:disabled {
+  background: #fee2e2;
+  color: #991b1b;
+  cursor: not-allowed;
 }
 
 .cards {
@@ -526,7 +552,7 @@
   .ownerCard {
     align-self: flex-start;
     flex: 0 1 auto;
-    width: min(300px, 100%);
+    width: min(380px, 100%);
     min-width: 0;
     gap: 8px;
     padding: 10px;
@@ -540,7 +566,8 @@
     font-size: 12px;
   }
 
-  .editButton {
+  .editButton,
+  .deleteButton {
     padding: 6px 8px;
   }
 

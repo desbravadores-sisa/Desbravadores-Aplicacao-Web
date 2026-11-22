@@ -104,8 +104,11 @@ function UnidadeDashboard() {
   const [erro, setErro] = useState(null);
   const [filtro, setFiltro] = useState("todas");
   const [editando, setEditando] = useState(false);
+  const [exclusaoAberta, setExclusaoAberta] = useState(false);
   const [form, setForm] = useState({ nome: "", idadeMinima: "", idadeMaxima: "" });
   const [erroForm, setErroForm] = useState(null);
+  const [erroNome, setErroNome] = useState(null);
+  const [tentouEditar, setTentouEditar] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [descontoAberto, setDescontoAberto] = useState(false);
   const [desconto, setDesconto] = useState({ pontos: "", motivo: "" });
@@ -151,6 +154,8 @@ function UnidadeDashboard() {
       idadeMaxima: dados.unidade.idadeMaxima ?? ""
     });
     setErroForm(null);
+    setErroNome(null);
+    setTentouEditar(false);
     setEditando(true);
   }
 
@@ -159,9 +164,9 @@ function UnidadeDashboard() {
     const nome = form.nome.trim();
     const min = form.idadeMinima === "" ? null : Number(form.idadeMinima);
     const max = form.idadeMaxima === "" ? null : Number(form.idadeMaxima);
+    setTentouEditar(true);
     if (!nome) return;
     if (min != null && max != null && min > max) {
-      setErroForm("A idade final deve ser maior ou igual à inicial.");
       return;
     }
     try {
@@ -176,11 +181,11 @@ function UnidadeDashboard() {
       setEditando(false);
       await carregar();
     } catch (error) {
-      setErroForm(
-        error.response?.status === 409
-          ? "Já existe uma unidade com este nome."
-          : "Não foi possível salvar as alterações."
-      );
+      if (error.response?.status === 409) {
+        setErroNome("Já existe uma unidade com este nome.");
+      } else {
+        setErroForm("Não foi possível salvar as alterações.");
+      }
     } finally {
       setSalvando(false);
     }
@@ -261,9 +266,14 @@ function UnidadeDashboard() {
               <i className="bx bx-group" /> {faixaEtaria(unidade.idadeMinima, unidade.idadeMaxima)}
             </p>
           </div>
-          <button type="button" className={styles.editButton} onClick={abrirEdicao} title="Editar dados da unidade">
-            <i className="bx bx-pencil" /> Editar
-          </button>
+          <div className={styles.ownerActions}>
+            <button type="button" className={styles.editButton} onClick={abrirEdicao} title="Editar dados da unidade">
+              <i className="bx bx-pencil" /> Editar
+            </button>
+            <button type="button" className={styles.deleteButton} onClick={() => setExclusaoAberta(true)} title="Excluir unidade">
+              <i className="bx bx-trash" /> Excluir
+            </button>
+          </div>
         </div>
       </div>
 
@@ -474,6 +484,26 @@ function UnidadeDashboard() {
         </Modal>
       )}
 
+      {exclusaoAberta && (
+        <Modal
+          className={modalStyles.formModal}
+          title="Excluir unidade"
+          labelledBy="delete-unit-dashboard-title"
+          headerClassName={modalStyles.formHeader}
+          bodyClassName={modalStyles.formBody}
+          footerClassName={`${modalStyles.formFooter} ${styles.deleteFooter}`}
+          footer={
+            <>
+              <button type="button" onClick={() => setExclusaoAberta(false)}>Cancelar</button>
+              <button type="button" disabled>Excluir</button>
+            </>
+          }
+          onClose={() => setExclusaoAberta(false)}
+        >
+          <p>Tem certeza que deseja excluir “{unidade.nome}”? Esta ação não pode ser desfeita.</p>
+        </Modal>
+      )}
+
       {editando && (
         <Modal
           className={modalStyles.formModal}
@@ -498,9 +528,12 @@ function UnidadeDashboard() {
           <input
             id="edit-nome"
             value={form.nome}
-            onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))}
+            onChange={(e) => { setForm((f) => ({ ...f, nome: e.target.value })); setErroNome(null); }}
+            aria-invalid={Boolean(erroNome)}
+            aria-describedby={erroNome ? "edit-name-error" : undefined}
             required
           />
+          {erroNome && <p id="edit-name-error" className={modalStyles.fieldError} role="alert">{erroNome}</p>}
           <label htmlFor="edit-min">Idade inicial</label>
           <input
             id="edit-min"
@@ -518,8 +551,13 @@ function UnidadeDashboard() {
             max="100"
             value={form.idadeMaxima}
             onChange={(e) => setForm((f) => ({ ...f, idadeMaxima: e.target.value }))}
+            aria-invalid={tentouEditar && form.idadeMinima !== "" && form.idadeMaxima !== "" && Number(form.idadeMinima) > Number(form.idadeMaxima)}
+            aria-describedby={tentouEditar && form.idadeMinima !== "" && form.idadeMaxima !== "" && Number(form.idadeMinima) > Number(form.idadeMaxima) ? "edit-age-error" : undefined}
           />
-          {erroForm && <p className={styles.formError}>{erroForm}</p>}
+          {tentouEditar && form.idadeMinima !== "" && form.idadeMaxima !== "" && Number(form.idadeMinima) > Number(form.idadeMaxima) && (
+            <p id="edit-age-error" className={modalStyles.fieldError} role="alert">A idade final deve ser maior ou igual à inicial.</p>
+          )}
+          {erroForm && <p className={styles.formError} role="alert">{erroForm}</p>}
         </Modal>
       )}
     </main>

@@ -19,9 +19,11 @@ function UnitCard({
 
         <h2>{name}</h2>
 
-        <span className={styles.position}>
-          #{position}
-        </span>
+        {position != null && (
+          <span className={styles.position} aria-label={`${position}º lugar`}>
+            #{position}
+          </span>
+        )}
 
       </div>
 

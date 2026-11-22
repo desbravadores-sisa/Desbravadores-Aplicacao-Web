@@ -45,6 +45,7 @@
   --font-size-body: 14px;
   --font-size-caption: 12px;
   --font-size-metric: 30px;
+  --icon-size-action: 18px;
 
   /* Espaçamentos */
   --spacing-negative-1px: -1px;
@@ -133,6 +134,10 @@ p {
 i.bx {
   line-height: 1;
   vertical-align: middle;
+}
+
+:where(button, a) > i.bx {
+  font-size: var(--icon-size-action);
 }
 
 button {

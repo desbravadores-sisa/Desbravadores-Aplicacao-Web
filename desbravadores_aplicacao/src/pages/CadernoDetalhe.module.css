@@ -1,6 +1,6 @@
 .page {
-  min-height: calc(100vh - 72px);
-  padding: 26px 36px 36px;
+  min-height: calc(100vh - 64px);
+  padding: 22px 24px 40px;
   background: #f8fafc;
   box-sizing: border-box;
 }
@@ -30,7 +30,7 @@
 .detailSurface {
   overflow: hidden;
   border: 1px solid #e1e8f0;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   background: #fff;
   box-shadow: 0 2px 3px rgba(15, 23, 42, 0.08);
 }
@@ -38,7 +38,7 @@
 .message {
   padding: 36px 24px;
   border: 1px solid #e1e8f0;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   background: #fff;
   color: #64748b;
   text-align: center;

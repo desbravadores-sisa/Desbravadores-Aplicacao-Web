@@ -1,5 +1,5 @@
 .section {
-  padding: 30px;
+  padding: 24px;
   background: #fff;
 }
 
@@ -13,7 +13,7 @@
 
 .sectionHeading h2 {
   color: #172033;
-  font-size: var(--font-size-19px);
+  font-size: var(--font-size-section-title);
   font-weight: 800;
 }
 
@@ -144,7 +144,7 @@
 }
 
 .viewButton i {
-  font-size: calc(var(--font-size-md) + 2px);
+  font-size: var(--icon-size-action);
 }
 
 .unlinkButton {

@@ -16,21 +16,110 @@
   max-width: 100%;
   max-height: calc(100vh - 40px);
   max-height: calc(100dvh - 40px);
+  overflow-x: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
   border-radius: var(--radius-md);
   background: #fff;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.24);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
 }
 
-.header h2 {
+.dialog > .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md-plus);
+  border-bottom: 1px solid #e8edf2;
+}
+
+.dialog > .header h2 {
   margin: 0;
+  color: #273449;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
-.header button {
+.dialog > .header > div {
+  min-width: 0;
+}
+
+.dialog > .header button {
+  display: block;
+  flex: 0 0 auto;
   padding: 0;
   border: 0;
   background: transparent;
+  color: #334155;
+  font-size: var(--font-size-24px);
+  line-height: 1;
   cursor: pointer;
+}
+
+.dialog > .header small,
+.dialog > .header span {
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+}
+
+.dialog > .body {
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md-plus) var(--spacing-md-plus) var(--spacing-sm-plus);
+}
+
+.dialog > .body label {
+  color: #526070;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.dialog > .body input:not([type="checkbox"]):not([type="radio"]),
+.dialog > .body select,
+.dialog > .body textarea {
+  box-sizing: border-box;
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+}
+
+.dialog > .body p,
+.dialog > .body small {
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+}
+
+.dialog > .body div:has(> .fieldError) {
+  flex-wrap: wrap;
+}
+
+.dialog > .body .fieldError {
+  flex-basis: 100%;
+}
+
+.dialog > .body [role="alert"] {
+  color: #b42318;
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+}
+
+.dialog > .footer {
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-md-plus) var(--spacing-md-plus);
+}
+
+.dialog > .footer button {
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: var(--spacing-sm-plus);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
 }
 
 .formModal {
@@ -94,13 +183,15 @@
   box-shadow: 0 0 0 2px rgba(255, 118, 30, 0.12);
 }
 
-.formBody input[aria-invalid="true"],
-.formBody select[aria-invalid="true"] {
+.dialog > .body input[aria-invalid="true"],
+.dialog > .body select[aria-invalid="true"],
+.dialog > .body textarea[aria-invalid="true"] {
   border-color: #c62828;
 }
 
-.formBody input[aria-invalid="true"]:focus,
-.formBody select[aria-invalid="true"]:focus {
+.dialog > .body input[aria-invalid="true"]:focus,
+.dialog > .body select[aria-invalid="true"]:focus,
+.dialog > .body textarea[aria-invalid="true"]:focus {
   box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.12);
 }
 
@@ -108,6 +199,7 @@
   margin: calc(-1 * var(--spacing-xs)) 0 0;
   color: #b42318;
   font-size: var(--font-size-xs);
+  font-weight: 400;
 }
 
 .formError {
@@ -144,7 +236,7 @@
 /* Modal de confirmação de exclusão (padrão: "Excluir Tarefa") */
 .confirmModal {
   width: min(360px, 100%);
-  padding: 20px;
+  padding: 0;
   border-radius: 13px;
 }
 
@@ -152,10 +244,6 @@
   margin: 0 0 12px;
   color: #273449;
   font-size: 16px;
-}
-
-.confirmModal .confirmHeader button {
-  display: none;
 }
 
 .confirmModal p {

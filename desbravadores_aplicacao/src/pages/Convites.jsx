@@ -472,7 +472,6 @@ function Convites() {
             <div>
               <strong>Para: {inviteResult.email}</strong>
             </div>
-            <button type="button" className={styles.closeInviteSuccess} aria-label="Fechar" onClick={closeInviteResultModal}>×</button>
           </div>
 
           <div className={styles.inviteMetadataRow}>
