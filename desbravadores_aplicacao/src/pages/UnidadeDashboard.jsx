@@ -105,6 +105,8 @@ function UnidadeDashboard() {
   const [filtro, setFiltro] = useState("todas");
   const [editando, setEditando] = useState(false);
   const [exclusaoAberta, setExclusaoAberta] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
+  const [erroExclusao, setErroExclusao] = useState(null);
   const [form, setForm] = useState({ nome: "", idadeMinima: "", idadeMaxima: "" });
   const [erroForm, setErroForm] = useState(null);
   const [erroNome, setErroNome] = useState(null);
@@ -223,6 +225,27 @@ function UnidadeDashboard() {
     }
   }
 
+  async function excluirUnidade() {
+    if (excluindo) return;
+    setExcluindo(true);
+    setErroExclusao(null);
+    try {
+      await api.delete(`/unidades/${unidadeId}`);
+      navigate("/unidades", { replace: true });
+    } catch (error) {
+      const status = error.response?.status;
+      setErroExclusao(
+        status === 403
+          ? "Você não tem permissão para excluir esta unidade."
+          : status === 404
+            ? "Unidade não encontrada no seu clube. Consulte a lista de unidades."
+            : "Não foi possível confirmar a exclusão. Consulte a lista de unidades antes de tentar novamente."
+      );
+    } finally {
+      setExcluindo(false);
+    }
+  }
+
   if (carregando && !dados) {
     return <main className={styles.page}><p>Carregando painel da unidade...</p></main>;
   }
@@ -270,7 +293,7 @@ function UnidadeDashboard() {
             <button type="button" className={styles.editButton} onClick={abrirEdicao} title="Editar dados da unidade">
               <i className="bx bx-pencil" /> Editar
             </button>
-            <button type="button" className={styles.deleteButton} onClick={() => setExclusaoAberta(true)} title="Excluir unidade">
+            <button type="button" className={styles.deleteButton} onClick={() => { setErroExclusao(null); setExclusaoAberta(true); }} title="Excluir unidade">
               <i className="bx bx-trash" /> Excluir
             </button>
           </div>
@@ -494,13 +517,17 @@ function UnidadeDashboard() {
           footerClassName={`${modalStyles.formFooter} ${styles.deleteFooter}`}
           footer={
             <>
-              <button type="button" onClick={() => setExclusaoAberta(false)}>Cancelar</button>
-              <button type="button" disabled>Excluir</button>
+              <button type="button" disabled={excluindo} onClick={() => setExclusaoAberta(false)}>Cancelar</button>
+              <button className={styles.deleteConfirm} type="button" disabled={excluindo} onClick={excluirUnidade}>
+                {excluindo ? "Excluindo..." : "Excluir"}
+              </button>
             </>
           }
-          onClose={() => setExclusaoAberta(false)}
+          onClose={() => { if (!excluindo) setExclusaoAberta(false); }}
         >
           <p>Tem certeza que deseja excluir “{unidade.nome}”? Esta ação não pode ser desfeita.</p>
+          <p>Os desbravadores e os dados associados serão excluídos. Os usuários serão mantidos sem unidade.</p>
+          {erroExclusao && <p className={styles.formError} role="alert">{erroExclusao}</p>}
         </Modal>
       )}
 

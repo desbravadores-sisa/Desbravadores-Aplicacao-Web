@@ -292,6 +292,7 @@ function Unidades() {
           onClose={() => setUnitToDelete(null)}
         >
           <p>Tem certeza que deseja excluir “{unitToDelete.nome}”? Esta ação não pode ser desfeita.</p>
+          <p>Os desbravadores e os dados associados serão excluídos. Os usuários serão mantidos sem unidade.</p>
         </Modal>
       )}
     </main>

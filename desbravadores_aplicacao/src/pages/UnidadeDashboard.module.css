@@ -143,10 +143,18 @@
   background: #fee2e2;
 }
 
+.deleteFooter .deleteConfirm {
+  background: #ef000b;
+  color: #fff;
+}
+
 .deleteFooter button:disabled {
+  cursor: not-allowed;
+}
+
+.deleteFooter .deleteConfirm:disabled {
   background: #fee2e2;
   color: #991b1b;
-  cursor: not-allowed;
 }
 
 .cards {
