@@ -85,7 +85,7 @@ function Evidencias() {
 
   function openRecognition(notebook) {
     setRecognition(notebook);
-    setRecognitionPoints(notebook.pontuacao || 0);
+    setRecognitionPoints(notebook.pontuacaoPrevista ?? notebook.pontuacao ?? 0);
   }
 
   async function recognizeNotebook(event) {
