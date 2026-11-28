@@ -5,6 +5,12 @@
   box-sizing: border-box;
 }
 
+.pointsError {
+  margin: 0;
+  color: #b42318;
+  font-size: 12px;
+}
+
 .pageHeader {
   margin-bottom: 24px;
 }

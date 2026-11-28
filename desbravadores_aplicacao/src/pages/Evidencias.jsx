@@ -6,6 +6,19 @@ import SectionHeader from "../components/SectionHeader/SectionHeader";
 import api, { urlArquivo } from "../service/api";
 import styles from "./Evidencias.module.css";
 
+function pointsError(value, maximum) {
+  if (maximum == null || maximum === "" || !Number.isFinite(Number(maximum)) || Number(maximum) < 0) {
+    return "Não foi possível determinar a pontuação prevista.";
+  }
+  if (value === "" || !Number.isInteger(Number(value)) || Number(value) < 0) {
+    return "Informe uma quantidade inteira de pontos maior ou igual a zero.";
+  }
+  if (Number(value) > Number(maximum)) {
+    return `A pontuação não pode ultrapassar ${maximum} pontos.`;
+  }
+  return "";
+}
+
 function Evidencias() {
   const [evidences, setEvidences] = useState([]);
   const [carregando, setCarregando] = useState(true);
@@ -46,7 +59,7 @@ function Evidencias() {
 
   function openModal(type, evidence) {
     setModal({ type, evidence });
-    setPoints(evidence.pontuacao || 0);
+    setPoints(evidence.pontuacao ?? "");
     setComment("");
   }
 
@@ -56,9 +69,10 @@ function Evidencias() {
 
   async function approveEvidence(event) {
     event.preventDefault();
+    if (pointsError(points, modal.evidence.pontuacao)) return;
     try {
       await api.put(`/evidencias/${modal.evidence.id}`, {
-        pontuacao: Number(points) || 0,
+        pontuacao: Number(points),
         comentarioFeedback: comment || null,
         status: "APROVADA",
       });
@@ -85,14 +99,15 @@ function Evidencias() {
 
   function openRecognition(notebook) {
     setRecognition(notebook);
-    setRecognitionPoints(notebook.pontuacaoPrevista ?? notebook.pontuacao ?? 0);
+    setRecognitionPoints(notebook.pontuacaoPrevista ?? notebook.pontuacao ?? "");
   }
 
   async function recognizeNotebook(event) {
     event.preventDefault();
+    if (pointsError(recognitionPoints, recognition.pontuacaoPrevista ?? recognition.pontuacao)) return;
     try {
       await api.put(`/evidencias/${recognition.id}`, {
-        pontuacao: Number(recognitionPoints) || 0,
+        pontuacao: Number(recognitionPoints),
         status: "RECONHECIDO",
       });
       setRecognition(null);
@@ -121,6 +136,9 @@ function Evidencias() {
   const isNotebook = (e) => e.tipoEvidencia === "CADERNO" || e.fkCaderno;
   const pendingEvidences = evidences.filter((e) => !isNotebook(e) && (!e.status || e.status === "PENDENTE"));
   const notebookEvidences = evidences.filter((e) => isNotebook(e) && e.status !== "RECONHECIDO");
+  const approvalPointsError = modal?.type === "approve" ? pointsError(points, modal.evidence.pontuacao) : "";
+  const recognitionMaximum = recognition?.pontuacaoPrevista ?? recognition?.pontuacao;
+  const recognitionPointsError = recognition ? pointsError(recognitionPoints, recognitionMaximum) : "";
 
   return (
     <main className={styles.page}>
@@ -213,11 +231,12 @@ function Evidencias() {
       )}
 
       {modal?.type === "approve" && (
-        <Modal className={styles.modal} title="Aprovar evidência" eyebrow="DECISÃO DA DIRETORIA" labelledBy="approve-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={styles.submitButton} type="submit"><i className="bx bx-check-circle" /> Conceder {points || 0} pts</button></>} onClose={closeModal} onSubmit={approveEvidence}>
+        <Modal className={styles.modal} title="Aprovar evidência" eyebrow="DECISÃO DA DIRETORIA" labelledBy="approve-evidence-title" headerClassName={styles.modalHeader} bodyClassName={styles.modalBody} footerClassName={styles.modalFooter} footer={<><button type="button" className={styles.cancelAction} onClick={closeModal}>Cancelar</button><button className={styles.submitButton} type="submit" disabled={Boolean(approvalPointsError)}><i className="bx bx-check-circle" /> Conceder {points || 0} pts</button></>} onClose={closeModal} onSubmit={approveEvidence}>
           <EvidenceSummary evidence={modal.evidence} />
           <label htmlFor="points">Pontos a conceder</label>
-          <p className={styles.helper}>A Diretoria pode manter ou ajustar a pontuação conforme a qualidade da entrega.</p>
-          <div className={styles.pointsInput}><input id="points" type="number" min="0" value={points} onChange={(event) => setPoints(event.target.value)} /><span>pts</span></div>
+          <p className={styles.helper}>A Diretoria pode manter ou reduzir a pontuação prevista conforme a qualidade da entrega.</p>
+          <div className={styles.pointsInput}><input id="points" type="number" min="0" max={modal.evidence.pontuacao ?? undefined} required value={points} onChange={(event) => setPoints(event.target.value)} aria-invalid={Boolean(approvalPointsError)} aria-describedby={approvalPointsError ? "points-error" : undefined} /><span>pts</span></div>
+          {approvalPointsError && <p id="points-error" className={styles.pointsError} role="alert">{approvalPointsError}</p>}
           <div className={styles.infoBox}><i className="bx bx-edit-alt" /><span>Este valor entra na pontuação líquida da unidade e atualiza o ranking imediatamente.</span></div>
         </Modal>
       )}
@@ -244,13 +263,14 @@ function Evidencias() {
           headerClassName={styles.modalHeader}
           bodyClassName={styles.modalBody}
           footerClassName={styles.modalFooter}
-          footer={<><button className={styles.cancelAction} type="button" onClick={() => setRecognition(null)}>Cancelar</button><button className={styles.recognizeButton} type="submit"><i className="bx bx-star" /> Reconhecer {recognitionPoints || 0} pts</button></>}
+          footer={<><button className={styles.cancelAction} type="button" onClick={() => setRecognition(null)}>Cancelar</button><button className={styles.recognizeButton} type="submit" disabled={Boolean(recognitionPointsError)}><i className="bx bx-star" /> Reconhecer {recognitionPoints || 0} pts</button></>}
           onSubmit={recognizeNotebook}
           onClose={() => setRecognition(null)}
         >
           <div className={styles.notebookInfoBox}><i className="bx bx-book-open" /><span>Reconhecer este caderno adiciona os pontos à pontuação da unidade. Esta ação é opcional, sem penalidade se não reconhecido.</span></div>
           <label htmlFor="notebook-points">Pontos a reconhecer</label>
-          <div className={styles.notebookPointsInput}><input id="notebook-points" type="number" min="0" value={recognitionPoints} onChange={(event) => setRecognitionPoints(event.target.value)} /><span>pts</span></div>
+          <div className={styles.notebookPointsInput}><input id="notebook-points" type="number" min="0" max={recognitionMaximum ?? undefined} required value={recognitionPoints} onChange={(event) => setRecognitionPoints(event.target.value)} aria-invalid={Boolean(recognitionPointsError)} aria-describedby={recognitionPointsError ? "notebook-points-error" : undefined} /><span>pts</span></div>
+          {recognitionPointsError && <p id="notebook-points-error" className={styles.pointsError} role="alert">{recognitionPointsError}</p>}
         </Modal>
       )}
       {evidenceToDismiss && (

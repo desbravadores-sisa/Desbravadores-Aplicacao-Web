@@ -382,11 +382,13 @@
 
 .roleOptions {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 9px;
 }
 
 .roleOptions button {
+	min-width: 0;
+	overflow-wrap: anywhere;
 	min-height: 52px;
 	padding: 9px 10px;
 	border: 1px solid #e1e7ed;
@@ -581,6 +583,11 @@
 	border-bottom: 1px solid #e7edf3;
 }
 
+.userSummaryHeader > div {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
 .avatarSmall {
 	display: grid;
 	place-items: center;
@@ -624,6 +631,10 @@
 .userSummaryMeta small {
 	color: #64748b;
 	font-size: 11px;
+}
+
+.userSummaryHeader .avatarSmall {
+	color: #fff;
 }
 
 .userSummaryMeta {
@@ -751,6 +762,11 @@
 .successHeaderRow strong {
 	color: #172033;
 	font-size: 13px;
+	overflow-wrap: anywhere;
+}
+
+.successHeaderRow > div {
+	min-width: 0;
 }
 
 .closeInviteSuccess {
@@ -785,6 +801,7 @@
 	display: block;
 	color: #172033;
 	font-size: 13px;
+	overflow-wrap: anywhere;
 }
 
 .linkFieldWrap {
@@ -930,6 +947,21 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.deactivationFooter,
+	.deleteInviteFooter {
+		flex-wrap: wrap;
+	}
+
+	.deactivationFooter button,
+	.deleteInviteFooter > button {
+		flex: 1 1 100%;
+	}
+
+	.deleteInviteText,
+	.userSummaryMeta strong {
+		overflow-wrap: anywhere;
 	}
 }
 .inviteSuccessBody, .linkFieldWrap, .linkField, .linkField span {min-width:0;}

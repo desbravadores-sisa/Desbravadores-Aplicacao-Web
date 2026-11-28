@@ -43,7 +43,9 @@
   font-size: 32px;
 }
 
-.photo span {
+.profileHeader .photo span {
+  margin-top: 0;
+  color: #fff;
   font-size: 24px;
   font-weight: 700;
 }
